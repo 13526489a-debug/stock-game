@@ -1,872 +1,2071 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>籌碼決定股價｜全班連線股票模擬</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --card-2: #273549;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --border: #334155;
-      --up: #ef4444;      /* 台股慣例：漲紅 */
-      --down: #22c55e;    /* 台股慣例：跌綠 */
-      --accent: #38bdf8;
-      --warn: #f59e0b;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      line-height: 1.5;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .topbar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 24px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.35rem;
-      font-weight: 700;
-    }
-
-    .badge {
-      font-size: 0.78rem;
-      padding: 3px 10px;
-      border-radius: 999px;
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-    }
-
-    .badge.ok {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-      border-color: rgba(34, 197, 94, 0.35);
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-    }
-
-    .card h2, .card h3 { margin-bottom: 12px; }
-
-    label {
-      display: block;
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 1rem;
-      margin-bottom: 14px;
-    }
-
-    button {
-      cursor: pointer;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 16px;
-      font-size: 0.98rem;
-      font-weight: 600;
-      color: #fff;
-      background: var(--primary);
-      transition: background 0.15s, transform 0.05s;
-    }
-
-    button:hover:not(:disabled) { background: var(--primary-hover); }
-    button:active:not(:disabled) { transform: scale(0.99); }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    button.secondary { background: var(--card-2); border: 1px solid var(--border); }
-    button.secondary:hover:not(:disabled) { background: #334155; }
-    button.warn { background: #d97706; }
-    button.warn:hover:not(:disabled) { background: #b45309; }
-    button.danger { background: #dc2626; }
-    button.danger:hover:not(:disabled) { background: #b91c1c; }
-    button.success { background: #15803d; }
-    button.success:hover:not(:disabled) { background: #166534; }
-    button.up { background: var(--up); }
-    button.down { background: #16a34a; }
-
-    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
-    .hidden { display: none !important; }
-
-    .room-banner {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      background: linear-gradient(135deg, #1e3a8a, #0f172a);
-      border: 1px solid #3b82f6;
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .room-code {
-      font-size: 2.4rem;
-      font-weight: 800;
-      letter-spacing: 6px;
-      color: #fde047;
-    }
-
-    .status-banner {
-      padding: 12px 16px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-      font-weight: 600;
-      font-size: 0.98rem;
-    }
-
-    .status-open {
-      background: rgba(34, 197, 94, 0.14);
-      border: 1px solid rgba(34, 197, 94, 0.4);
-      color: #4ade80;
-    }
-
-    .status-closed {
-      background: rgba(245, 158, 11, 0.14);
-      border: 1px solid rgba(245, 158, 11, 0.45);
-      color: #fbbf24;
-    }
-
-    .summary-box {
-      background: rgba(56, 189, 248, 0.1);
-      border-left: 4px solid var(--accent);
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-
-    .stock-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .stock-item {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-    }
-
-    .stock-price {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin: 6px 0;
-    }
-
-    .pos { color: var(--up); }
-    .neg { color: var(--down); }
-    .flat { color: var(--muted); }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    th, td {
-      text-align: left;
-      padding: 10px 8px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.95rem;
-    }
-    th { color: var(--muted); font-weight: 600; }
-
-    .portfolio-summary {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .stat-box {
-      background: var(--card-2);
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-    }
-
-    .stat-label { font-size: 0.8rem; color: var(--muted); }
-    .stat-val { font-size: 1.2rem; font-weight: 700; margin-top: 2px; }
-
-    .trade-card {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-
-    .trade-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 8px;
-    }
-
-    .trade-actions {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .trade-actions button { padding: 8px 6px; font-size: 0.85rem; }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #0f172a;
-      color: #fff;
-      border: 1px solid var(--accent);
-      padding: 10px 18px;
-      border-radius: 999px;
-      font-size: 0.92rem;
-      z-index: 999;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>華爾街風雲：五回合操盤手 | 多人即時股票交易遊戲</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        terminal: {
+                            bg: '#0b0e14',
+                            card: '#131722',
+                            border: '#2a2e39',
+                            hover: '#1e222d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0b0e14;
+            color: #d1d4dc;
+            overflow-x: hidden;
+        }
+        /* 自訂滾動條 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0e14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2e39;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #434651;
+        }
+        /* 跑馬燈動畫 */
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-ticker {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker 25s linear infinite;
+        }
+        .animate-ticker:hover {
+            animation-play-state: paused;
+        }
+        /* 價格閃爍動畫 */
+        @keyframes flashUp {
+            0% { background-color: rgba(239, 68, 68, 0.35); }
+            100% { background-color: transparent; }
+        }
+        @keyframes flashDown {
+            0% { background-color: rgba(34, 197, 94, 0.35); }
+            100% { background-color: transparent; }
+        }
+        @keyframes flashUpUS {
+            0% { background-color: rgba(34, 197, 94, 0.35); }
+            100% { background-color: transparent; }
+        }
+        @keyframes flashDownUS {
+            0% { background-color: rgba(239, 68, 68, 0.35); }
+            100% { background-color: transparent; }
+        }
+        .flash-red { animation: flashUp 0.6s ease-out; }
+        .flash-green { animation: flashDown 0.6s ease-out; }
+        .flash-us-up { animation: flashUpUS 0.6s ease-out; }
+        .flash-us-down { animation: flashDownUS 0.6s ease-out; }
+        
+        .glass-modal {
+            background: rgba(19, 23, 34, 0.92);
+            backdrop-filter: blur(12px);
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <div class="topbar">
-      <div class="brand">
-        <span>⚖️ 籌碼決定股價｜全班連線模擬</span>
-        <span id="connBadge" class="badge">連線中...</span>
-      </div>
-      <div class="btn-row">
-        <button class="secondary" onclick="goHome()">回到首頁</button>
-      </div>
-    </div>
-
-    <!-- 1. 首頁 -->
-    <div id="homeView" class="grid-2">
-      <div class="card">
-        <h2>🎤 主持人控制台（大螢幕投影）</h2>
-        <p style="color: var(--muted); margin-bottom: 16px;">
-          本回合由<strong>全班買賣力道</strong>決定漲跌；按「停止交易」後系統自動結算股價，供你講解說明，再按「下一回合」繼續。
-        </p>
-        <button onclick="createHostRoom()">建立新房間（開啟控制台）</button>
-      </div>
-
-      <div class="card">
-        <h2>📱 學生交易端（手機加入）</h2>
-        <p style="color: var(--muted); margin-bottom: 14px;">
-          輸入 4 位數房號與暱稱，起始資金 <strong>$100,000</strong>。買得多漲得多、賣得多跌得多！
-        </p>
-        <label for="joinCode">房間代碼（4 位數）</label>
-        <input id="joinCode" type="text" maxlength="4" placeholder="例如：8429" />
-
-        <label for="joinName">你的暱稱 / 學號</label>
-        <input id="joinName" type="text" maxlength="16" placeholder="例如：王小明" />
-
-        <button onclick="joinPlayerRoom()">進入交易大廳</button>
-      </div>
-    </div>
-
-    <!-- 2. 主持人控制台 -->
-    <div id="hostView" class="hidden">
-      <div class="room-banner">
-        <div>
-          <div style="font-size: 0.9rem; color: #bfdbfe;">房間代碼</div>
-          <div id="hostRoomCode" class="room-code">----</div>
-          <div id="shareUrlText" style="font-size: 0.85rem; color: #dbeafe; margin-top: 6px; word-break: break-all;"></div>
-        </div>
-        <div class="btn-row">
-          <button id="closeAndSettleBtn" class="danger" onclick="closeAndSettleRound()">⏹ 停止交易並結算股價</button>
-          <button id="nextRoundBtn" class="warn" onclick="startNextRound()" disabled>▶ 進入下一回合（開放交易）</button>
-          <button class="secondary" onclick="resetGame()">重新開始本局</button>
-        </div>
-      </div>
-
-      <div id="hostPhaseBanner" class="status-banner status-open">
-        🟢 第 <span id="hostRoundNum">1</span> 回合：交易開放中！全班買賣力道將決定封盤漲跌
-      </div>
-
-      <div class="summary-box">
-        <div style="font-size: 0.85rem; color: var(--accent); font-weight: 700;">
-          📢 回合結算與講解重點
-        </div>
-        <div id="hostExplanationText" style="font-size: 1.05rem; margin-top: 4px;">
-          目前正在進行第 1 回合交易。按下「停止交易並結算股價」後，這裡會顯示本回合籌碼變化與股價調整結果，方便你向全班說明。
-        </div>
-      </div>
-
-      <h3>即時股價與本回合淨買超（買進股數 − 賣出股數）</h3>
-      <div id="hostStocksGrid" class="stock-list"></div>
-
-      <div class="card">
-        <h3>🏆 全班即時總資產排行榜（<span id="playerCount">0</span> 人在線）</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>名次</th>
-              <th>暱稱</th>
-              <th>現金</th>
-              <th>持股市值</th>
-              <th>總資產</th>
-              <th>報酬率</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboardBody">
-            <tr><td colspan="6" style="color: var(--muted);">等待同學加入...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 3. 學生手機介面 -->
-    <div id="playerView" class="hidden">
-      <div class="card" style="margin-bottom: 16px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <div>
-            <span class="badge ok">房號 <span id="pRoomCode">----</span></span>
-            <strong id="pNameDisplay" style="margin-left: 8px; font-size: 1.1rem;"></strong>
-          </div>
-          <div style="font-size: 0.9rem; color: var(--muted);">
-            第 <strong id="pRoundNum">1</strong> 回合
-          </div>
-        </div>
-
-        <div id="playerPhaseBanner" class="status-banner status-open">
-          🟢 交易開放中！你的買賣會影響封盤股價
-        </div>
-
-        <div class="summary-box" style="margin-bottom: 14px; padding: 10px 12px;">
-          <div style="font-size: 0.78rem; color: var(--accent); font-weight: 700;">本回合結算說明</div>
-          <div id="pExplanationText" style="font-size: 0.96rem; margin-top: 2px;">等待本回合封盤結算...</div>
-        </div>
-
-        <div class="portfolio-summary">
-          <div class="stat-box">
-            <div class="stat-label">可用現金</div>
-            <div id="pCash" class="stat-val">$100,000</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">總資產（報酬率）</div>
-            <div id="pTotalAsset" class="stat-val">$100,000 (0.0%)</div>
-          </div>
-        </div>
-      </div>
-
-      <h3 style="margin-bottom: 10px;">市場股票下單（1 股為單位）</h3>
-      <div id="playerStocksList"></div>
-    </div>
-  </div>
-
-  <div id="toast" class="toast hidden"></div>
-
-  <!-- Firebase Realtime Database 初始化 -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
-    import {
-      getDatabase,
-      ref,
-      set,
-      update,
-      onValue
-    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDubiUNwvmoKOG8GuPqQ7dFjzHDxseFN9s",
-      authDomain: "project-1744995653105721933.firebaseapp.com",
-      databaseURL: "https://project-1744995653105721933-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "project-1744995653105721933",
-      storageBucket: "project-1744995653105721933.firebasestorage.app",
-      messagingSenderId: "747774125222",
-      appId: "1:747774125222:web:c4ab920774dc67411a0067",
-      measurementId: "G-9HMGX8NQ3L"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    window.fb = { db, ref, set, update, onValue };
-    window.dispatchEvent(new Event("firebase-ready"));
-  </script>
-
-  <!-- 遊戲主邏輯 -->
-  <script>
-    const INITIAL_CASH = 100000;
-    // 每 1 股淨買超（買進 - 賣出）帶來的漲跌幅權重（可依班級人數調整，例如 30 人班可設 0.015～0.025）
-    const IMPACT_PER_NET_SHARE = 0.02;
-    // 單回合最大漲跌幅上限（±25%），避免瞬間暴漲暴跌失控
-    const MAX_ROUND_MOVE = 0.25;
-
-    const DEFAULT_STOCKS = [
-      { id: "A", name: "星辰科技 (A股)", price: 100, prevPrice: 100, netFlow: 0 },
-      { id: "B", name: "海風航運 (B股)", price: 100, prevPrice: 100, netFlow: 0 },
-      { id: "C", name: "綠原能源 (C股)", price: 100, prevPrice: 100, netFlow: 0 },
-      { id: "D", name: "穩健電信 (D股)", price: 100, prevPrice: 100, netFlow: 0 }
-    ];
-
-    let currentRole = null;
-    let currentRoom = null;
-    let currentPlayerId = null;
-    let latestRoomData = null;
-
-    function showToast(msg) {
-      const el = document.getElementById("toast");
-      el.textContent = msg;
-      el.classList.remove("hidden");
-      clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => el.classList.add("hidden"), 2400);
-    }
-
-    function setBadge(text, ok = false) {
-      const badge = document.getElementById("connBadge");
-      badge.textContent = text;
-      badge.className = ok ? "badge ok" : "badge";
-    }
-
-    window.addEventListener("firebase-ready", () => {
-      setBadge("Firebase 已連線", true);
-    });
-
-    setTimeout(() => {
-      if (!window.fb) setBadge("本機離線模式", false);
-    }, 2500);
-
-    function goHome() {
-      currentRole = null;
-      document.getElementById("homeView").classList.remove("hidden");
-      document.getElementById("hostView").classList.add("hidden");
-      document.getElementById("playerView").classList.add("hidden");
-    }
-
-    function genRoomCode() {
-      return String(Math.floor(1000 + Math.random() * 9000));
-    }
-
-    function buildInitialRoom(code) {
-      const stocksObj = {};
-      DEFAULT_STOCKS.forEach(s => {
-        stocksObj[s.id] = { ...s };
-      });
-      return {
-        code,
-        round: 1,
-        tradingOpen: true,
-        explanation: "第 1 回合交易進行中！全班買賣力道將在封盤時決定各股漲跌。",
-        stocks: stocksObj,
-        players: {}
-      };
-    }
-
-    function writeRoom(code, data) {
-      if (window.fb) {
-        return window.fb.set(window.fb.ref(window.fb.db, "rooms/" + code), data);
-      } else {
-        localStorage.setItem("room_" + code, JSON.stringify(data));
-        renderRoom(data);
-        return Promise.resolve();
-      }
-    }
-
-    function patchRoom(path, value) {
-      if (window.fb) {
-        const targetRef = path === ""
-          ? window.fb.ref(window.fb.db, "rooms/" + currentRoom)
-          : window.fb.ref(window.fb.db, "rooms/" + currentRoom + "/" + path);
-        return window.fb.update(targetRef, value);
-      } else {
-        const raw = localStorage.getItem("room_" + currentRoom);
-        if (!raw) return Promise.resolve();
-        const data = JSON.parse(raw);
-        if (path === "") {
-          Object.assign(data, value);
-        } else {
-          const parts = path.split("/");
-          let target = data;
-          for (let i = 0; i < parts.length - 1; i++) {
-            target[parts[i]] = target[parts[i]] || {};
-            target = target[parts[i]];
-          }
-          target[parts[parts.length - 1]] = {
-            ...(target[parts[parts.length - 1]] || {}),
-            ...value
-          };
-        }
-        localStorage.setItem("room_" + currentRoom, JSON.stringify(data));
-        renderRoom(data);
-        return Promise.resolve();
-      }
-    }
-
-    function subscribeRoom(code) {
-      if (window.fb) {
-        window.fb.onValue(window.fb.ref(window.fb.db, "rooms/" + code), (snap) => {
-          const val = snap.val();
-          if (val) {
-            latestRoomData = val;
-            renderRoom(val);
-          }
-        });
-      } else {
-        setInterval(() => {
-          const raw = localStorage.getItem("room_" + code);
-          if (raw) {
-            latestRoomData = JSON.parse(raw);
-            renderRoom(latestRoomData);
-          }
-        }, 500);
-      }
-    }
-
-    async function createHostRoom() {
-      const code = genRoomCode();
-      currentRole = "host";
-      currentRoom = code;
-      const initial = buildInitialRoom(code);
-      await writeRoom(code, initial);
-      subscribeRoom(code);
-
-      document.getElementById("homeView").classList.add("hidden");
-      document.getElementById("playerView").classList.add("hidden");
-      document.getElementById("hostView").classList.remove("hidden");
-
-      document.getElementById("hostRoomCode").textContent = code;
-      document.getElementById("shareUrlText").textContent =
-        "網址：" + window.location.href.split("?")[0] + " ｜ 房號：" + code;
-      renderRoom(initial);
-      showToast("房間 " + code + " 已建立！");
-    }
-
-    async function joinPlayerRoom() {
-      const code = document.getElementById("joinCode").value.trim();
-      const name = document.getElementById("joinName").value.trim();
-      if (!/^\d{4}$/.test(code)) return showToast("請輸入 4 位數數字房號");
-      if (!name) return showToast("請輸入你的暱稱或學號");
-
-      currentRole = "player";
-      currentRoom = code;
-      currentPlayerId = "p_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-
-      const playerObj = { name, cash: INITIAL_CASH, holdings: {} };
-
-      if (window.fb) {
-        await window.fb.set(
-          window.fb.ref(window.fb.db, `rooms/${code}/players/${currentPlayerId}`),
-          playerObj
-        );
-      } else {
-        const raw = localStorage.getItem("room_" + code);
-        const data = raw ? JSON.parse(raw) : buildInitialRoom(code);
-        data.players = data.players || {};
-        data.players[currentPlayerId] = playerObj;
-        localStorage.setItem("room_" + code, JSON.stringify(data));
-      }
-
-      subscribeRoom(code);
-
-      document.getElementById("homeView").classList.add("hidden");
-      document.getElementById("hostView").classList.add("hidden");
-      document.getElementById("playerView").classList.remove("hidden");
-
-      document.getElementById("pRoomCode").textContent = code;
-      document.getElementById("pNameDisplay").textContent = name;
-      showToast("已加入房間 " + code);
-    }
-
-    // 停止交易並依全班淨買超結算股價
-    async function closeAndSettleRound() {
-      if (!latestRoomData) return;
-      if (!latestRoomData.tradingOpen) {
-        return showToast("本回合已經停止交易並結算了！");
-      }
-
-      const stocksMap = latestRoomData.stocks || {};
-      const updatedStocks = {};
-      const notes = [];
-
-      Object.values(stocksMap).forEach(s => {
-        const flow = s.netFlow || 0;
-        const rawChange = flow * IMPACT_PER_NET_SHARE;
-        const clampedChange = Math.max(-MAX_ROUND_MOVE, Math.min(MAX_ROUND_MOVE, rawChange));
-        const newPrice = Math.max(10, Math.round(s.price * (1 + clampedChange)));
-        const pctText = ((clampedChange >= 0 ? "+" : "") + (clampedChange * 100).toFixed(1) + "%");
-
-        updatedStocks[s.id] = {
-          ...s,
-          prevPrice: s.price,
-          price: newPrice
-        };
-
-        notes.push(`${s.name}：淨買超 ${flow >= 0 ? "+" : ""}${flow} 股 ➔ 股價 $${s.price} → $${newPrice}（${pctText}）`);
-      });
-
-      const explanation =
-        `第 ${latestRoomData.round} 回合已封盤！本回合股價由全班籌碼決定：` + notes.join("；") +
-        `。請主持人說明盤勢後，點擊「進入下一回合」。`;
-
-      await patchRoom("", {
-        tradingOpen: false,
-        stocks: updatedStocks,
-        explanation
-      });
-      showToast("已停止交易並結算本回合股價！");
-    }
-
-    // 進入下一回合：歸零本回合 netFlow 並重新開放交易
-    async function startNextRound() {
-      if (!latestRoomData) return;
-      if (latestRoomData.tradingOpen) {
-        return showToast("請先按「停止交易並結算股價」結束本回合！");
-      }
-
-      const nextRound = (latestRoomData.round || 1) + 1;
-      const resetStocks = {};
-      Object.values(latestRoomData.stocks || {}).forEach(s => {
-        resetStocks[s.id] = {
-          ...s,
-          netFlow: 0
-        };
-      });
-
-      await patchRoom("", {
-        round: nextRound,
-        tradingOpen: true,
-        stocks: resetStocks,
-        explanation: `第 ${nextRound} 回合開始！本回合淨買超已歸零，請同學根據目前價格與策略進行買賣。`
-      });
-      showToast(`已進入第 ${nextRound} 回合並開放交易！`);
-    }
-
-    async function resetGame() {
-      if (!currentRoom) return;
-      const fresh = buildInitialRoom(currentRoom);
-      const oldPlayers = latestRoomData?.players || {};
-      Object.keys(oldPlayers).forEach(pid => {
-        fresh.players[pid] = {
-          name: oldPlayers[pid].name,
-          cash: INITIAL_CASH,
-          holdings: {}
-        };
-      });
-      await writeRoom(currentRoom, fresh);
-      showToast("已重置為第 1 回合！");
-    }
-
-    function calcPlayerTotal(player, stocksMap) {
-      let stockVal = 0;
-      const holdings = player.holdings || {};
-      Object.keys(holdings).forEach(sid => {
-        const qty = holdings[sid] || 0;
-        const price = stocksMap[sid]?.price || 0;
-        stockVal += qty * price;
-      });
-      const cash = player.cash ?? INITIAL_CASH;
-      return { cash, stockVal, total: cash + stockVal };
-    }
-
-    async function trade(stockId, action) {
-      if (!latestRoomData || !currentPlayerId) return;
-      if (!latestRoomData.tradingOpen) {
-        return showToast("本回合已停止交易，請看主持人說明並等待下一回合！");
-      }
-
-      const player = latestRoomData.players?.[currentPlayerId];
-      const stock = latestRoomData.stocks?.[stockId];
-      if (!player || !stock) return;
-
-      let cash = player.cash ?? INITIAL_CASH;
-      const holdings = { ...(player.holdings || {}) };
-      let qty = holdings[stockId] || 0;
-      const price = stock.price;
-      let deltaFlow = 0;
-
-      if (action === "buy1") {
-        if (cash < price) return showToast("現金不足買進 1 股");
-        cash -= price;
-        qty += 1;
-        deltaFlow = 1;
-      } else if (action === "buyAll") {
-        const maxBuy = Math.floor(cash / price);
-        if (maxBuy <= 0) return showToast("現金不足");
-        cash -= maxBuy * price;
-        qty += maxBuy;
-        deltaFlow = maxBuy;
-      } else if (action === "sell1") {
-        if (qty <= 0) return showToast("目前沒有持股可賣");
-        cash += price;
-        qty -= 1;
-        deltaFlow = -1;
-      } else if (action === "sellAll") {
-        if (qty <= 0) return showToast("目前沒有持股可賣");
-        cash += qty * price;
-        deltaFlow = -qty;
-        qty = 0;
-      }
-
-      holdings[stockId] = qty;
-      const nextFlow = (stock.netFlow || 0) + deltaFlow;
-
-      await patchRoom("players/" + currentPlayerId, { cash, holdings });
-      await patchRoom("stocks/" + stockId, { netFlow: nextFlow });
-      showToast("委託已成交（已影響本回合籌碼）！");
-    }
-
-    function renderRoom(data) {
-      const stocksMap = data.stocks || {};
-      const stocksArr = Object.values(stocksMap);
-      const playersMap = data.players || {};
-      const isOpen = Boolean(data.tradingOpen);
-
-      const playersArr = Object.entries(playersMap).map(([id, p]) => {
-        const stats = calcPlayerTotal(p, stocksMap);
-        return { id, ...p, ...stats };
-      }).sort((a, b) => b.total - a.total);
-
-      if (currentRole === "host") {
-        document.getElementById("hostRoundNum").textContent = data.round;
-        document.getElementById("hostExplanationText").textContent = data.explanation || "";
-        document.getElementById("playerCount").textContent = playersArr.length;
-
-        const closeBtn = document.getElementById("closeAndSettleBtn");
-        const nextBtn = document.getElementById("nextRoundBtn");
-        const phaseBanner = document.getElementById("hostPhaseBanner");
-
-        if (isOpen) {
-          closeBtn.disabled = false;
-          nextBtn.disabled = true;
-          phaseBanner.textContent = `🟢 第 ${data.round} 回合：交易開放中！全班買賣力道將決定封盤漲跌`;
-          phaseBanner.className = "status-banner status-open";
-        } else {
-          closeBtn.disabled = true;
-          nextBtn.disabled = false;
-          phaseBanner.textContent = `🟡 第 ${data.round} 回合已封盤結算！請向全班說明盤勢，再按「進入下一回合」`;
-          phaseBanner.className = "status-banner status-closed";
-        }
-
-        document.getElementById("hostStocksGrid").innerHTML = stocksArr.map(s => {
-          const diff = s.price - s.prevPrice;
-          const pct = s.prevPrice ? ((diff / s.prevPrice) * 100).toFixed(1) : "0.0";
-          const cls = diff > 0 ? "pos" : diff < 0 ? "neg" : "flat";
-          const arrow = diff > 0 ? "▲" : diff < 0 ? "▼" : "—";
-          const flow = s.netFlow || 0;
-          const flowCls = flow > 0 ? "pos" : flow < 0 ? "neg" : "flat";
-          return `
-            <div class="stock-item">
-              <div style="font-weight: 700;">${s.name}</div>
-              <div class="stock-price ${cls}">$${s.price.toLocaleString()}</div>
-              <div class="${cls}" style="font-size: 0.9rem;">上輪變動：${arrow} ${diff >= 0 ? "+" : ""}${diff} (${pct}%)</div>
-              <div class="${flowCls}" style="font-size: 0.88rem; margin-top: 4px;">
-                本回合淨買超：<strong>${flow >= 0 ? "+" : ""}${flow}</strong> 股
-              </div>
+<body class="min-h-screen flex flex-col font-sans select-none">
+
+    <!-- 頂部導覽列 -->
+    <header class="bg-terminal-card border-b border-terminal-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-30">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
+                <i class="fa-solid fa-chart-line text-lg"></i>
             </div>
-          `;
-        }).join("");
-
-        const tbody = document.getElementById("leaderboardBody");
-        if (playersArr.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" style="color: var(--muted);">等待同學加入...</td></tr>`;
-        } else {
-          tbody.innerHTML = playersArr.map((p, idx) => {
-            const ret = (((p.total - INITIAL_CASH) / INITIAL_CASH) * 100).toFixed(1);
-            const cls = p.total >= INITIAL_CASH ? "pos" : "neg";
-            return `
-              <tr>
-                <td><strong>#${idx + 1}</strong></td>
-                <td>${p.name}</td>
-                <td>$${p.cash.toLocaleString()}</td>
-                <td>$${p.stockVal.toLocaleString()}</td>
-                <td><strong>$${p.total.toLocaleString()}</strong></td>
-                <td class="${cls}">${ret >= 0 ? "+" : ""}${ret}%</td>
-              </tr>
-            `;
-          }).join("");
-        }
-      }
-
-      if (currentRole === "player") {
-        document.getElementById("pRoundNum").textContent = data.round;
-        document.getElementById("pExplanationText").textContent = data.explanation || "";
-
-        const pBanner = document.getElementById("playerPhaseBanner");
-        if (isOpen) {
-          pBanner.textContent = `🟢 第 ${data.round} 回合交易開放中！你的買賣會影響封盤股價`;
-          pBanner.className = "status-banner status-open";
-        } else {
-          pBanner.textContent = `🟡 第 ${data.round} 回合已停止交易！請聽主持人說明並等待下一回合`;
-          pBanner.className = "status-banner status-closed";
-        }
-
-        const me = playersMap[currentPlayerId] || { name: "", cash: INITIAL_CASH, holdings: {} };
-        const stats = calcPlayerTotal(me, stocksMap);
-        const ret = (((stats.total - INITIAL_CASH) / INITIAL_CASH) * 100).toFixed(1);
-        const retCls = stats.total >= INITIAL_CASH ? "pos" : "neg";
-
-        document.getElementById("pCash").textContent = "$" + stats.cash.toLocaleString();
-        document.getElementById("pTotalAsset").innerHTML =
-          `$${stats.total.toLocaleString()} <span class="${retCls}" style="font-size:0.9rem;">(${ret >= 0 ? "+" : ""}${ret}%)</span>`;
-
-        const disAttr = isOpen ? "" : "disabled";
-        document.getElementById("playerStocksList").innerHTML = stocksArr.map(s => {
-          const qty = me.holdings?.[s.id] || 0;
-          const diff = s.price - s.prevPrice;
-          const cls = diff > 0 ? "pos" : diff < 0 ? "neg" : "flat";
-          return `
-            <div class="trade-card">
-              <div class="trade-header">
-                <strong>${s.name}</strong>
-                <span class="${cls}" style="font-size: 1.15rem; font-weight: 700;">$${s.price.toLocaleString()}</span>
-              </div>
-              <div style="font-size: 0.88rem; color: var(--muted);">
-                目前持有：<strong>${qty}</strong> 股（市值 $${(qty * s.price).toLocaleString()}）
-              </div>
-              <div class="trade-actions">
-                <button class="up" ${disAttr} onclick="trade('${s.id}', 'buy1')">買 1 股</button>
-                <button class="up" ${disAttr} onclick="trade('${s.id}', 'buyAll')">全倉買</button>
-                <button class="down" ${disAttr} onclick="trade('${s.id}', 'sell1')">賣 1 股</button>
-                <button class="down" ${disAttr} onclick="trade('${s.id}', 'sellAll')">全出清</button>
-              </div>
+            <div>
+                <h1 class="font-bold text-white text-base sm:text-lg tracking-tight flex items-center gap-2">
+                    華爾街風雲 <span class="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 font-mono">5-ROUND TERMINAL</span>
+                </h1>
+                <p class="text-[11px] text-gray-400 hidden sm:block">即時多人供需演算 × 新聞事件驅動交易模擬</p>
             </div>
-          `;
-        }).join("");
-      }
-    }
-  </script>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- 漲跌顏色切換 (台股紅漲綠跌 vs 美股綠漲紅跌) -->
+            <button id="btn-color-scheme" onclick="toggleColorScheme()" class="px-2.5 py-1.5 rounded-lg bg-terminal-bg border border-terminal-border hover:border-gray-500 text-xs font-medium flex items-center gap-1.5 transition" title="切換台股/美股漲跌配色">
+                <span id="color-scheme-indicator" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                <span id="color-scheme-text">台股配色 (紅漲綠跌)</span>
+            </button>
+
+            <!-- Firebase 設定按鈕 -->
+            <button onclick="openModal('modal-firebase')" class="px-2.5 py-1.5 rounded-lg bg-terminal-bg border border-terminal-border hover:border-amber-500/50 text-xs font-medium text-amber-400 flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-cloud"></i>
+                <span class="hidden md:inline" id="conn-status-text">連線設定</span>
+            </button>
+
+            <!-- GitHub Pages 部署與下載按鈕 -->
+            <button onclick="openModal('modal-github')" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/40 hover:bg-emerald-600/30 text-emerald-400 text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-brands fa-github text-sm"></i>
+                <span>部署 / 匯出 HTML</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 即時成交與新聞跑馬燈 -->
+    <div id="ticker-bar" class="bg-[#080a0f] border-b border-terminal-border py-1.5 px-4 overflow-hidden flex items-center gap-3 text-xs font-mono">
+        <span class="px-2 py-0.5 rounded bg-red-600 text-white font-bold text-[10px] shrink-0 animate-pulse">LIVE 盤中快訊</span>
+        <div class="overflow-hidden w-full relative h-4">
+            <div id="ticker-content" class="animate-ticker text-gray-300">
+                歡迎來到華爾街風雲終端機！請輸入暱稱建立或加入房間，每回合將發布重大財經新聞並進行 30 秒即時供需交易...
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 畫面 1: 遊戲大廳 (LOBBY) ==================== -->
+    <main id="view-lobby" class="flex-1 flex items-center justify-center p-4">
+        <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- 左側：建立 / 加入房間 -->
+            <div class="lg:col-span-7 bg-terminal-card border border-terminal-border rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col justify-between">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-4">
+                        <i class="fa-solid fa-bolt"></i> 支援 GitHub Pages 無伺服器多人連線
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">進入交易大廳</h2>
+                    <p class="text-gray-400 text-sm mb-6">起始資金 <span class="text-white font-mono font-bold">$100,000</span>，歷經 5 回合新聞衝擊與玩家多空對決，資產最高者勝出！</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">操盤手暱稱</label>
+                            <input type="text" id="input-nickname" maxlength="12" placeholder="例如：少年股神、華爾街之狼" 
+                                class="w-full bg-terminal-bg border border-terminal-border focus:border-blue-500 rounded-xl px-4 py-3 text-white font-medium outline-none transition">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <!-- 單人 AI 模式 -->
+                            <div class="bg-terminal-bg/80 border border-terminal-border rounded-xl p-4 flex flex-col justify-between hover:border-indigo-500/50 transition">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-indigo-400 font-bold text-sm"><i class="fa-solid fa-robot mr-1.5"></i>單人實戰 (含 AI 對手)</span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300">免設定即玩</span>
+                                    </div>
+                                    <p class="text-xs text-gray-400 mb-4">與 3 位不同風格的 AI 操盤手同場競技，AI 會根據新聞與盤勢自動下單影響股價。</p>
+                                </div>
+                                <button onclick="startSoloGame()" class="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/20 transition cursor-pointer">
+                                    立即開始單人局
+                                </button>
+                            </div>
+
+                            <!-- 線上多人模式 -->
+                            <div class="bg-terminal-bg/80 border border-terminal-border rounded-xl p-4 flex flex-col justify-between hover:border-blue-500/50 transition">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-blue-400 font-bold text-sm"><i class="fa-solid fa-users mr-1.5"></i>線上多人連線</span>
+                                        <span id="multiplayer-badge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">已就緒</span>
+                                    </div>
+                                    <input type="text" id="input-room-code" maxlength="6" placeholder="輸入 4~6 碼房號 (留空自動建立)" 
+                                        class="w-full bg-terminal-card border border-terminal-border focus:border-blue-500 rounded-lg px-3 py-2 text-white font-mono text-sm uppercase outline-none mb-3">
+                                </div>
+                                <button onclick="joinOrCreateMultiplayer()" class="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-600/20 transition cursor-pointer">
+                                    建立 / 加入多人房間
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-terminal-border flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
+                    <span><i class="fa-solid fa-shield-halved mr-1"></i>即時供需演算引擎 v2.5</span>
+                    <span>支援手機、平板與桌面瀏覽器</span>
+                </div>
+            </div>
+
+            <!-- 右側：規則說明與 5 檔標的預覽 -->
+            <div class="lg:col-span-5 bg-terminal-card border border-terminal-border rounded-2xl p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-blue-400"></i> 交易室規則與掛牌標的
+                    </h3>
+                    
+                    <div class="space-y-3 text-xs text-gray-300 mb-6">
+                        <div class="flex gap-3 items-start bg-terminal-bg p-3 rounded-xl border border-terminal-border/60">
+                            <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center shrink-0">1</span>
+                            <div>
+                                <p class="font-bold text-white">新聞快訊階段 (8 秒)</p>
+                                <p class="text-gray-400 mt-0.5">每回合開盤前發布突發新聞，包含產業利多、黑天鵝或政策轉向，預告本回合股價基本面趨勢。</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start bg-terminal-bg p-3 rounded-xl border border-terminal-border/60">
+                            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 font-bold flex items-center justify-center shrink-0">2</span>
+                            <div>
+                                <p class="font-bold text-white">盤中即時交易 (30 秒)</p>
+                                <p class="text-gray-400 mt-0.5">股價每秒跳動！<span class="text-amber-400">新聞動能</span>加上<span class="text-emerald-400">所有線上玩家的即時買賣單</span>將直接推升或砸盤股價。</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start bg-terminal-bg p-3 rounded-xl border border-terminal-border/60">
+                            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center shrink-0">3</span>
+                            <div>
+                                <p class="font-bold text-white">五回合最終結算</p>
+                                <p class="text-gray-400 mt-0.5">第 5 回合結束後強制平倉結算總淨值，爭奪「華爾街之狼」最高榮譽！</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">掛牌交易標的 (5 檔)</div>
+                    <div class="grid grid-cols-1 gap-1.5 text-xs">
+                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
+                            <span class="font-bold text-white"><span class="text-blue-400 font-mono mr-1.5">TSMC</span>護國神山晶圓</span>
+                            <span class="text-gray-400 font-mono">起始 $100</span>
+                        </div>
+                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
+                            <span class="font-bold text-white"><span class="text-purple-400 font-mono mr-1.5">NVDA</span>超微算力科技</span>
+                            <span class="text-gray-400 font-mono">起始 $120</span>
+                        </div>
+                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
+                            <span class="font-bold text-white"><span class="text-emerald-400 font-mono mr-1.5">BIOX</span>基因生技醫療</span>
+                            <span class="text-gray-400 font-mono">起始 $60</span>
+                        </div>
+                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
+                            <span class="font-bold text-white"><span class="text-cyan-400 font-mono mr-1.5">SHIP</span>長榮綠能航運</span>
+                            <span class="text-gray-400 font-mono">起始 $50</span>
+                        </div>
+                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
+                            <span class="font-bold text-white"><span class="text-amber-400 font-mono mr-1.5">COIN</span>區塊鏈加密金控</span>
+                            <span class="text-gray-400 font-mono">起始 $80</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== 畫面 2: 多人等候室 (WAITING ROOM) ==================== -->
+    <section id="view-waiting" class="hidden flex-1 flex items-center justify-center p-4">
+        <div class="max-w-lg w-full bg-terminal-card border border-terminal-border rounded-2xl p-6 sm:p-8 shadow-2xl text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-3">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 多人連線房間已建立
+            </div>
+            <h2 class="text-xl font-bold text-white mb-1">邀請好友加入交易室</h2>
+            <p class="text-xs text-gray-400 mb-5">分享下方房間代碼給好友，全員到齊後由房主點擊開始</p>
+
+            <div class="bg-terminal-bg border border-terminal-border rounded-xl p-4 mb-6 flex items-center justify-between">
+                <div class="text-left">
+                    <div class="text-[11px] text-gray-400">房間代碼 (ROOM CODE)</div>
+                    <div id="display-room-code" class="text-3xl font-mono font-extrabold text-blue-400 tracking-widest">----</div>
+                </div>
+                <button onclick="copyRoomCode()" class="px-4 py-2 rounded-lg bg-terminal-card hover:bg-terminal-hover border border-terminal-border text-xs font-semibold text-white flex items-center gap-1.5 transition cursor-pointer">
+                    <i class="fa-regular fa-copy"></i> 複製房號
+                </button>
+            </div>
+
+            <div class="text-left mb-6">
+                <div class="flex justify-between items-center text-xs text-gray-400 mb-2">
+                    <span>已連線操盤手 (<span id="waiting-player-count">1</span> 人)</span>
+                    <span>初始資金 $100,000</span>
+                </div>
+                <div id="waiting-player-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <!-- 動態生成玩家列表 -->
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="leaveRoom()" class="px-4 py-3 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-gray-300 font-semibold text-sm transition cursor-pointer">
+                    離開房間
+                </button>
+                <button id="btn-host-start" onclick="hostStartGame()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/25 transition cursor-pointer">
+                    <i class="fa-solid fa-play mr-1.5"></i> 開始第 1 回合交易
+                </button>
+            </div>
+            <p id="waiting-guest-msg" class="hidden text-xs text-amber-400 mt-3 animate-pulse">
+                <i class="fa-solid fa-spinner fa-spin mr-1"></i> 等待房主開始遊戲...
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== 畫面 3: 主交易終端機 (TRADING ARENA) ==================== -->
+    <section id="view-game" class="hidden flex-1 flex flex-col max-w-[1600px] w-full mx-auto p-3 sm:p-4 gap-3 sm:gap-4">
+        
+        <!-- 頂部狀態儀表板：回合數、階段倒數、個人資產總覽 -->
+        <div class="grid grid-cols-2 lg:grid-cols-12 gap-3">
+            <!-- 回合與倒數計時器 -->
+            <div class="col-span-2 lg:col-span-4 bg-terminal-card border border-terminal-border rounded-xl p-3.5 flex items-center justify-between">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span id="game-round-badge" class="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-mono font-bold text-xs">ROUND 1 / 5</span>
+                        <span id="game-phase-badge" class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-xs">新聞發布中</span>
+                    </div>
+                    <div id="game-room-label" class="text-[11px] text-gray-400 font-mono mt-1.5">模式：單人實戰</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] text-gray-400 uppercase font-semibold">階段剩餘時間</div>
+                    <div id="game-timer" class="text-3xl font-mono font-extrabold text-white leading-none mt-0.5">08<span class="text-sm text-gray-400 ml-0.5">s</span></div>
+                </div>
+            </div>
+
+            <!-- 個人現金餘額 -->
+            <div class="col-span-1 lg:col-span-3 bg-terminal-card border border-terminal-border rounded-xl p-3.5 flex flex-col justify-center">
+                <div class="text-xs text-gray-400 flex items-center justify-between">
+                    <span>可用現金 (CASH)</span>
+                    <i class="fa-solid fa-wallet text-gray-500"></i>
+                </div>
+                <div id="player-cash" class="text-xl sm:text-2xl font-mono font-bold text-white mt-1">$100,000</div>
+            </div>
+
+            <!-- 股票持倉市值 -->
+            <div class="col-span-1 lg:col-span-2 bg-terminal-card border border-terminal-border rounded-xl p-3.5 flex flex-col justify-center">
+                <div class="text-xs text-gray-400 flex items-center justify-between">
+                    <span>持倉市值</span>
+                    <i class="fa-solid fa-briefcase text-gray-500"></i>
+                </div>
+                <div id="player-stock-value" class="text-xl sm:text-2xl font-mono font-bold text-blue-400 mt-1">$0</div>
+            </div>
+
+            <!-- 總資產淨值與報酬率 -->
+            <div class="col-span-2 lg:col-span-3 bg-gradient-to-r from-terminal-card to-[#181e2c] border border-blue-500/30 rounded-xl p-3.5 flex flex-col justify-center">
+                <div class="text-xs text-gray-300 flex items-center justify-between">
+                    <span>總資產淨值 (NET WORTH)</span>
+                    <span id="player-roi" class="font-mono font-bold text-xs px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">0.00%</span>
+                </div>
+                <div id="player-net-worth" class="text-2xl sm:text-3xl font-mono font-extrabold text-white mt-0.5">$100,000</div>
+            </div>
+        </div>
+
+        <!-- 當回合新聞快訊橫幅 -->
+        <div id="active-news-banner" class="bg-gradient-to-r from-amber-950/60 via-terminal-card to-terminal-card border border-amber-500/40 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                    <i class="fa-solid fa-newspaper text-lg"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">第 <span id="banner-round-num">1</span> 回合頭條新聞</span>
+                        <span id="banner-news-tag" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">市場焦點</span>
+                    </div>
+                    <h3 id="banner-news-title" class="text-white font-bold text-sm sm:text-base mt-0.5">載入中...</h3>
+                    <p id="banner-news-desc" class="text-xs text-gray-300 mt-0.5">請留意新聞對各產業板塊的潛在衝擊。</p>
+                </div>
+            </div>
+            <button onclick="reopenNewsModal()" class="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-semibold shrink-0 self-end sm:self-center transition cursor-pointer">
+                <i class="fa-solid fa-expand mr-1"></i> 檢視快訊詳情
+            </button>
+        </div>
+
+        <!-- 中央主要交易區：左側走勢圖 + 下單面板，右側 5 檔報價 + 排行榜 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
+            
+            <!-- 左側 (7欄)：即時走勢圖與交易執行面板 -->
+            <div class="lg:col-span-7 flex flex-col gap-4">
+                <!-- 走勢圖卡片 -->
+                <div class="bg-terminal-card border border-terminal-border rounded-xl p-4 flex flex-col">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-3">
+                            <span id="chart-stock-symbol" class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-400 font-mono font-bold text-sm">TSMC</span>
+                            <div>
+                                <h3 id="chart-stock-name" class="text-white font-bold text-base leading-tight">護國神山晶圓</h3>
+                                <span id="chart-stock-sector" class="text-[11px] text-gray-400">半導體 / 晶圓代工</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div id="chart-stock-price" class="text-2xl font-mono font-extrabold text-white">$100.00</div>
+                            <div id="chart-stock-change" class="text-xs font-mono font-semibold text-gray-400">0.00 (0.00%)</div>
+                        </div>
+                    </div>
+
+                    <!-- Canvas 即時走勢圖 -->
+                    <div class="relative w-full h-56 sm:h-64 bg-[#090c10] rounded-lg border border-terminal-border/80 overflow-hidden">
+                        <canvas id="stock-chart-canvas" class="w-full h-full block"></canvas>
+                        <!-- 盤中買賣力道條 (Order Book Pressure) -->
+                        <div class="absolute bottom-2 left-3 right-3 flex items-center gap-2 bg-terminal-card/90 backdrop-blur px-2.5 py-1.5 rounded border border-terminal-border text-[11px]">
+                            <span class="text-gray-400 shrink-0">即時多空力道:</span>
+                            <div class="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden flex">
+                                <div id="pressure-buy-bar" class="bg-red-500 h-full transition-all duration-300" style="width: 50%"></div>
+                                <div id="pressure-sell-bar" class="bg-green-500 h-full transition-all duration-300" style="width: 50%"></div>
+                            </div>
+                            <span id="pressure-text" class="font-mono text-gray-300 shrink-0">均衡</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快速下單操作面板 -->
+                <div class="bg-terminal-card border border-terminal-border rounded-xl p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-amber-400"></i> 閃電下單交易台 (<span id="trade-panel-symbol" class="font-mono text-blue-400">TSMC</span>)
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            目前持有: <span id="trade-panel-owned" class="font-mono font-bold text-white">0</span> 股 
+                            (均價: <span id="trade-panel-avg" class="font-mono text-gray-300">$0.00</span>)
+                        </div>
+                    </div>
+
+                    <!-- 數量選擇快捷鍵 -->
+                    <div class="grid grid-cols-5 gap-2 mb-3">
+                        <button onclick="setTradeQty(10)" class="qty-btn py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-mono font-semibold text-gray-300 transition cursor-pointer">10 股</button>
+                        <button onclick="setTradeQty(50)" class="qty-btn py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-mono font-semibold text-gray-300 transition cursor-pointer">50 股</button>
+                        <button onclick="setTradeQty(100)" class="qty-btn py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-blue-500/50 text-xs font-mono font-bold text-blue-400 transition cursor-pointer">100 股</button>
+                        <button onclick="setTradeQty('MAX_BUY')" class="py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-semibold text-amber-400 transition cursor-pointer">全倉買入</button>
+                        <button onclick="setTradeQty('MAX_SELL')" class="py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-semibold text-purple-400 transition cursor-pointer">全數清倉</button>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <div class="flex items-center bg-terminal-bg border border-terminal-border rounded-xl px-3 py-2 sm:w-44">
+                            <span class="text-xs text-gray-400 mr-2">股數</span>
+                            <input type="number" id="input-trade-qty" value="100" min="1" step="10" oninput="updateOrderPreview()"
+                                class="w-full bg-transparent text-white font-mono font-bold text-base outline-none text-right">
+                        </div>
+
+                        <div class="flex-1 grid grid-cols-2 gap-2.5">
+                            <button id="btn-execute-buy" onclick="executeTrade('BUY')" class="py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer">
+                                <span>買進做多 (BUY)</span>
+                                <span id="buy-cost-preview" class="text-[11px] font-mono opacity-90 font-normal">預估 $10,000</span>
+                            </button>
+                            <button id="btn-execute-sell" onclick="executeTrade('SELL')" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer">
+                                <span>賣出平倉 (SELL)</span>
+                                <span id="sell-gain-preview" class="text-[11px] font-mono opacity-90 font-normal">預估 $10,000</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側 (5欄)：5檔股票即時報價表 + 玩家排行榜 + 成交紀錄 -->
+            <div class="lg:col-span-5 flex flex-col gap-4">
+                
+                <!-- 5 檔股票報價清單 -->
+                <div class="bg-terminal-card border border-terminal-border rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2.5">
+                        <h3 class="text-sm font-bold text-white">盤中即時報價 (點擊切換圖表)</h3>
+                        <span class="text-[11px] text-gray-400">受新聞與玩家買賣驅動</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-[11px] text-gray-400 border-b border-terminal-border">
+                                    <th class="pb-2 font-medium">標的</th>
+                                    <th class="pb-2 font-medium text-right">現價</th>
+                                    <th class="pb-2 font-medium text-right">漲跌幅</th>
+                                    <th class="pb-2 font-medium text-right">庫存 / 損益</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stock-list-tbody" class="divide-y divide-terminal-border/50 text-xs">
+                                <!-- JS 動態渲染 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 即時資產排行榜 -->
+                <div class="bg-terminal-card border border-terminal-border rounded-xl p-4 flex-1 flex flex-col">
+                    <div class="flex items-center justify-between mb-2.5">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            <i class="fa-solid fa-trophy text-amber-400"></i> 即時操盤手排行榜
+                        </h3>
+                        <span id="online-count-badge" class="text-[11px] px-2 py-0.5 rounded bg-terminal-bg text-gray-400 font-mono">4 位在線</span>
+                    </div>
+                    <div id="leaderboard-list" class="space-y-2 overflow-y-auto max-h-48 pr-1">
+                        <!-- JS 動態渲染 -->
+                    </div>
+
+                    <!-- 即時交易動態日誌 -->
+                    <div class="mt-4 pt-3 border-t border-terminal-border">
+                        <div class="text-[11px] font-semibold text-gray-400 mb-1.5">市場大單與新聞日誌</div>
+                        <div id="trade-log-feed" class="space-y-1 text-[11px] font-mono h-24 overflow-y-auto pr-1 text-gray-300">
+                            <!-- JS 動態渲染 -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 畫面 4: 最終結算排行榜 (GAME OVER) ==================== -->
+    <section id="view-gameover" class="hidden flex-1 flex items-center justify-center p-4">
+        <div class="max-w-2xl w-full bg-terminal-card border border-terminal-border rounded-2xl p-6 sm:p-8 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 text-white flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg shadow-amber-500/30">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-widest text-amber-400">5 回合交易正式收盤</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">最終資產結算榜</h2>
+                <p class="text-xs text-gray-400 mt-1">所有剩餘持股已依收盤價自動平倉換算為現金淨值</p>
+            </div>
+
+            <div id="final-standings-list" class="space-y-3 mb-6">
+                <!-- JS 動態渲染最終排名與稱號 -->
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="returnToLobby()" class="flex-1 py-3 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-white font-bold text-sm transition cursor-pointer">
+                    返回遊戲大廳
+                </button>
+                <button id="btn-play-again" onclick="restartGame()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/25 transition cursor-pointer">
+                    <i class="fa-solid fa-rotate-right mr-1.5"></i> 原班人馬再戰五回合
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 彈窗 1: 每回合突發新聞快訊彈窗 ==================== -->
+    <div id="modal-news" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div class="glass-modal border-2 border-amber-500/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl transform transition-all">
+            <div class="flex items-center justify-between border-b border-terminal-border pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded bg-red-600 text-white font-bold text-xs animate-pulse">BREAKING NEWS</span>
+                    <span id="modal-news-round" class="font-mono text-amber-400 font-bold text-sm">ROUND 1 / 5</span>
+                </div>
+                <div class="text-xs font-mono text-gray-400">
+                    開盤倒數: <span id="modal-news-countdown" class="text-white font-bold text-base">8</span>s
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <div id="modal-news-category" class="text-xs font-semibold text-amber-400 mb-1">【全球財經頭條】</div>
+                <h3 id="modal-news-headline" class="text-xl sm:text-2xl font-extrabold text-white leading-snug mb-3">
+                    新聞標題載入中...
+                </h3>
+                <p id="modal-news-body" class="text-sm text-gray-300 leading-relaxed bg-terminal-bg/90 p-4 rounded-xl border border-terminal-border">
+                    新聞內文載入中...
+                </p>
+            </div>
+
+            <div class="bg-blue-950/30 border border-blue-500/30 rounded-xl p-3 mb-5 flex items-center gap-3 text-xs text-blue-200">
+                <i class="fa-solid fa-lightbulb text-amber-400 text-base shrink-0"></i>
+                <span>分析師提示：新聞將持續影響本回合股價走勢，但若大量玩家同時搶買或拋售，短期供需力道將劇烈放大波動！</span>
+            </div>
+
+            <button onclick="closeModal('modal-news')" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-sm transition cursor-pointer">
+                收到情報，準備進場交易！
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== 彈窗 2: Firebase 連線設定 ==================== -->
+    <div id="modal-firebase" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div class="glass-modal border border-terminal-border rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-amber-500"></i> 線上多人連線設定 (Firebase)
+                </h3>
+                <button onclick="closeModal('modal-firebase')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <p class="text-xs text-gray-300 leading-relaxed mb-4">
+                由於 GitHub Pages 為純靜態網頁託管，若要與遠端朋友跨裝置即時連線，請貼上您免費申請的 <strong>Firebase Config JSON</strong>（支援 Realtime Database 或 Firestore）。若未設定，系統也會在同瀏覽器分頁間模擬同步，或可直接使用「單人 AI 模式」。
+            </p>
+
+            <div class="mb-4">
+                <label class="block text-xs font-semibold text-gray-400 mb-1.5">貼上 Firebase Config (JSON 格式或 JS 物件)</label>
+                <textarea id="input-firebase-config" rows="6" placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "your-app.firebaseapp.com",
+  "databaseURL": "https://your-app-default-rtdb.firebaseio.com",
+  "projectId": "your-app",
+  "storageBucket": "your-app.appspot.com",
+  "messagingSenderId": "123456",
+  "appId": "1:123456:web:abcdef"
+}' class="w-full bg-terminal-bg border border-terminal-border focus:border-blue-500 rounded-xl p-3 text-xs font-mono text-emerald-400 outline-none"></textarea>
+            </div>
+
+            <div id="firebase-config-msg" class="text-xs mb-4 hidden"></div>
+
+            <div class="flex gap-3">
+                <button onclick="clearFirebaseConfig()" class="px-4 py-2.5 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs text-gray-300 font-semibold cursor-pointer">
+                    清除設定
+                </button>
+                <button onclick="saveFirebaseConfig()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold cursor-pointer">
+                    儲存並初始化多人連線
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 彈窗 3: GitHub Pages 部署說明與匯出 ==================== -->
+    <div id="modal-github" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div class="glass-modal border border-terminal-border rounded-2xl max-w-xl w-full p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-brands fa-github text-white"></i> 部署至 GitHub Pages 指南
+                </h3>
+                <button onclick="closeModal('modal-github')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-3 text-xs text-gray-300 mb-5">
+                <p>本遊戲已將所有 HTML、CSS 與多人連線邏輯打包為單一檔案，只需 3 步驟即可免費上線：</p>
+                <ol class="list-decimal list-inside space-y-2 bg-terminal-bg p-4 rounded-xl border border-terminal-border">
+                    <li>點擊下方按鈕下載 <code class="text-emerald-400 font-mono">index.html</code>（若您已填入 Firebase Config，下載的檔案會自動內嵌您的連線金鑰，好友打開網址即可直接連線！）。</li>
+                    <li>前往 GitHub 建立一個新的公開儲存庫 (Repository)，例如 <code class="text-blue-400 font-mono">stock-trading-game</code>，並上傳 <code class="text-emerald-400 font-mono">index.html</code>。</li>
+                    <li>進入儲存庫的 <strong>Settings → Pages</strong>，將 Branch 設為 <code class="text-amber-400 font-mono">main</code> 並儲存，約 1 分鐘後即可獲得專屬遊戲網址！</li>
+                </ol>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeModal('modal-github')" class="px-4 py-2.5 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs text-gray-300 font-semibold cursor-pointer">
+                    關閉
+                </button>
+                <button onclick="downloadStandaloneHTML()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer">
+                    <i class="fa-solid fa-download"></i> 下載完整 index.html (含目前連線設定)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自訂 Toast 訊息提示框 (取代 alert) -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Firebase SDK (Compat 版本便於動態初始化與 GitHub Pages 單檔部署) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <script>
+        /**
+         * ============================================================================
+         * 華爾街風雲：五回合操盤手 - 核心遊戲與即時多人同步引擎
+         * ============================================================================
+         */
+
+        // 內嵌 Firebase 設定區 (匯出 HTML 時會自動將使用者設定寫入此處)
+        const EMBEDDED_FIREBASE_CONFIG = null;
+
+        // 全域遊戲常數
+        const TOTAL_ROUNDS = 5;
+        const NEWS_DURATION = 8;      // 每回合新聞閱讀秒數
+        const TRADING_DURATION = 30;  // 每回合交易秒數
+        const INITIAL_CASH = 100000;  // 起始資金 $100,000
+
+        // 5 檔掛牌股票定義
+        const INITIAL_STOCKS = [
+            { id: 'TSMC', name: '護國神山晶圓', sector: '半導體製造', price: 100.00, basePrice: 100.00, volatility: 0.018, color: '#3b82f6' },
+            { id: 'NVDA', name: '超微算力科技', sector: 'AI 伺服器', price: 120.00, basePrice: 120.00, volatility: 0.025, color: '#a855f7' },
+            { id: 'BIOX', name: '基因生技醫療', sector: '新藥研發', price: 60.00,  basePrice: 60.00,  volatility: 0.030, color: '#10b981' },
+            { id: 'SHIP', name: '長榮綠能航運', sector: '全球海運', price: 50.00,  basePrice: 50.00,  volatility: 0.022, color: '#06b6d4' },
+            { id: 'COIN', name: '區塊鏈加密金控', sector: '數位資產', price: 80.00,  basePrice: 80.00,  volatility: 0.035, color: '#f59e0b' }
+        ];
+
+        // 豐富的財經新聞事件庫 (每回合隨機抽取不重複新聞，影響各股票基本面漂移率 drift)
+        const NEWS_POOL = [
+            {
+                category: '【半導體重磅】',
+                title: '全球 AI 巨头追加 2 奈米先進製程大單，晶圓產能全面滿載！',
+                body: '北美雲端大廠宣布明年資本支出翻倍，護國神山晶圓與超微算力科技訂單能見度直達年底，法人機構紛紛調升目標價。',
+                impacts: { TSMC: 0.028, NVDA: 0.024, BIOX: -0.004, SHIP: 0.005, COIN: 0.004 }
+            },
+            {
+                category: '【地緣黑天鵝】',
+                title: '紅海與蘇伊士運河航道突發封鎖，全球貨櫃運價單週飆漲 45%！',
+                body: '國際航商被迫繞道好望角，船期延誤導致全球供應鏈吃緊，綠能航運迎來暴利時代，但科技硬體出口面臨物流成本上升壓力。',
+                impacts: { TSMC: -0.008, NVDA: -0.006, BIOX: 0.002, SHIP: 0.036, COIN: 0.006 }
+            },
+            {
+                category: '【生技醫療突破】',
+                title: '基因生技醫療第三期臨床試驗大獲成功，獲 FDA 加速核准上市！',
+                body: '旗下阿茲海默症與抗癌新藥療效遠超市場預期，國際藥廠傳出天價併購邀約，資金大幅從高估值科技股輪動至生技板塊。',
+                impacts: { TSMC: -0.005, NVDA: -0.010, BIOX: 0.038, SHIP: -0.002, COIN: -0.005 }
+            },
+            {
+                category: '【金融監管風暴】',
+                title: '多國央行聯手頒布加密貨幣嚴格儲備金新規，市場流動性驟降！',
+                body: '大型交易所面臨合規審查，投資人恐慌性撤出高風險數位資產，避險資金轉向實體晶片與傳統航運股。',
+                impacts: { TSMC: 0.006, NVDA: -0.005, BIOX: 0.004, SHIP: 0.005, COIN: -0.038 }
+            },
+            {
+                category: '【算力泡沫疑慮】',
+                title: '華爾街空頭機構發布報告質疑 AI 變現能力，算力晶片遭遇獲利了結！',
+                body: '報告指出企業導入 AI 軟體營收成長不如預期，超微算力科技首當其衝遭外資大舉調節，連鎖效應波及晶圓代工。',
+                impacts: { TSMC: -0.014, NVDA: -0.032, BIOX: 0.008, SHIP: 0.004, COIN: -0.008 }
+            },
+            {
+                category: '【華爾街史詩利多】',
+                title: '主權財富基金宣布將比特幣與加密金控納入外匯儲備資產！',
+                body: '機構資金大舉湧入數位金融領域，區塊鏈加密金控交易量暴增三倍，同時帶動高階算力伺服器需求回溫。',
+                impacts: { TSMC: 0.005, NVDA: 0.012, BIOX: -0.003, SHIP: -0.003, COIN: 0.038 }
+            },
+            {
+                category: '【全球降息循環】',
+                title: '聯準會宣布超預期降息 2 碼，全球資金派對正式啟動！',
+                body: '無風險利率大幅下滑，高成長科技、生技研發與數位資產全面受惠，市場風險偏好達到頂峰！',
+                impacts: { TSMC: 0.015, NVDA: 0.018, BIOX: 0.016, SHIP: 0.008, COIN: 0.020 }
+            },
+            {
+                category: '【貿易關稅壁壘】',
+                title: '歐美宣布對進口商品加徵高額懲罰性關稅，全球貿易量萎縮！',
+                body: '跨國貨運需求急凍，航運股面臨運價崩跌危機；同時半導體設備出口管制升級，科技股承壓。',
+                impacts: { TSMC: -0.015, NVDA: -0.012, BIOX: 0.006, SHIP: -0.034, COIN: 0.004 }
+            }
+        ];
+
+        // 遊戲狀態管理
+        let state = {
+            mode: 'SOLO', // 'SOLO' | 'MULTI'
+            colorScheme: 'TW', // 'TW' (紅漲綠跌) | 'US' (綠漲紅跌)
+            roomCode: '',
+            isHost: true,
+            myId: 'player_' + Math.random().toString(36).substring(2, 9),
+            myName: '操盤手',
+            
+            // 回合與階段狀態
+            status: 'LOBBY', // 'LOBBY' | 'WAITING' | 'NEWS' | 'TRADING' | 'GAMEOVER'
+            round: 1,
+            timeLeft: NEWS_DURATION,
+            currentNews: null,
+            usedNewsIndices: [],
+            
+            // 市場與股票狀態
+            stocks: JSON.parse(JSON.stringify(INITIAL_STOCKS)),
+            priceHistory: {}, // { TSMC: [100, 101.2, ...], ... }
+            selectedStockId: 'TSMC',
+            
+            // 即時供需力道池 (累積本秒內所有玩家的淨買賣股數)
+            netOrderFlow: { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 },
+            recentPressure: { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 },
+            
+            // 玩家狀態表 { playerId: { id, name, isAI, cash, holdings: { TSMC: { qty, avgPrice } }, netWorth } }
+            players: {},
+            tradeLogs: []
+        };
+
+        // Firebase 變數
+        let fbApp = null;
+        let fbDb = null;
+        let fbAuth = null;
+        let fbUnsubscribeRoom = null;
+        let fbUnsubscribeOrders = null;
+        let processedOrderIds = new Set();
+        let gameLoopInterval = null;
+        let broadcastChannel = null; // 支援同瀏覽器多分頁免 Firebase 測試多人連線
+
+        // 初始化歷史價格陣列
+        function resetPriceHistory() {
+            state.priceHistory = {};
+            state.stocks.forEach(s => {
+                state.priceHistory[s.id] = [s.price];
+            });
+        }
+
+        // 頁面載入初始化
+        window.onload = function () {
+            resetPriceHistory();
+            initFirebaseIfConfigured();
+            initBroadcastChannel();
+            
+            // 讀取上次輸入的暱稱
+            const savedName = sessionStorage.getItem('ws_nickname');
+            if (savedName) {
+                document.getElementById('input-nickname').value = savedName;
+            }
+
+            // 監聽視窗縮放重繪圖表
+            window.addEventListener('resize', drawStockChart);
+        };
+
+        /**
+         * ============================================================================
+         * Firebase 與跨分頁連線初始化
+         * ============================================================================
+         */
+        function getStoredFirebaseConfig() {
+            if (EMBEDDED_FIREBASE_CONFIG) return EMBEDDED_FIREBASE_CONFIG;
+            try {
+                const raw = sessionStorage.getItem('ws_firebase_config');
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function initFirebaseIfConfigured() {
+            const config = getStoredFirebaseConfig();
+            const statusText = document.getElementById('conn-status-text');
+            const badge = document.getElementById('multiplayer-badge');
+
+            if (!config || !config.projectId) {
+                statusText.textContent = '本地/分頁連線模式';
+                badge.textContent = '同瀏覽器多開 / 單人';
+                badge.className = 'text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300';
+                return;
+            }
+
+            try {
+                if (!firebase.apps.length) {
+                    fbApp = firebase.initializeApp(config);
+                } else {
+                    fbApp = firebase.app();
+                }
+                fbAuth = firebase.auth();
+                fbDb = firebase.firestore();
+
+                await fbAuth.signInAnonymously();
+                state.myId = fbAuth.currentUser.uid;
+
+                statusText.textContent = 'Firebase 雲端已連線';
+                badge.textContent = '全球即時連線已啟用';
+                badge.className = 'text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300';
+                document.getElementById('input-firebase-config').value = JSON.stringify(config, null, 2);
+            } catch (err) {
+                console.error('Firebase 初始化失敗:', err);
+                showToast('Firebase 設定無效，已切換為本地模式', 'error');
+                statusText.textContent = '連線設定錯誤';
+            }
+        }
+
+        function saveFirebaseConfig() {
+            const raw = document.getElementById('input-firebase-config').value.trim();
+            const msgEl = document.getElementById('firebase-config-msg');
+            try {
+                // 允許貼上包含 const firebaseConfig = {...}; 的字串，自動擷取大括號內容
+                const jsonMatch = raw.match(/\{[\s\S]*\}/);
+                if (!jsonMatch) throw new Error('找不到有效的 JSON 物件');
+                
+                // 將未加引號的 key 轉為標準 JSON
+                const sanitized = jsonMatch[0].replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2":').replace(/'/g, '"');
+                const parsed = JSON.parse(sanitized);
+                if (!parsed.apiKey || !parsed.projectId) {
+                    throw new Error('缺少 apiKey 或 projectId 欄位');
+                }
+                sessionStorage.setItem('ws_firebase_config', JSON.stringify(parsed));
+                msgEl.textContent = '設定已儲存！正在初始化雲端連線...';
+                msgEl.className = 'text-xs mb-4 text-emerald-400 block';
+                initFirebaseIfConfigured().then(() => {
+                    setTimeout(() => closeModal('modal-firebase'), 800);
+                });
+            } catch (e) {
+                msgEl.textContent = '格式錯誤：' + e.message;
+                msgEl.className = 'text-xs mb-4 text-red-400 block';
+            }
+        }
+
+        function clearFirebaseConfig() {
+            sessionStorage.removeItem('ws_firebase_config');
+            document.getElementById('input-firebase-config').value = '';
+            fbDb = null;
+            showToast('已清除雲端設定，恢復為本地模式', 'info');
+            initFirebaseIfConfigured();
+            closeModal('modal-firebase');
+        }
+
+        // 同瀏覽器分頁廣播通道 (方便無 Firebase 時開兩個分頁測試多人連線)
+        function initBroadcastChannel() {
+            if ('BroadcastChannel' in window) {
+                broadcastChannel = new BroadcastChannel('wall_street_5round_sync');
+                broadcastChannel.onmessage = (event) => {
+                    const msg = event.data;
+                    if (!msg || msg.roomCode !== state.roomCode) return;
+                    handleLocalSyncMessage(msg);
+                };
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 遊戲大廳與房間建立邏輯
+         * ============================================================================
+         */
+        function getPlayerNickname() {
+            let name = document.getElementById('input-nickname').value.trim();
+            if (!name) {
+                const randomTitles = ['華爾街新秀', '多頭總司令', '當沖小王子', '價值投資客', '量化交易員'];
+                name = randomTitles[Math.floor(Math.random() * randomTitles.length)] + Math.floor(10 + Math.random() * 89);
+                document.getElementById('input-nickname').value = name;
+            }
+            sessionStorage.setItem('ws_nickname', name);
+            state.myName = name;
+            return name;
+        }
+
+        function createInitialPlayerObj(id, name, isAI = false, aiStyle = '') {
+            const holdings = {};
+            INITIAL_STOCKS.forEach(s => {
+                holdings[s.id] = { qty: 0, avgPrice: 0 };
+            });
+            return {
+                id,
+                name,
+                isAI,
+                aiStyle,
+                cash: INITIAL_CASH,
+                holdings,
+                netWorth: INITIAL_CASH
+            };
+        }
+
+        // 1. 啟動單人 AI 實戰模式
+        function startSoloGame() {
+            const myName = getPlayerNickname();
+            state.mode = 'SOLO';
+            state.isHost = true;
+            state.roomCode = 'SOLO';
+            state.stocks = JSON.parse(JSON.stringify(INITIAL_STOCKS));
+            resetPriceHistory();
+            state.usedNewsIndices = [];
+            state.tradeLogs = [];
+            state.netOrderFlow = { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 };
+
+            // 建立自己與 3 位 AI 對手
+            state.players = {};
+            state.players[state.myId] = createInitialPlayerObj(state.myId, myName, false);
+            state.players['ai_buffett'] = createInitialPlayerObj('ai_buffett', '巴菲特 AI (價值派)', true, 'VALUE');
+            state.players['ai_soros'] = createInitialPlayerObj('ai_soros', '索羅斯 AI (順勢派)', true, 'MOMENTUM');
+            state.players['ai_yolo'] = createInitialPlayerObj('ai_yolo', '馬斯克 AI (激進派)', true, 'AGGRESSIVE');
+
+            switchView('view-game');
+            document.getElementById('game-room-label').textContent = '模式：單人實戰 (含 3 位 AI 操盤手)';
+            startNewRound(1);
+        }
+
+        // 2. 建立或加入線上多人房間
+        async function joinOrCreateMultiplayer() {
+            const myName = getPlayerNickname();
+            let code = document.getElementById('input-room-code').value.trim().toUpperCase();
+            const isCreating = !code;
+            if (isCreating) {
+                code = Math.random().toString(36).substring(2, 6).toUpperCase();
+            }
+
+            state.mode = 'MULTI';
+            state.roomCode = code;
+            state.stocks = JSON.parse(JSON.stringify(INITIAL_STOCKS));
+            resetPriceHistory();
+            state.usedNewsIndices = [];
+            state.tradeLogs = [];
+            processedOrderIds.clear();
+
+            const myPlayer = createInitialPlayerObj(state.myId, myName, false);
+
+            if (fbDb) {
+                // 使用 Firebase Firestore 雲端多人連線
+                const roomRef = fbDb.collection('ws_rooms').doc(code);
+                try {
+                    const docSnap = await roomRef.get();
+                    if (!docSnap.exists) {
+                        // 建立新房間 (成為房主)
+                        state.isHost = true;
+                        state.players = { [state.myId]: myPlayer };
+                        await roomRef.set({
+                            roomCode: code,
+                            hostId: state.myId,
+                            status: 'WAITING',
+                            round: 1,
+                            timeLeft: NEWS_DURATION,
+                            currentNews: null,
+                            stocks: state.stocks,
+                            players: state.players,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        // 加入現有房間
+                        const data = docSnap.data();
+                        if (data.status !== 'WAITING' && data.hostId !== state.myId) {
+                            showToast('該房間已經開盤交易中，請輸入其他房號或留空建立新房', 'error');
+                            return;
+                        }
+                        state.isHost = (data.hostId === state.myId);
+                        await roomRef.update({
+                            [`players.${state.myId}`]: myPlayer
+                        });
+                    }
+                    subscribeToFirebaseRoom(code);
+                } catch (err) {
+                    console.error(err);
+                    showToast('雲端房間連線失敗，請檢查 Firebase 權限規則', 'error');
+                    return;
+                }
+            } else {
+                // 無 Firebase 時，透過 BroadcastChannel 支援同瀏覽器多分頁即時對戰
+                state.isHost = isCreating;
+                state.players = { [state.myId]: myPlayer };
+                if (!isCreating && broadcastChannel) {
+                    broadcastChannel.postMessage({
+                        type: 'JOIN_REQUEST',
+                        roomCode: code,
+                        player: myPlayer
+                    });
+                }
+            }
+
+            enterWaitingRoom();
+        }
+
+        function enterWaitingRoom() {
+            switchView('view-waiting');
+            document.getElementById('display-room-code').textContent = state.roomCode;
+            updateWaitingRoomUI();
+        }
+
+        function updateWaitingRoomUI() {
+            const listEl = document.getElementById('waiting-player-list');
+            const playerArr = Object.values(state.players);
+            document.getElementById('waiting-player-count').textContent = playerArr.length;
+
+            listEl.innerHTML = playerArr.map((p, idx) => `
+                <div class="flex items-center justify-between bg-terminal-bg border border-terminal-border px-3.5 py-2.5 rounded-xl">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-blue-600/30 text-blue-400 font-bold text-xs flex items-center justify-center">
+                            ${p.name.charAt(0)}
+                        </div>
+                        <span class="text-sm font-bold text-white">${escapeHtml(p.name)}</span>
+                        ${p.id === state.myId ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300">你</span>' : ''}
+                    </div>
+                    <span class="text-xs text-gray-400 font-mono">${idx === 0 ? '<i class="fa-solid fa-crown text-amber-400 mr-1"></i>房主' : '已準備'}</span>
+                </div>
+            `).join('');
+
+            const startBtn = document.getElementById('btn-host-start');
+            const guestMsg = document.getElementById('waiting-guest-msg');
+            if (state.isHost) {
+                startBtn.classList.remove('hidden');
+                guestMsg.classList.add('hidden');
+            } else {
+                startBtn.classList.add('hidden');
+                guestMsg.classList.remove('hidden');
+            }
+        }
+
+        // 處理本地分頁同步訊息
+        function handleLocalSyncMessage(msg) {
+            if (msg.type === 'JOIN_REQUEST' && state.isHost && state.status === 'LOBBY') {
+                state.players[msg.player.id] = msg.player;
+                updateWaitingRoomUI();
+                broadcastChannel.postMessage({
+                    type: 'ROOM_STATE',
+                    roomCode: state.roomCode,
+                    stateSnapshot: extractSyncSnapshot()
+                });
+            } else if (msg.type === 'ROOM_STATE' && !state.isHost) {
+                applySyncSnapshot(msg.stateSnapshot);
+            } else if (msg.type === 'PLAYER_ORDER' && state.isHost) {
+                processIncomingOrder(msg.order);
+            }
+        }
+
+        // Firebase 即時監聽房間狀態與玩家下單
+        function subscribeToFirebaseRoom(code) {
+            if (fbUnsubscribeRoom) fbUnsubscribeRoom();
+            if (fbUnsubscribeOrders) fbUnsubscribeOrders();
+
+            const roomRef = fbDb.collection('ws_rooms').doc(code);
+            fbUnsubscribeRoom = roomRef.onSnapshot((doc) => {
+                if (!doc.exists) return;
+                const data = doc.data();
+                state.isHost = (data.hostId === state.myId);
+
+                if (state.isHost) {
+                    // 房主只同步新加入的玩家列表
+                    if (data.players) {
+                        Object.keys(data.players).forEach(pid => {
+                            if (!state.players[pid]) {
+                                state.players[pid] = data.players[pid];
+                            }
+                        });
+                        if (document.getElementById('view-waiting').classList.contains('hidden') === false) {
+                            updateWaitingRoomUI();
+                        }
+                    }
+                } else {
+                    // 非房主完全跟隨房主廣播的市場與回合狀態
+                    applySyncSnapshot(data);
+                }
+            }, (err) => console.error('Room snapshot error:', err));
+
+            // 房主監聽所有玩家的即時買賣委託單 (影響股價供需)
+            fbUnsubscribeOrders = roomRef.collection('orders').onSnapshot((snapshot) => {
+                if (!state.isHost) return;
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added') {
+                        const orderId = change.doc.id;
+                        if (!processedOrderIds.has(orderId)) {
+                            processedOrderIds.add(orderId);
+                            processIncomingOrder(change.doc.data());
+                        }
+                    }
+                });
+            }, (err) => console.error('Orders snapshot error:', err));
+        }
+
+        function extractSyncSnapshot() {
+            return {
+                status: state.status,
+                round: state.round,
+                timeLeft: state.timeLeft,
+                currentNews: state.currentNews,
+                stocks: state.stocks,
+                players: state.players,
+                recentPressure: state.recentPressure,
+                latestLog: state.tradeLogs[0] || null
+            };
+        }
+
+        function applySyncSnapshot(snap) {
+            const prevStatus = state.status;
+            const prevRound = state.round;
+
+            state.status = snap.status;
+            state.round = snap.round;
+            state.timeLeft = snap.timeLeft;
+            state.currentNews = snap.currentNews;
+            if (snap.stocks) {
+                state.stocks = snap.stocks;
+                state.stocks.forEach(s => {
+                    if (!state.priceHistory[s.id]) state.priceHistory[s.id] = [];
+                    const hist = state.priceHistory[s.id];
+                    if (hist[hist.length - 1] !== s.price) {
+                        hist.push(s.price);
+                        if (hist.length > 160) hist.shift();
+                    }
+                });
+            }
+            if (snap.players) state.players = snap.players;
+            if (snap.recentPressure) state.recentPressure = snap.recentPressure;
+            if (snap.latestLog && (!state.tradeLogs[0] || state.tradeLogs[0].id !== snap.latestLog.id)) {
+                state.tradeLogs.unshift(snap.latestLog);
+                if (state.tradeLogs.length > 30) state.tradeLogs.pop();
+            }
+
+            if (state.status === 'WAITING') {
+                updateWaitingRoomUI();
+            } else if (state.status === 'NEWS' || state.status === 'TRADING') {
+                if (document.getElementById('view-game').classList.contains('hidden')) {
+                    switchView('view-game');
+                    document.getElementById('game-room-label').textContent = `房號：${state.roomCode} (線上多人)`;
+                }
+                if (state.status === 'NEWS' && (prevStatus !== 'NEWS' || prevRound !== state.round)) {
+                    showNewsPopup(state.currentNews, state.round);
+                }
+                if (state.status === 'TRADING' && prevStatus === 'NEWS') {
+                    closeModal('modal-news');
+                }
+                renderAllGameUI();
+            } else if (state.status === 'GAMEOVER' && prevStatus !== 'GAMEOVER') {
+                closeModal('modal-news');
+                showGameOverScreen();
+            }
+        }
+
+        async function syncHostStateToClients() {
+            if (state.mode !== 'MULTI' || !state.isHost) return;
+            const snap = extractSyncSnapshot();
+            if (fbDb) {
+                try {
+                    await fbDb.collection('ws_rooms').doc(state.roomCode).update(snap);
+                } catch (e) {
+                    console.error('Sync update failed:', e);
+                }
+            } else if (broadcastChannel) {
+                broadcastChannel.postMessage({
+                    type: 'ROOM_STATE',
+                    roomCode: state.roomCode,
+                    stateSnapshot: snap
+                });
+            }
+        }
+
+        function hostStartGame() {
+            if (!state.isHost) return;
+            switchView('view-game');
+            document.getElementById('game-room-label').textContent = `房號：${state.roomCode} (線上多人)`;
+            startNewRound(1);
+        }
+
+        function leaveRoom() {
+            if (gameLoopInterval) clearInterval(gameLoopInterval);
+            if (fbUnsubscribeRoom) fbUnsubscribeRoom();
+            if (fbUnsubscribeOrders) fbUnsubscribeOrders();
+            state.status = 'LOBBY';
+            switchView('view-lobby');
+        }
+
+        function copyRoomCode() {
+            const temp = document.createElement('input');
+            temp.value = state.roomCode;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast(`已複製房間代碼：${state.roomCode}`, 'success');
+        }
+
+        /**
+         * ============================================================================
+         * 五回合制核心迴圈 (新聞階段 -> 交易階段 -> 動態股價演算 -> 結算)
+         * ============================================================================
+         */
+        function startNewRound(roundNum) {
+            state.round = roundNum;
+            state.status = 'NEWS';
+            state.timeLeft = NEWS_DURATION;
+            state.netOrderFlow = { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 };
+            state.recentPressure = { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 };
+
+            // 挑選一則本局尚未出現過的新聞
+            let availableIndices = NEWS_POOL.map((_, i) => i).filter(i => !state.usedNewsIndices.includes(i));
+            if (availableIndices.length === 0) {
+                state.usedNewsIndices = [];
+                availableIndices = NEWS_POOL.map((_, i) => i);
+            }
+            const chosenIdx = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+            state.usedNewsIndices.push(chosenIdx);
+            state.currentNews = NEWS_POOL[chosenIdx];
+
+            addTradeLog(`📰 第 ${roundNum} 回合頭條：${state.currentNews.title}`, 'text-amber-400');
+            showNewsPopup(state.currentNews, roundNum);
+            renderAllGameUI();
+            syncHostStateToClients();
+
+            if (gameLoopInterval) clearInterval(gameLoopInterval);
+            gameLoopInterval = setInterval(gameTick, 1000);
+        }
+
+        // 每秒核心時脈 (僅房主或單人模式執行演算)
+        function gameTick() {
+            if (!state.isHost) return;
+
+            state.timeLeft -= 1;
+
+            if (state.status === 'NEWS') {
+                document.getElementById('modal-news-countdown').textContent = Math.max(0, state.timeLeft);
+                if (state.timeLeft <= 0) {
+                    // 切換進入交易階段
+                    state.status = 'TRADING';
+                    state.timeLeft = TRADING_DURATION;
+                    closeModal('modal-news');
+                    addTradeLog(`🔔 第 ${state.round} 回合正式開盤！交易時間 ${TRADING_DURATION} 秒`, 'text-blue-400');
+                    showToast(`第 ${state.round} 回合開盤！請把握 30 秒進行買賣`, 'info');
+                }
+            } else if (state.status === 'TRADING') {
+                // 1. 若為單人模式，AI 對手根據新聞與盤勢自動下單
+                if (state.mode === 'SOLO') {
+                    simulateAITrades();
+                }
+
+                // 2. 動態股價演算：結合「新聞基本面漂移」+「玩家即時買賣供需衝擊」+「隨機市場雜訊」
+                updateMarketPrices();
+
+                // 3. 更新所有玩家最新總資產淨值
+                recalculateAllPlayersNetWorth();
+
+                if (state.timeLeft <= 0) {
+                    if (state.round < TOTAL_ROUNDS) {
+                        startNewRound(state.round + 1);
+                        return;
+                    } else {
+                        // 5 回合結束，進入最終結算
+                        clearInterval(gameLoopInterval);
+                        finalizeGameOver();
+                        return;
+                    }
+                }
+            }
+
+            renderAllGameUI();
+            syncHostStateToClients();
+        }
+
+        /**
+         * 核心股價動態演算模型
+         * 股價變動 = 新聞基本面趨勢 (News Drift) + 玩家即時買賣盤供需衝擊 (Order Flow Impact) + 隨機波動
+         */
+        function updateMarketPrices() {
+            const newsImpacts = state.currentNews ? state.currentNews.impacts : {};
+
+            state.stocks.forEach(stock => {
+                const prevPrice = stock.price;
+                
+                // A. 新聞基本面影響 (每秒漸進釋放新聞利多/利空)
+                const newsDrift = (newsImpacts[stock.id] || 0) * 0.45;
+
+                // B. 玩家現場買賣供需力道 (每淨買入 100 股推升約 0.65% 股價，賣出則壓低)
+                const netShares = state.netOrderFlow[stock.id] || 0;
+                // 使用 tanh 函數平滑化超大單衝擊，避免單秒暴漲暴跌失控，同時保留明顯推升感
+                const orderImpact = Math.tanh(netShares / 600) * 0.032;
+
+                // 記錄平滑後的多空力道供 UI 顯示
+                state.recentPressure[stock.id] = (state.recentPressure[stock.id] * 0.5) + (netShares * 0.5);
+                // 清空本秒已消化的委託量
+                state.netOrderFlow[stock.id] = 0;
+
+                // C. 市場隨機微幅波動
+                const randomShock = (Math.random() - 0.5) * stock.volatility * 0.9;
+
+                // 綜合變動率
+                let totalChangeRate = newsDrift + orderImpact + randomShock;
+                // 限制單秒最大漲跌幅在 ±6% 內
+                totalChangeRate = Math.max(-0.06, Math.min(0.06, totalChangeRate));
+
+                let newPrice = prevPrice * (1 + totalChangeRate);
+                // 最低股價保護 ($5.00)
+                newPrice = Math.max(5.00, Number(newPrice.toFixed(2)));
+                
+                stock.lastTickDiff = newPrice - prevPrice;
+                stock.price = newPrice;
+
+                // 寫入歷史走勢
+                state.priceHistory[stock.id].push(newPrice);
+                if (state.priceHistory[stock.id].length > 160) {
+                    state.priceHistory[stock.id].shift();
+                }
+            });
+        }
+
+        // AI 對手行為模擬 (單人實戰模式)
+        function simulateAITrades() {
+            const newsImpacts = state.currentNews ? state.currentNews.impacts : {};
+            const aiPlayers = Object.values(state.players).filter(p => p.isAI);
+
+            aiPlayers.forEach(ai => {
+                // 每秒約 55% 機率出手交易
+                if (Math.random() > 0.55) return;
+
+                // 挑選一檔股票評估
+                const stock = state.stocks[Math.floor(Math.random() * state.stocks.length)];
+                const impact = newsImpacts[stock.id] || 0;
+                const holding = ai.holdings[stock.id];
+
+                let action = null;
+                if (ai.aiStyle === 'MOMENTUM') {
+                    // 順勢派：看新聞利多就追買，利空就賣出
+                    if (impact > 0.01 && ai.cash > stock.price * 50) action = 'BUY';
+                    else if (impact < -0.01 && holding.qty > 0) action = 'SELL';
+                } else if (ai.aiStyle === 'VALUE') {
+                    // 價值派：低於起始價就買，獲利超過 12% 就停利
+                    if (stock.price < stock.basePrice * 0.95 && ai.cash > stock.price * 60) action = 'BUY';
+                    else if (holding.qty > 0 && stock.price > holding.avgPrice * 1.12) action = 'SELL';
+                } else {
+                    // 激進派：隨機大單炒作或獲利了結
+                    if (Math.random() > 0.45 && ai.cash > stock.price * 80) action = 'BUY';
+                    else if (holding.qty > 0) action = 'SELL';
+                }
+
+                if (action === 'BUY') {
+                    const maxAffordable = Math.floor(ai.cash / stock.price);
+                    const qty = Math.min(maxAffordable, (Math.floor(Math.random() * 4) + 1) * 40);
+                    if (qty >= 10) {
+                        applyTradeToPlayer(ai, stock, 'BUY', qty);
+                    }
+                } else if (action === 'SELL' && holding.qty > 0) {
+                    const qty = Math.min(holding.qty, Math.max(10, Math.floor(holding.qty * 0.6)));
+                    applyTradeToPlayer(ai, stock, 'SELL', qty);
+                }
+            });
+        }
+
+        /**
+         * ============================================================================
+         * 玩家下單交易與供需寫入
+         * ============================================================================
+         */
+        function selectStock(stockId) {
+            state.selectedStockId = stockId;
+            renderAllGameUI();
+        }
+
+        function setTradeQty(val) {
+            const input = document.getElementById('input-trade-qty');
+            const stock = state.stocks.find(s => s.id === state.selectedStockId);
+            const me = state.players[state.myId];
+            if (!stock || !me) return;
+
+            if (val === 'MAX_BUY') {
+                const maxShares = Math.floor(me.cash / stock.price);
+                input.value = Math.max(1, maxShares);
+            } else if (val === 'MAX_SELL') {
+                const owned = me.holdings[stock.id]?.qty || 0;
+                input.value = Math.max(1, owned);
+            } else {
+                input.value = val;
+            }
+            updateOrderPreview();
+        }
+
+        function updateOrderPreview() {
+            const qty = Math.max(1, parseInt(document.getElementById('input-trade-qty').value) || 0);
+            const stock = state.stocks.find(s => s.id === state.selectedStockId);
+            const me = state.players[state.myId];
+            if (!stock || !me) return;
+
+            const totalAmount = qty * stock.price;
+            document.getElementById('buy-cost-preview').textContent = `預估 $${formatMoney(totalAmount)}`;
+            document.getElementById('sell-gain-preview').textContent = `預估 $${formatMoney(totalAmount)}`;
+
+            const isTradingOpen = (state.status === 'TRADING');
+            const ownedQty = me.holdings[stock.id]?.qty || 0;
+
+            document.getElementById('btn-execute-buy').disabled = !isTradingOpen || (me.cash < stock.price);
+            document.getElementById('btn-execute-sell').disabled = !isTradingOpen || (ownedQty <= 0);
+        }
+
+        async function executeTrade(side) {
+            if (state.status !== 'TRADING') {
+                showToast('目前為新聞發布階段，請等待開盤倒數結束後下單！', 'error');
+                return;
+            }
+
+            const stock = state.stocks.find(s => s.id === state.selectedStockId);
+            const me = state.players[state.myId];
+            let qty = Math.floor(Number(document.getElementById('input-trade-qty').value));
+
+            if (!stock || !me || isNaN(qty) || qty <= 0) {
+                showToast('請輸入有效的交易股數', 'error');
+                return;
+            }
+
+            if (side === 'BUY') {
+                const maxAffordable = Math.floor(me.cash / stock.price);
+                if (maxAffordable <= 0) {
+                    showToast('可用現金不足，無法買進！', 'error');
+                    return;
+                }
+                if (qty > maxAffordable) qty = maxAffordable;
+            } else if (side === 'SELL') {
+                const owned = me.holdings[stock.id]?.qty || 0;
+                if (owned <= 0) {
+                    showToast(`您目前沒有 ${stock.id} 的持股可賣出！`, 'error');
+                    return;
+                }
+                if (qty > owned) qty = owned;
+            }
+
+            // 執行本地端帳戶扣款/入帳，提供零延遲手感
+            applyTradeToPlayer(me, stock, side, qty);
+            recalculateAllPlayersNetWorth();
+            renderAllGameUI();
+
+            // 若為非房主的多人模式，將委託單發送給房主計入全球供需池
+            if (state.mode === 'MULTI' && !state.isHost) {
+                const orderPayload = {
+                    playerId: state.myId,
+                    playerName: state.myName,
+                    stockId: stock.id,
+                    side,
+                    qty,
+                    price: stock.price,
+                    timestamp: Date.now()
+                };
+                if (fbDb) {
+                    try {
+                        await fbDb.collection('ws_rooms').doc(state.roomCode).collection('orders').add(orderPayload);
+                    } catch (e) {
+                        console.error('Send order error:', e);
+                    }
+                } else if (broadcastChannel) {
+                    broadcastChannel.postMessage({
+                        type: 'PLAYER_ORDER',
+                        roomCode: state.roomCode,
+                        order: orderPayload
+                    });
+                }
+            }
+        }
+
+        // 房主收到其他玩家的委託單後，更新其帳戶並寫入供需力道池
+        function processIncomingOrder(order) {
+            const player = state.players[order.playerId];
+            const stock = state.stocks.find(s => s.id === order.stockId);
+            if (!player || !stock) return;
+            if (order.playerId === state.myId) return; // 房主自己已在本地扣款
+
+            applyTradeToPlayer(player, stock, order.side, order.qty);
+        }
+
+        // 實際撮合帳戶變化並推動市場供需力道
+        function applyTradeToPlayer(player, stock, side, qty) {
+            const amount = qty * stock.price;
+            const holding = player.holdings[stock.id];
+
+            if (side === 'BUY') {
+                if (player.cash < amount - 0.01) return;
+                const totalCost = (holding.qty * holding.avgPrice) + amount;
+                holding.qty += qty;
+                holding.avgPrice = totalCost / holding.qty;
+                player.cash -= amount;
+
+                // 買盤推升股價供需池
+                state.netOrderFlow[stock.id] = (state.netOrderFlow[stock.id] || 0) + qty;
+                if (qty >= 50 || player.id === state.myId) {
+                    addTradeLog(`📈 ${player.name} 買進 ${stock.id} ${qty} 股 (@$${stock.price.toFixed(2)})`, 'text-red-400');
+                }
+            } else if (side === 'SELL') {
+                if (holding.qty < qty) return;
+                holding.qty -= qty;
+                if (holding.qty === 0) holding.avgPrice = 0;
+                player.cash += amount;
+
+                // 賣盤壓低股價供需池
+                state.netOrderFlow[stock.id] = (state.netOrderFlow[stock.id] || 0) - qty;
+                if (qty >= 50 || player.id === state.myId) {
+                    addTradeLog(`📉 ${player.name} 賣出 ${stock.id} ${qty} 股 (@$${stock.price.toFixed(2)})`, 'text-emerald-400');
+                }
+            }
+        }
+
+        function recalculateAllPlayersNetWorth() {
+            Object.values(state.players).forEach(p => {
+                let stockVal = 0;
+                state.stocks.forEach(s => {
+                    const qty = p.holdings[s.id]?.qty || 0;
+                    stockVal += qty * s.price;
+                });
+                p.netWorth = p.cash + stockVal;
+            });
+        }
+
+        /**
+         * ============================================================================
+         * 遊戲結束與結算頒獎
+         * ============================================================================
+         */
+        function finalizeGameOver() {
+            state.status = 'GAMEOVER';
+            // 強制依收盤價結算所有玩家持股為現金
+            Object.values(state.players).forEach(p => {
+                state.stocks.forEach(s => {
+                    const h = p.holdings[s.id];
+                    if (h && h.qty > 0) {
+                        p.cash += h.qty * s.price;
+                        h.qty = 0;
+                        h.avgPrice = 0;
+                    }
+                });
+                p.netWorth = p.cash;
+            });
+
+            syncHostStateToClients();
+            showGameOverScreen();
+        }
+
+        function showGameOverScreen() {
+            switchView('view-gameover');
+            const sorted = Object.values(state.players).sort((a, b) => b.netWorth - a.netWorth);
+            const listEl = document.getElementById('final-standings-list');
+
+            listEl.innerHTML = sorted.map((p, idx) => {
+                const roi = ((p.netWorth - INITIAL_CASH) / INITIAL_CASH) * 100;
+                const roiSign = roi >= 0 ? '+' : '';
+                const roiColor = getTrendTextColor(roi);
+                
+                // 頒發趣味操盤稱號
+                let badgeTitle = '穩健交易員';
+                let badgeClass = 'bg-gray-700 text-gray-200';
+                if (idx === 0 && roi > 15) {
+                    badgeTitle = '🏆 華爾街之狼';
+                    badgeClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                } else if (idx === 0) {
+                    badgeTitle = '👑 盤面總冠軍';
+                    badgeClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                } else if (roi >= 20) {
+                    badgeTitle = '🚀 少年股神';
+                    badgeClass = 'bg-purple-500/20 text-purple-300 border border-purple-500/40';
+                } else if (roi < -15) {
+                    badgeTitle = '🥬 頂級韭菜王';
+                    badgeClass = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+                } else if (roi < 0) {
+                    badgeTitle = '💸 慈善家操盤手';
+                    badgeClass = 'bg-blue-500/20 text-blue-300 border border-blue-500/40';
+                }
+
+                const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+
+                return `
+                    <div class="flex items-center justify-between p-4 rounded-xl bg-terminal-bg border ${p.id === state.myId ? 'border-blue-500' : 'border-terminal-border'}">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl font-bold w-8 text-center">${rankIcon}</span>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-white text-sm sm:text-base">${escapeHtml(p.name)}</span>
+                                    ${p.id === state.myId ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">你</span>' : ''}
+                                </div>
+                                <span class="inline-block mt-1 text-[11px] px-2 py-0.5 rounded font-semibold ${badgeClass}">${badgeTitle}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg sm:text-xl font-mono font-extrabold text-white">$${formatMoney(p.netWorth)}</div>
+                            <div class="text-xs font-mono font-bold ${roiColor}">${roiSign}${roi.toFixed(2)}%</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const restartBtn = document.getElementById('btn-play-again');
+            if (state.isHost) {
+                restartBtn.classList.remove('hidden');
+            } else {
+                restartBtn.classList.add('hidden');
+            }
+        }
+
+        function restartGame() {
+            if (!state.isHost) return;
+            state.stocks = JSON.parse(JSON.stringify(INITIAL_STOCKS));
+            resetPriceHistory();
+            state.usedNewsIndices = [];
+            state.tradeLogs = [];
+            Object.keys(state.players).forEach(pid => {
+                const old = state.players[pid];
+                state.players[pid] = createInitialPlayerObj(old.id, old.name, old.isAI, old.aiStyle);
+            });
+            switchView('view-game');
+            startNewRound(1);
+        }
+
+        function returnToLobby() {
+            leaveRoom();
+        }
+
+        /**
+         * ============================================================================
+         * UI 渲染與即時走勢圖繪製 (Canvas)
+         * ============================================================================
+         */
+        function renderAllGameUI() {
+            // 1. 頂部回合與倒數
+            document.getElementById('game-round-badge').textContent = `ROUND ${state.round} / ${TOTAL_ROUNDS}`;
+            const phaseBadge = document.getElementById('game-phase-badge');
+            if (state.status === 'NEWS') {
+                phaseBadge.textContent = '📰 新聞發布中';
+                phaseBadge.className = 'px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-xs';
+            } else {
+                phaseBadge.textContent = '⚡ 盤中即時交易';
+                phaseBadge.className = 'px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold text-xs animate-pulse';
+            }
+
+            const timerEl = document.getElementById('game-timer');
+            timerEl.innerHTML = `${String(Math.max(0, state.timeLeft)).padStart(2, '0')}<span class="text-sm text-gray-400 ml-0.5">s</span>`;
+            if (state.status === 'TRADING' && state.timeLeft <= 5) {
+                timerEl.classList.add('text-red-500');
+                timerEl.classList.remove('text-white');
+            } else {
+                timerEl.classList.add('text-white');
+                timerEl.classList.remove('text-red-500');
+            }
+
+            // 2. 新聞橫幅
+            if (state.currentNews) {
+                document.getElementById('banner-round-num').textContent = state.round;
+                document.getElementById('banner-news-tag').textContent = state.currentNews.category;
+                document.getElementById('banner-news-title').textContent = state.currentNews.title;
+                document.getElementById('banner-news-desc').textContent = state.currentNews.body;
+            }
+
+            // 3. 個人資產統計
+            const me = state.players[state.myId];
+            if (me) {
+                let stockVal = 0;
+                state.stocks.forEach(s => {
+                    stockVal += (me.holdings[s.id]?.qty || 0) * s.price;
+                });
+                const netWorth = me.cash + stockVal;
+                const roi = ((netWorth - INITIAL_CASH) / INITIAL_CASH) * 100;
+
+                document.getElementById('player-cash').textContent = `$${formatMoney(me.cash)}`;
+                document.getElementById('player-stock-value').textContent = `$${formatMoney(stockVal)}`;
+                document.getElementById('player-net-worth').textContent = `$${formatMoney(netWorth)}`;
+
+                const roiEl = document.getElementById('player-roi');
+                const sign = roi >= 0 ? '+' : '';
+                roiEl.textContent = `${sign}${roi.toFixed(2)}%`;
+                roiEl.className = `font-mono font-bold text-xs px-1.5 py-0.5 rounded bg-gray-900 ${getTrendTextColor(roi)}`;
+            }
+
+            // 4. 選中股票詳情與下單台
+            const selected = state.stocks.find(s => s.id === state.selectedStockId) || state.stocks[0];
+            if (selected) {
+                const diffFromBase = selected.price - selected.basePrice;
+                const pctFromBase = (diffFromBase / selected.basePrice) * 100;
+                const sign = diffFromBase >= 0 ? '+' : '';
+                const trendColor = getTrendTextColor(diffFromBase);
+
+                document.getElementById('chart-stock-symbol').textContent = selected.id;
+                document.getElementById('chart-stock-name').textContent = selected.name;
+                document.getElementById('chart-stock-sector').textContent = selected.sector;
+                document.getElementById('chart-stock-price').textContent = `$${selected.price.toFixed(2)}`;
+                document.getElementById('chart-stock-price').className = `text-2xl font-mono font-extrabold ${trendColor}`;
+                document.getElementById('chart-stock-change').textContent = `${sign}${diffFromBase.toFixed(2)} (${sign}${pctFromBase.toFixed(2)}%)`;
+                document.getElementById('chart-stock-change').className = `text-xs font-mono font-semibold ${trendColor}`;
+
+                document.getElementById('trade-panel-symbol').textContent = selected.id;
+                const myHolding = me?.holdings[selected.id] || { qty: 0, avgPrice: 0 };
+                document.getElementById('trade-panel-owned').textContent = myHolding.qty;
+                document.getElementById('trade-panel-avg').textContent = `$${myHolding.avgPrice.toFixed(2)}`;
+
+                // 多空力道條
+                const pressure = state.recentPressure[selected.id] || 0;
+                const buyPct = Math.max(10, Math.min(90, 50 + (pressure / 15)));
+                document.getElementById('pressure-buy-bar').style.width = `${buyPct}%`;
+                document.getElementById('pressure-sell-bar').style.width = `${100 - buyPct}%`;
+                document.getElementById('pressure-buy-bar').className = `h-full transition-all duration-300 ${state.colorScheme === 'TW' ? 'bg-red-500' : 'bg-emerald-500'}`;
+                document.getElementById('pressure-sell-bar').className = `h-full transition-all duration-300 ${state.colorScheme === 'TW' ? 'bg-emerald-500' : 'bg-red-500'}`;
+                
+                const pText = document.getElementById('pressure-text');
+                if (pressure > 25) pText.textContent = '買盤強勁推升';
+                else if (pressure < -25) pText.textContent = '賣壓湧現下探';
+                else pText.textContent = '多空均衡';
+            }
+
+            updateOrderPreview();
+            renderStockTable();
+            renderLeaderboard();
+            renderTradeLogs();
+            drawStockChart();
+        }
+
+        function renderStockTable() {
+            const tbody = document.getElementById('stock-list-tbody');
+            const me = state.players[state.myId];
+
+            tbody.innerHTML = state.stocks.map(s => {
+                const isSelected = s.id === state.selectedStockId;
+                const diff = s.price - s.basePrice;
+                const pct = (diff / s.basePrice) * 100;
+                const sign = diff >= 0 ? '+' : '';
+                const trendColor = getTrendTextColor(diff);
+
+                const holding = me?.holdings[s.id] || { qty: 0, avgPrice: 0 };
+                let unrealizedPnL = 0;
+                if (holding.qty > 0) {
+                    unrealizedPnL = (s.price - holding.avgPrice) * holding.qty;
+                }
+                const pnlColor = getTrendTextColor(unrealizedPnL);
+
+                // 單秒價格跳動閃爍效果
+                let flashClass = '';
+                if (s.lastTickDiff > 0.01) {
+                    flashClass = state.colorScheme === 'TW' ? 'flash-red' : 'flash-us-up';
+                } else if (s.lastTickDiff < -0.01) {
+                    flashClass = state.colorScheme === 'TW' ? 'flash-green' : 'flash-us-down';
+                }
+                s.lastTickDiff = 0;
+
+                return `
+                    <tr onclick="selectStock('${s.id}')" class="cursor-pointer transition ${isSelected ? 'bg-blue-500/15' : 'hover:bg-terminal-hover'} ${flashClass}">
+                        <td class="py-2.5 pr-2">
+                            <div class="font-bold text-white flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full" style="background-color: ${s.color}"></span>
+                                ${s.id}
+                            </div>
+                            <div class="text-[11px] text-gray-400">${s.name}</div>
+                        </td>
+                        <td class="py-2.5 text-right font-mono font-bold text-white">$${s.price.toFixed(2)}</td>
+                        <td class="py-2.5 text-right font-mono font-semibold ${trendColor}">${sign}${pct.toFixed(2)}%</td>
+                        <td class="py-2.5 text-right font-mono">
+                            <div class="text-white font-semibold">${holding.qty} 股</div>
+                            ${holding.qty > 0 
+                                ? `<div class="text-[10px] ${pnlColor}">${unrealizedPnL >= 0 ? '+' : ''}$${Math.round(unrealizedPnL)}</div>` 
+                                : '<div class="text-[10px] text-gray-500">-</div>'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderLeaderboard() {
+            const listEl = document.getElementById('leaderboard-list');
+            const sorted = Object.values(state.players).sort((a, b) => b.netWorth - a.netWorth);
+            document.getElementById('online-count-badge').textContent = `${sorted.length} 位在線`;
+
+            listEl.innerHTML = sorted.map((p, idx) => {
+                const roi = ((p.netWorth - INITIAL_CASH) / INITIAL_CASH) * 100;
+                const roiColor = getTrendTextColor(roi);
+                const isMe = p.id === state.myId;
+
+                return `
+                    <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border ${isMe ? 'border-blue-500/60' : 'border-terminal-border/60'} text-xs">
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="font-mono font-bold w-4 text-gray-400">${idx + 1}.</span>
+                            <span class="font-bold text-white truncate">${escapeHtml(p.name)}</span>
+                            ${isMe ? '<span class="text-[9px] px-1 rounded bg-blue-600 text-white shrink-0">我</span>' : ''}
+                        </div>
+                        <div class="flex items-center gap-2.5 shrink-0 font-mono">
+                            <span class="text-[11px] ${roiColor}">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</span>
+                            <span class="font-bold text-white">$${formatMoney(p.netWorth)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 繪製即時股票走勢折線圖 (響應式高解析度 Canvas)
+        function drawStockChart() {
+            const canvas = document.getElementById('stock-chart-canvas');
+            if (!canvas || canvas.offsetParent === null) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            const w = rect.width;
+            const h = rect.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const stock = state.stocks.find(s => s.id === state.selectedStockId);
+            if (!stock) return;
+
+            const prices = state.priceHistory[stock.id] || [stock.price];
+            const padTop = 20, padBottom = 38, padLeft = 14, padRight = 54;
+            const plotW = w - padLeft - padRight;
+            const plotH = h - padTop - padBottom;
+
+            let minP = Math.min(...prices, stock.basePrice);
+            let maxP = Math.max(...prices, stock.basePrice);
+            if (maxP - minP < 2) {
+                minP -= 1;
+                maxP += 1;
+            }
+            const margin = (maxP - minP) * 0.12;
+            minP -= margin;
+            maxP += margin;
+
+            const getY = (val) => padTop + plotH - ((val - minP) / (maxP - minP)) * plotH;
+            const getX = (idx) => padLeft + (prices.length > 1 ? (idx / (prices.length - 1)) * plotW : plotW / 2);
+
+            // 背景水平網格線與右側價格刻度
+            ctx.strokeStyle = '#1e222d';
+            ctx.lineWidth = 1;
+            ctx.font = '10px JetBrains Mono';
+            ctx.fillStyle = '#6b7280';
+            ctx.textAlign = 'left';
+
+            const gridSteps = 4;
+            for (let i = 0; i <= gridSteps; i++) {
+                const val = minP + ((maxP - minP) / gridSteps) * i;
+                const y = getY(val);
+                ctx.beginPath();
+                ctx.moveTo(padLeft, y);
+                ctx.lineTo(w - padRight, y);
+                ctx.stroke();
+                ctx.fillText('$' + val.toFixed(1), w - padRight + 6, y + 3);
+            }
+
+            // 起始基準價虛線
+            const baseY = getY(stock.basePrice);
+            ctx.save();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = '#4b5563';
+            ctx.beginPath();
+            ctx.moveTo(padLeft, baseY);
+            ctx.lineTo(w - padRight, baseY);
+            ctx.stroke();
+            ctx.restore();
+
+            // 走勢線顏色 (依據目前漲跌與台美股配色)
+            const isUp = stock.price >= stock.basePrice;
+            let lineColor = '#ef4444'; // 預設紅漲
+            if (state.colorScheme === 'TW') {
+                lineColor = isUp ? '#ef4444' : '#10b981';
+            } else {
+                lineColor = isUp ? '#10b981' : '#ef4444';
+            }
+
+            if (prices.length > 1) {
+                // 漸層填充區域
+                const grad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
+                grad.addColorStop(0, lineColor + '44');
+                grad.addColorStop(1, lineColor + '00');
+
+                ctx.beginPath();
+                ctx.moveTo(getX(0), padTop + plotH);
+                prices.forEach((p, idx) => ctx.lineTo(getX(idx), getY(p)));
+                ctx.lineTo(getX(prices.length - 1), padTop + plotH);
+                ctx.closePath();
+                ctx.fillStyle = grad;
+                ctx.fill();
+
+                // 主折線
+                ctx.beginPath();
+                prices.forEach((p, idx) => {
+                    if (idx === 0) ctx.moveTo(getX(idx), getY(p));
+                    else ctx.lineTo(getX(idx), getY(p));
+                });
+                ctx.strokeStyle = lineColor;
+                ctx.lineWidth = 2.5;
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+            }
+
+            // 最新價格光點
+            const lastX = getX(prices.length - 1);
+            const lastY = getY(prices[prices.length - 1]);
+            ctx.beginPath();
+            ctx.arc(lastX, lastY, 4.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+        }
+
+        /**
+         * ============================================================================
+         * 輔助工具、新聞彈窗、色彩切換與 HTML 匯出
+         * ============================================================================
+         */
+        function showNewsPopup(news, roundNum) {
+            if (!news) return;
+            document.getElementById('modal-news-round').textContent = `ROUND ${roundNum} / ${TOTAL_ROUNDS}`;
+            document.getElementById('modal-news-countdown').textContent = state.timeLeft;
+            document.getElementById('modal-news-category').textContent = news.category;
+            document.getElementById('modal-news-headline').textContent = news.title;
+            document.getElementById('modal-news-body').textContent = news.body;
+            openModal('modal-news');
+        }
+
+        function reopenNewsModal() {
+            if (state.currentNews) {
+                showNewsPopup(state.currentNews, state.round);
+            }
+        }
+
+        function addTradeLog(text, colorClass = 'text-gray-300') {
+            const logItem = {
+                id: Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                time: new Date().toLocaleTimeString('zh-TW', { hour12: false, minute: '2-digit', second: '2-digit' }),
+                text,
+                colorClass
+            };
+            state.tradeLogs.unshift(logItem);
+            if (state.tradeLogs.length > 35) state.tradeLogs.pop();
+
+            // 同步更新頂部跑馬燈
+            document.getElementById('ticker-content').textContent = state.tradeLogs.slice(0, 5).map(l => `[${l.time}] ${l.text}`).join('   |   ');
+            renderTradeLogs();
+        }
+
+        function renderTradeLogs() {
+            const feed = document.getElementById('trade-log-feed');
+            feed.innerHTML = state.tradeLogs.map(item => `
+                <div class="${item.colorClass} leading-snug">
+                    <span class="text-gray-500">[${item.time}]</span> ${escapeHtml(item.text)}
+                </div>
+            `).join('');
+        }
+
+        function toggleColorScheme() {
+            state.colorScheme = state.colorScheme === 'TW' ? 'US' : 'TW';
+            const indicator = document.getElementById('color-scheme-indicator');
+            const textEl = document.getElementById('color-scheme-text');
+            const buyBtn = document.getElementById('btn-execute-buy');
+            const sellBtn = document.getElementById('btn-execute-sell');
+
+            if (state.colorScheme === 'TW') {
+                indicator.className = 'w-2.5 h-2.5 rounded-full bg-red-500';
+                textEl.textContent = '台股配色 (紅漲綠跌)';
+                buyBtn.className = 'py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
+                sellBtn.className = 'py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
+            } else {
+                indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+                textEl.textContent = '美股配色 (綠漲紅跌)';
+                buyBtn.className = 'py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
+                sellBtn.className = 'py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
+            }
+            renderAllGameUI();
+        }
+
+        function getTrendTextColor(val) {
+            if (Math.abs(val) < 0.001) return 'text-gray-400';
+            if (state.colorScheme === 'TW') {
+                return val > 0 ? 'text-red-400' : 'text-emerald-400';
+            } else {
+                return val > 0 ? 'text-emerald-400' : 'text-red-400';
+            }
+        }
+
+        function switchView(viewId) {
+            ['view-lobby', 'view-waiting', 'view-game', 'view-gameover'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+            if (viewId === 'view-game') {
+                setTimeout(drawStockChart, 50);
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = {
+                info: 'bg-blue-600 text-white border-blue-400',
+                success: 'bg-emerald-600 text-white border-emerald-400',
+                error: 'bg-red-600 text-white border-red-400'
+            };
+            toast.className = `px-4 py-2.5 rounded-xl border shadow-xl text-xs font-bold flex items-center gap-2 transition-all transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function formatMoney(num) {
+            return Math.round(num).toLocaleString('en-US');
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // 一鍵下載可直接部署至 GitHub Pages 的 index.html (並自動內嵌使用者設定的 Firebase Config)
+        function downloadStandaloneHTML() {
+            let htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const currentConfig = getStoredFirebaseConfig();
+            if (currentConfig) {
+                htmlContent = htmlContent.replace(
+                    'const EMBEDDED_FIREBASE_CONFIG = null;',
+                    `const EMBEDDED_FIREBASE_CONFIG = ${JSON.stringify(currentConfig)};`
+                );
+            }
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'index.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('已下載 index.html！可直接上傳至 GitHub Repository 開啟 Pages', 'success');
+        }
+    </script>
 </body>
 </html>
