@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>籌碼決定股價｜全班連線股票模擬</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-2: #273549;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #334155;
+      --up: #ef4444;      /* 台股慣例：漲紅 */
+      --down: #22c55e;    /* 台股慣例：跌綠 */
+      --accent: #38bdf8;
+      --warn: #f59e0b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .badge {
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    .badge.ok {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.35);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .card h2, .card h3 { margin-bottom: 12px; }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      margin-bottom: 14px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--primary);
+      transition: background 0.15s, transform 0.05s;
+    }
+
+    button:hover:not(:disabled) { background: var(--primary-hover); }
+    button:active:not(:disabled) { transform: scale(0.99); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    button.secondary { background: var(--card-2); border: 1px solid var(--border); }
+    button.secondary:hover:not(:disabled) { background: #334155; }
+    button.warn { background: #d97706; }
+    button.warn:hover:not(:disabled) { background: #b45309; }
+    button.danger { background: #dc2626; }
+    button.danger:hover:not(:disabled) { background: #b91c1c; }
+    button.success { background: #15803d; }
+    button.success:hover:not(:disabled) { background: #166534; }
+    button.up { background: var(--up); }
+    button.down { background: #16a34a; }
+
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .hidden { display: none !important; }
+
+    .room-banner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      background: linear-gradient(135deg, #1e3a8a, #0f172a);
+      border: 1px solid #3b82f6;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .room-code {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: 6px;
+      color: #fde047;
+    }
+
+    .status-banner {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      font-size: 0.98rem;
+    }
+
+    .status-open {
+      background: rgba(34, 197, 94, 0.14);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+    }
+
+    .status-closed {
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fbbf24;
+    }
+
+    .summary-box {
+      background: rgba(56, 189, 248, 0.1);
+      border-left: 4px solid var(--accent);
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stock-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stock-item {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .stock-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 6px 0;
+    }
+
+    .pos { color: var(--up); }
+    .neg { color: var(--down); }
+    .flat { color: var(--muted); }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+    }
+    th { color: var(--muted); font-weight: 600; }
+
+    .portfolio-summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-box {
+      background: var(--card-2);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-label { font-size: 0.8rem; color: var(--muted); }
+    .stat-val { font-size: 1.2rem; font-weight: 700; margin-top: 2px; }
+
+    .trade-card {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .trade-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .trade-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .trade-actions button { padding: 8px 6px; font-size: 0.85rem; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #fff;
+      border: 1px solid var(--accent);
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      z-index: 999;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="brand">
+        <span>⚖️ 籌碼決定股價｜全班連線模擬</span>
+        <span id="connBadge" class="badge">連線中...</span>
+      </div>
+      <div class="btn-row">
+        <button class="secondary" onclick="goHome()">回到首頁</button>
+      </div>
+    </div>
+
+    <!-- 1. 首頁 -->
+    <div id="homeView" class="grid-2">
+      <div class="card">
+        <h2>🎤 主持人控制台（大螢幕投影）</h2>
+        <p style="color: var(--muted); margin-bottom: 16px;">
+          本回合由<strong>全班買賣力道</strong>決定漲跌；按「停止交易」後系統自動結算股價，供你講解說明，再按「下一回合」繼續。
+        </p>
+        <button onclick="createHostRoom()">建立新房間（開啟控制台）</button>
+      </div>
+
+      <div class="card">
+        <h2>📱 學生交易端（手機加入）</h2>
+        <p style="color: var(--muted); margin-bottom: 14px;">
+          輸入 4 位數房號與暱稱，起始資金 <strong>$100,000</strong>。買得多漲得多、賣得多跌得多！
+        </p>
+        <label for="joinCode">房間代碼（4 位數）</label>
+        <input id="joinCode" type="text" maxlength="4" placeholder="例如：8429" />
+
+        <label for="joinName">你的暱稱 / 學號</label>
+        <input id="joinName" type="text" maxlength="16" placeholder="例如：王小明" />
+
+        <button onclick="joinPlayerRoom()">進入交易大廳</button>
+      </div>
+    </div>
+
+    <!-- 2. 主持人控制台 -->
+    <div id="hostView" class="hidden">
+      <div class="room-banner">
+        <div>
+          <div style="font-size: 0.9rem; color: #bfdbfe;">房間代碼</div>
+          <div id="hostRoomCode" class="room-code">----</div>
+          <div id="shareUrlText" style="font-size: 0.85rem; color: #dbeafe; margin-top: 6px; word-break: break-all;"></div>
+        </div>
+        <div class="btn-row">
+          <button id="closeAndSettleBtn" class="danger" onclick="closeAndSettleRound()">⏹ 停止交易並結算股價</button>
+          <button id="nextRoundBtn" class="warn" onclick="startNextRound()" disabled>▶ 進入下一回合（開放交易）</button>
+          <button class="secondary" onclick="resetGame()">重新開始本局</button>
+        </div>
+      </div>
+
+      <div id="hostPhaseBanner" class="status-banner status-open">
+        🟢 第 <span id="hostRoundNum">1</span> 回合：交易開放中！全班買賣力道將決定封盤漲跌
+      </div>
+
+      <div class="summary-box">
+        <div style="font-size: 0.85rem; color: var(--accent); font-weight: 700;">
+          📢 回合結算與講解重點
+        </div>
+        <div id="hostExplanationText" style="font-size: 1.05rem; margin-top: 4px;">
+          目前正在進行第 1 回合交易。按下「停止交易並結算股價」後，這裡會顯示本回合籌碼變化與股價調整結果，方便你向全班說明。
+        </div>
+      </div>
+
+      <h3>即時股價與本回合淨買超（買進股數 − 賣出股數）</h3>
+      <div id="hostStocksGrid" class="stock-list"></div>
+
+      <div class="card">
+        <h3>🏆 全班即時總資產排行榜（<span id="playerCount">0</span> 人在線）</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>名次</th>
+              <th>暱稱</th>
+              <th>現金</th>
+              <th>持股市值</th>
+              <th>總資產</th>
+              <th>報酬率</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <tr><td colspan="6" style="color: var(--muted);">等待同學加入...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. 學生手機介面 -->
+    <div id="playerView" class="hidden">
+      <div class="card" style="margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div>
+            <span class="badge ok">房號 <span id="pRoomCode">----</span></span>
+            <strong id="pNameDisplay" style="margin-left: 8px; font-size: 1.1rem;"></strong>
+          </div>
+          <div style="font-size: 0.9rem; color: var(--muted);">
+            第 <strong id="pRoundNum">1</strong> 回合
+          </div>
+        </div>
+
+        <div id="playerPhaseBanner" class="status-banner status-open">
+          🟢 交易開放中！你的買賣會影響封盤股價
+        </div>
+
+        <div class="summary-box" style="margin-bottom: 14px; padding: 10px 12px;">
+          <div style="font-size: 0.78rem; color: var(--accent); font-weight: 700;">本回合結算說明</div>
+          <div id="pExplanationText" style="font-size: 0.96rem; margin-top: 2px;">等待本回合封盤結算...</div>
+        </div>
+
+        <div class="portfolio-summary">
+          <div class="stat-box">
+            <div class="stat-label">可用現金</div>
+            <div id="pCash" class="stat-val">$100,000</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">總資產（報酬率）</div>
+            <div id="pTotalAsset" class="stat-val">$100,000 (0.0%)</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom: 10px;">市場股票下單（1 股為單位）</h3>
+      <div id="playerStocksList"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Firebase Realtime Database 初始化 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      set,
+      update,
+      onValue
+    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDubiUNwvmoKOG8GuPqQ7dFjzHDxseFN9s",
+      authDomain: "project-1744995653105721933.firebaseapp.com",
+      databaseURL: "https://project-1744995653105721933-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "project-1744995653105721933",
+      storageBucket: "project-1744995653105721933.firebasestorage.app",
+      messagingSenderId: "747774125222",
+      appId: "1:747774125222:web:c4ab920774dc67411a0067",
+      measurementId: "G-9HMGX8NQ3L"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    window.fb = { db, ref, set, update, onValue };
+    window.dispatchEvent(new Event("firebase-ready"));
+  </script>
+
+  <!-- 遊戲主邏輯 -->
+  <script>
+    const INITIAL_CASH = 100000;
+    // 每 1 股淨買超（買進 - 賣出）帶來的漲跌幅權重（可依班級人數調整，例如 30 人班可設 0.015～0.025）
+    const IMPACT_PER_NET_SHARE = 0.02;
+    // 單回合最大漲跌幅上限（±25%），避免瞬間暴漲暴跌失控
+    const MAX_ROUND_MOVE = 0.25;
+
+    const DEFAULT_STOCKS = [
+      { id: "A", name: "星辰科技 (A股)", price: 100, prevPrice: 100, netFlow: 0 },
+      { id: "B", name: "海風航運 (B股)", price: 100, prevPrice: 100, netFlow: 0 },
+      { id: "C", name: "綠原能源 (C股)", price: 100, prevPrice: 100, netFlow: 0 },
+      { id: "D", name: "穩健電信 (D股)", price: 100, prevPrice: 100, netFlow: 0 }
+    ];
+
+    let currentRole = null;
+    let currentRoom = null;
+    let currentPlayerId = null;
+    let latestRoomData = null;
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => el.classList.add("hidden"), 2400);
+    }
+
+    function setBadge(text, ok = false) {
+      const badge = document.getElementById("connBadge");
+      badge.textContent = text;
+      badge.className = ok ? "badge ok" : "badge";
+    }
+
+    window.addEventListener("firebase-ready", () => {
+      setBadge("Firebase 已連線", true);
+    });
+
+    setTimeout(() => {
+      if (!window.fb) setBadge("本機離線模式", false);
+    }, 2500);
+
+    function goHome() {
+      currentRole = null;
+      document.getElementById("homeView").classList.remove("hidden");
+      document.getElementById("hostView").classList.add("hidden");
+      document.getElementById("playerView").classList.add("hidden");
+    }
+
+    function genRoomCode() {
+      return String(Math.floor(1000 + Math.random() * 9000));
+    }
+
+    function buildInitialRoom(code) {
+      const stocksObj = {};
+      DEFAULT_STOCKS.forEach(s => {
+        stocksObj[s.id] = { ...s };
+      });
+      return {
+        code,
+        round: 1,
+        tradingOpen: true,
+        explanation: "第 1 回合交易進行中！全班買賣力道將在封盤時決定各股漲跌。",
+        stocks: stocksObj,
+        players: {}
+      };
+    }
+
+    function writeRoom(code, data) {
+      if (window.fb) {
+        return window.fb.set(window.fb.ref(window.fb.db, "rooms/" + code), data);
+      } else {
+        localStorage.setItem("room_" + code, JSON.stringify(data));
+        renderRoom(data);
+        return Promise.resolve();
+      }
+    }
+
+    function patchRoom(path, value) {
+      if (window.fb) {
+        const targetRef = path === ""
+          ? window.fb.ref(window.fb.db, "rooms/" + currentRoom)
+          : window.fb.ref(window.fb.db, "rooms/" + currentRoom + "/" + path);
+        return window.fb.update(targetRef, value);
+      } else {
+        const raw = localStorage.getItem("room_" + currentRoom);
+        if (!raw) return Promise.resolve();
+        const data = JSON.parse(raw);
+        if (path === "") {
+          Object.assign(data, value);
+        } else {
+          const parts = path.split("/");
+          let target = data;
+          for (let i = 0; i < parts.length - 1; i++) {
+            target[parts[i]] = target[parts[i]] || {};
+            target = target[parts[i]];
+          }
+          target[parts[parts.length - 1]] = {
+            ...(target[parts[parts.length - 1]] || {}),
+            ...value
+          };
+        }
+        localStorage.setItem("room_" + currentRoom, JSON.stringify(data));
+        renderRoom(data);
+        return Promise.resolve();
+      }
+    }
+
+    function subscribeRoom(code) {
+      if (window.fb) {
+        window.fb.onValue(window.fb.ref(window.fb.db, "rooms/" + code), (snap) => {
+          const val = snap.val();
+          if (val) {
+            latestRoomData = val;
+            renderRoom(val);
+          }
+        });
+      } else {
+        setInterval(() => {
+          const raw = localStorage.getItem("room_" + code);
+          if (raw) {
+            latestRoomData = JSON.parse(raw);
+            renderRoom(latestRoomData);
+          }
+        }, 500);
+      }
+    }
+
+    async function createHostRoom() {
+      const code = genRoomCode();
+      currentRole = "host";
+      currentRoom = code;
+      const initial = buildInitialRoom(code);
+      await writeRoom(code, initial);
+      subscribeRoom(code);
+
+      document.getElementById("homeView").classList.add("hidden");
+      document.getElementById("playerView").classList.add("hidden");
+      document.getElementById("hostView").classList.remove("hidden");
+
+      document.getElementById("hostRoomCode").textContent = code;
+      document.getElementById("shareUrlText").textContent =
+        "網址：" + window.location.href.split("?")[0] + " ｜ 房號：" + code;
+      renderRoom(initial);
+      showToast("房間 " + code + " 已建立！");
+    }
+
+    async function joinPlayerRoom() {
+      const code = document.getElementById("joinCode").value.trim();
+      const name = document.getElementById("joinName").value.trim();
+      if (!/^\d{4}$/.test(code)) return showToast("請輸入 4 位數數字房號");
+      if (!name) return showToast("請輸入你的暱稱或學號");
+
+      currentRole = "player";
+      currentRoom = code;
+      currentPlayerId = "p_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+
+      const playerObj = { name, cash: INITIAL_CASH, holdings: {} };
+
+      if (window.fb) {
+        await window.fb.set(
+          window.fb.ref(window.fb.db, `rooms/${code}/players/${currentPlayerId}`),
+          playerObj
+        );
+      } else {
+        const raw = localStorage.getItem("room_" + code);
+        const data = raw ? JSON.parse(raw) : buildInitialRoom(code);
+        data.players = data.players || {};
+        data.players[currentPlayerId] = playerObj;
+        localStorage.setItem("room_" + code, JSON.stringify(data));
+      }
+
+      subscribeRoom(code);
+
+      document.getElementById("homeView").classList.add("hidden");
+      document.getElementById("hostView").classList.add("hidden");
+      document.getElementById("playerView").classList.remove("hidden");
+
+      document.getElementById("pRoomCode").textContent = code;
+      document.getElementById("pNameDisplay").textContent = name;
+      showToast("已加入房間 " + code);
+    }
+
+    // 停止交易並依全班淨買超結算股價
+    async function closeAndSettleRound() {
+      if (!latestRoomData) return;
+      if (!latestRoomData.tradingOpen) {
+        return showToast("本回合已經停止交易並結算了！");
+      }
+
+      const stocksMap = latestRoomData.stocks || {};
+      const updatedStocks = {};
+      const notes = [];
+
+      Object.values(stocksMap).forEach(s => {
+        const flow = s.netFlow || 0;
+        const rawChange = flow * IMPACT_PER_NET_SHARE;
+        const clampedChange = Math.max(-MAX_ROUND_MOVE, Math.min(MAX_ROUND_MOVE, rawChange));
+        const newPrice = Math.max(10, Math.round(s.price * (1 + clampedChange)));
+        const pctText = ((clampedChange >= 0 ? "+" : "") + (clampedChange * 100).toFixed(1) + "%");
+
+        updatedStocks[s.id] = {
+          ...s,
+          prevPrice: s.price,
+          price: newPrice
+        };
+
+        notes.push(`${s.name}：淨買超 ${flow >= 0 ? "+" : ""}${flow} 股 ➔ 股價 $${s.price} → $${newPrice}（${pctText}）`);
+      });
+
+      const explanation =
+        `第 ${latestRoomData.round} 回合已封盤！本回合股價由全班籌碼決定：` + notes.join("；") +
+        `。請主持人說明盤勢後，點擊「進入下一回合」。`;
+
+      await patchRoom("", {
+        tradingOpen: false,
+        stocks: updatedStocks,
+        explanation
+      });
+      showToast("已停止交易並結算本回合股價！");
+    }
+
+    // 進入下一回合：歸零本回合 netFlow 並重新開放交易
+    async function startNextRound() {
+      if (!latestRoomData) return;
+      if (latestRoomData.tradingOpen) {
+        return showToast("請先按「停止交易並結算股價」結束本回合！");
+      }
+
+      const nextRound = (latestRoomData.round || 1) + 1;
+      const resetStocks = {};
+      Object.values(latestRoomData.stocks || {}).forEach(s => {
+        resetStocks[s.id] = {
+          ...s,
+          netFlow: 0
+        };
+      });
+
+      await patchRoom("", {
+        round: nextRound,
+        tradingOpen: true,
+        stocks: resetStocks,
+        explanation: `第 ${nextRound} 回合開始！本回合淨買超已歸零，請同學根據目前價格與策略進行買賣。`
+      });
+      showToast(`已進入第 ${nextRound} 回合並開放交易！`);
+    }
+
+    async function resetGame() {
+      if (!currentRoom) return;
+      const fresh = buildInitialRoom(currentRoom);
+      const oldPlayers = latestRoomData?.players || {};
+      Object.keys(oldPlayers).forEach(pid => {
+        fresh.players[pid] = {
+          name: oldPlayers[pid].name,
+          cash: INITIAL_CASH,
+          holdings: {}
+        };
+      });
+      await writeRoom(currentRoom, fresh);
+      showToast("已重置為第 1 回合！");
+    }
+
+    function calcPlayerTotal(player, stocksMap) {
+      let stockVal = 0;
+      const holdings = player.holdings || {};
+      Object.keys(holdings).forEach(sid => {
+        const qty = holdings[sid] || 0;
+        const price = stocksMap[sid]?.price || 0;
+        stockVal += qty * price;
+      });
+      const cash = player.cash ?? INITIAL_CASH;
+      return { cash, stockVal, total: cash + stockVal };
+    }
+
+    async function trade(stockId, action) {
+      if (!latestRoomData || !currentPlayerId) return;
+      if (!latestRoomData.tradingOpen) {
+        return showToast("本回合已停止交易，請看主持人說明並等待下一回合！");
+      }
+
+      const player = latestRoomData.players?.[currentPlayerId];
+      const stock = latestRoomData.stocks?.[stockId];
+      if (!player || !stock) return;
+
+      let cash = player.cash ?? INITIAL_CASH;
+      const holdings = { ...(player.holdings || {}) };
+      let qty = holdings[stockId] || 0;
+      const price = stock.price;
+      let deltaFlow = 0;
+
+      if (action === "buy1") {
+        if (cash < price) return showToast("現金不足買進 1 股");
+        cash -= price;
+        qty += 1;
+        deltaFlow = 1;
+      } else if (action === "buyAll") {
+        const maxBuy = Math.floor(cash / price);
+        if (maxBuy <= 0) return showToast("現金不足");
+        cash -= maxBuy * price;
+        qty += maxBuy;
+        deltaFlow = maxBuy;
+      } else if (action === "sell1") {
+        if (qty <= 0) return showToast("目前沒有持股可賣");
+        cash += price;
+        qty -= 1;
+        deltaFlow = -1;
+      } else if (action === "sellAll") {
+        if (qty <= 0) return showToast("目前沒有持股可賣");
+        cash += qty * price;
+        deltaFlow = -qty;
+        qty = 0;
+      }
+
+      holdings[stockId] = qty;
+      const nextFlow = (stock.netFlow || 0) + deltaFlow;
+
+      await patchRoom("players/" + currentPlayerId, { cash, holdings });
+      await patchRoom("stocks/" + stockId, { netFlow: nextFlow });
+      showToast("委託已成交（已影響本回合籌碼）！");
+    }
+
+    function renderRoom(data) {
+      const stocksMap = data.stocks || {};
+      const stocksArr = Object.values(stocksMap);
+      const playersMap = data.players || {};
+      const isOpen = Boolean(data.tradingOpen);
+
+      const playersArr = Object.entries(playersMap).map(([id, p]) => {
+        const stats = calcPlayerTotal(p, stocksMap);
+        return { id, ...p, ...stats };
+      }).sort((a, b) => b.total - a.total);
+
+      if (currentRole === "host") {
+        document.getElementById("hostRoundNum").textContent = data.round;
+        document.getElementById("hostExplanationText").textContent = data.explanation || "";
+        document.getElementById("playerCount").textContent = playersArr.length;
+
+        const closeBtn = document.getElementById("closeAndSettleBtn");
+        const nextBtn = document.getElementById("nextRoundBtn");
+        const phaseBanner = document.getElementById("hostPhaseBanner");
+
+        if (isOpen) {
+          closeBtn.disabled = false;
+          nextBtn.disabled = true;
+          phaseBanner.textContent = `🟢 第 ${data.round} 回合：交易開放中！全班買賣力道將決定封盤漲跌`;
+          phaseBanner.className = "status-banner status-open";
+        } else {
+          closeBtn.disabled = true;
+          nextBtn.disabled = false;
+          phaseBanner.textContent = `🟡 第 ${data.round} 回合已封盤結算！請向全班說明盤勢，再按「進入下一回合」`;
+          phaseBanner.className = "status-banner status-closed";
+        }
+
+        document.getElementById("hostStocksGrid").innerHTML = stocksArr.map(s => {
+          const diff = s.price - s.prevPrice;
+          const pct = s.prevPrice ? ((diff / s.prevPrice) * 100).toFixed(1) : "0.0";
+          const cls = diff > 0 ? "pos" : diff < 0 ? "neg" : "flat";
+          const arrow = diff > 0 ? "▲" : diff < 0 ? "▼" : "—";
+          const flow = s.netFlow || 0;
+          const flowCls = flow > 0 ? "pos" : flow < 0 ? "neg" : "flat";
+          return `
+            <div class="stock-item">
+              <div style="font-weight: 700;">${s.name}</div>
+              <div class="stock-price ${cls}">$${s.price.toLocaleString()}</div>
+              <div class="${cls}" style="font-size: 0.9rem;">上輪變動：${arrow} ${diff >= 0 ? "+" : ""}${diff} (${pct}%)</div>
+              <div class="${flowCls}" style="font-size: 0.88rem; margin-top: 4px;">
+                本回合淨買超：<strong>${flow >= 0 ? "+" : ""}${flow}</strong> 股
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        const tbody = document.getElementById("leaderboardBody");
+        if (playersArr.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="color: var(--muted);">等待同學加入...</td></tr>`;
+        } else {
+          tbody.innerHTML = playersArr.map((p, idx) => {
+            const ret = (((p.total - INITIAL_CASH) / INITIAL_CASH) * 100).toFixed(1);
+            const cls = p.total >= INITIAL_CASH ? "pos" : "neg";
+            return `
+              <tr>
+                <td><strong>#${idx + 1}</strong></td>
+                <td>${p.name}</td>
+                <td>$${p.cash.toLocaleString()}</td>
+                <td>$${p.stockVal.toLocaleString()}</td>
+                <td><strong>$${p.total.toLocaleString()}</strong></td>
+                <td class="${cls}">${ret >= 0 ? "+" : ""}${ret}%</td>
+              </tr>
+            `;
+          }).join("");
+        }
+      }
+
+      if (currentRole === "player") {
+        document.getElementById("pRoundNum").textContent = data.round;
+        document.getElementById("pExplanationText").textContent = data.explanation || "";
+
+        const pBanner = document.getElementById("playerPhaseBanner");
+        if (isOpen) {
+          pBanner.textContent = `🟢 第 ${data.round} 回合交易開放中！你的買賣會影響封盤股價`;
+          pBanner.className = "status-banner status-open";
+        } else {
+          pBanner.textContent = `🟡 第 ${data.round} 回合已停止交易！請聽主持人說明並等待下一回合`;
+          pBanner.className = "status-banner status-closed";
+        }
+
+        const me = playersMap[currentPlayerId] || { name: "", cash: INITIAL_CASH, holdings: {} };
+        const stats = calcPlayerTotal(me, stocksMap);
+        const ret = (((stats.total - INITIAL_CASH) / INITIAL_CASH) * 100).toFixed(1);
+        const retCls = stats.total >= INITIAL_CASH ? "pos" : "neg";
+
+        document.getElementById("pCash").textContent = "$" + stats.cash.toLocaleString();
+        document.getElementById("pTotalAsset").innerHTML =
+          `$${stats.total.toLocaleString()} <span class="${retCls}" style="font-size:0.9rem;">(${ret >= 0 ? "+" : ""}${ret}%)</span>`;
+
+        const disAttr = isOpen ? "" : "disabled";
+        document.getElementById("playerStocksList").innerHTML = stocksArr.map(s => {
+          const qty = me.holdings?.[s.id] || 0;
+          const diff = s.price - s.prevPrice;
+          const cls = diff > 0 ? "pos" : diff < 0 ? "neg" : "flat";
+          return `
+            <div class="trade-card">
+              <div class="trade-header">
+                <strong>${s.name}</strong>
+                <span class="${cls}" style="font-size: 1.15rem; font-weight: 700;">$${s.price.toLocaleString()}</span>
+              </div>
+              <div style="font-size: 0.88rem; color: var(--muted);">
+                目前持有：<strong>${qty}</strong> 股（市值 $${(qty * s.price).toLocaleString()}）
+              </div>
+              <div class="trade-actions">
+                <button class="up" ${disAttr} onclick="trade('${s.id}', 'buy1')">買 1 股</button>
+                <button class="up" ${disAttr} onclick="trade('${s.id}', 'buyAll')">全倉買</button>
+                <button class="down" ${disAttr} onclick="trade('${s.id}', 'sell1')">賣 1 股</button>
+                <button class="down" ${disAttr} onclick="trade('${s.id}', 'sellAll')">全出清</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+  </script>
+</body>
+</html>
