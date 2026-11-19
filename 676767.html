@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>華爾街風雲：五回合操盤手 | 多人即時股票交易遊戲</title>
+    <title>華爾街風雲：十台AI操盤手對決 | 單人五回合股票模擬器</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -22,1790 +22,1653 @@
                     },
                     colors: {
                         terminal: {
-                            bg: '#0b0e14',
-                            card: '#131722',
-                            border: '#2a2e39',
-                            hover: '#1e222d'
+                            bg: '#090c12',
+                            card: '#121722',
+                            border: '#252c3d',
+                            hover: '#1b2232'
                         }
                     }
                 }
             }
-        }
+        };
     </script>
+
     <style>
         body {
-            background-color: #0b0e14;
-            color: #d1d4dc;
+            background-color: #090c12;
+            color: #d8dee9;
             overflow-x: hidden;
         }
-        /* 自訂滾動條 */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #0b0e14;
+            background: #090c12;
         }
         ::-webkit-scrollbar-thumb {
-            background: #2a2e39;
+            background: #283044;
             border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #434651;
+            background: #3d4866;
         }
+
         /* 跑馬燈動畫 */
-        @keyframes ticker {
+        @keyframes tickerScroll {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
         .animate-ticker {
             display: inline-block;
             white-space: nowrap;
-            animation: ticker 25s linear infinite;
+            animation: tickerScroll 30s linear infinite;
         }
         .animate-ticker:hover {
             animation-play-state: paused;
         }
-        /* 價格閃爍動畫 */
-        @keyframes flashUp {
+
+        /* 價格跳動閃爍動畫 */
+        @keyframes flashUpTW {
             0% { background-color: rgba(239, 68, 68, 0.35); }
             100% { background-color: transparent; }
         }
-        @keyframes flashDown {
-            0% { background-color: rgba(34, 197, 94, 0.35); }
+        @keyframes flashDownTW {
+            0% { background-color: rgba(16, 185, 129, 0.35); }
             100% { background-color: transparent; }
         }
         @keyframes flashUpUS {
-            0% { background-color: rgba(34, 197, 94, 0.35); }
+            0% { background-color: rgba(16, 185, 129, 0.35); }
             100% { background-color: transparent; }
         }
         @keyframes flashDownUS {
             0% { background-color: rgba(239, 68, 68, 0.35); }
             100% { background-color: transparent; }
         }
-        .flash-red { animation: flashUp 0.6s ease-out; }
-        .flash-green { animation: flashDown 0.6s ease-out; }
-        .flash-us-up { animation: flashUpUS 0.6s ease-out; }
-        .flash-us-down { animation: flashDownUS 0.6s ease-out; }
-        
+        .flash-tw-up { animation: flashUpTW 0.65s ease-out; }
+        .flash-tw-down { animation: flashDownTW 0.65s ease-out; }
+        .flash-us-up { animation: flashUpUS 0.65s ease-out; }
+        .flash-us-down { animation: flashDownUS 0.65s ease-out; }
+
         .glass-modal {
-            background: rgba(19, 23, 34, 0.92);
-            backdrop-filter: blur(12px);
+            background: rgba(16, 21, 32, 0.96);
+            backdrop-filter: blur(14px);
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans select-none">
 
-    <!-- 頂部導覽列 -->
+    <!-- ==================== 頂部導覽列 ==================== -->
     <header class="bg-terminal-card border-b border-terminal-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-30">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
-                <i class="fa-solid fa-chart-line text-lg"></i>
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 via-orange-600 to-rose-600 flex items-center justify-center text-white font-extrabold shadow-lg shadow-orange-600/20">
+                <i class="fa-solid fa-sack-dollar text-base"></i>
             </div>
             <div>
-                <h1 class="font-bold text-white text-base sm:text-lg tracking-tight flex items-center gap-2">
-                    華爾街風雲 <span class="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 font-mono">5-ROUND TERMINAL</span>
+                <h1 class="font-extrabold text-white text-sm sm:text-lg tracking-tight flex items-center gap-2">
+                    華爾街風雲：十台AI操盤手對決
+                    <span class="hidden md:inline-block text-[11px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono">±10% LIMIT • 10 AI ARENA</span>
                 </h1>
-                <p class="text-[11px] text-gray-400 hidden sm:block">即時多人供需演算 × 新聞事件驅動交易模擬</p>
+                <p class="text-[11px] text-gray-400 hidden sm:block">每回合 30s 新聞（可跳過）＋ 30s 交易 × 10 台智慧 AI × 臨時突發事件 × 單回合 ±10% 漲跌停</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-2 sm:gap-3">
-            <!-- 漲跌顏色切換 (台股紅漲綠跌 vs 美股綠漲紅跌) -->
-            <button id="btn-color-scheme" onclick="toggleColorScheme()" class="px-2.5 py-1.5 rounded-lg bg-terminal-bg border border-terminal-border hover:border-gray-500 text-xs font-medium flex items-center gap-1.5 transition" title="切換台股/美股漲跌配色">
-                <span id="color-scheme-indicator" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                <span id="color-scheme-text">台股配色 (紅漲綠跌)</span>
+        <div class="flex items-center gap-2">
+            <!-- 規則說明按鈕 -->
+            <button onclick="openModal('modal-rules')" class="px-2.5 py-1.5 rounded-lg bg-terminal-bg border border-terminal-border hover:border-amber-400/60 text-xs font-semibold text-amber-300 flex items-center gap-1.5 transition cursor-pointer">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>規則說明</span>
             </button>
 
-            <!-- Firebase 設定按鈕 -->
-            <button onclick="openModal('modal-firebase')" class="px-2.5 py-1.5 rounded-lg bg-terminal-bg border border-terminal-border hover:border-amber-500/50 text-xs font-medium text-amber-400 flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-cloud"></i>
-                <span class="hidden md:inline" id="conn-status-text">連線設定</span>
+            <!-- 漲跌配色切換 -->
+            <button id="btn-color-scheme" onclick="toggleColorScheme()" class="px-2.5 py-1.5 rounded-lg bg-terminal-bg border border-terminal-border hover:border-gray-500 text-xs font-medium flex items-center gap-1.5 transition cursor-pointer" title="切換台股紅漲綠跌 / 美股綠漲紅跌">
+                <span id="color-scheme-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                <span id="color-scheme-label">台股紅漲綠跌</span>
             </button>
 
-            <!-- GitHub Pages 部署與下載按鈕 -->
-            <button onclick="openModal('modal-github')" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/40 hover:bg-emerald-600/30 text-emerald-400 text-xs font-semibold flex items-center gap-1.5 transition">
-                <i class="fa-brands fa-github text-sm"></i>
-                <span>部署 / 匯出 HTML</span>
+            <!-- 匯出 GitHub Pages 單檔 index.html -->
+            <button onclick="openModal('modal-github')" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/40 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer">
+                <i class="fa-brands fa-github"></i>
+                <span>匯出 index.html</span>
             </button>
         </div>
     </header>
 
-    <!-- 即時成交與新聞跑馬燈 -->
-    <div id="ticker-bar" class="bg-[#080a0f] border-b border-terminal-border py-1.5 px-4 overflow-hidden flex items-center gap-3 text-xs font-mono">
-        <span class="px-2 py-0.5 rounded bg-red-600 text-white font-bold text-[10px] shrink-0 animate-pulse">LIVE 盤中快訊</span>
+    <!-- 即時盤中、突發事件與 AI 操盤跑馬燈 -->
+    <div class="bg-[#06080c] border-b border-terminal-border py-1.5 px-4 flex items-center gap-3 text-xs font-mono overflow-hidden">
+        <span class="px-2 py-0.5 rounded bg-amber-500 text-gray-950 font-extrabold text-[10px] shrink-0">盤中戰情</span>
         <div class="overflow-hidden w-full relative h-4">
             <div id="ticker-content" class="animate-ticker text-gray-300">
-                歡迎來到華爾街風雲終端機！請輸入暱稱建立或加入房間，每回合將發布重大財經新聞並進行 30 秒即時供需交易...
+                歡迎來到華爾街操盤競技場！每回合單日漲跌限 ±10%，小心 10 台 AI 操盤手與盤中突發事件！
             </div>
         </div>
     </div>
 
-    <!-- ==================== 畫面 1: 遊戲大廳 (LOBBY) ==================== -->
-    <main id="view-lobby" class="flex-1 flex items-center justify-center p-4">
-        <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            <!-- 左側：建立 / 加入房間 -->
-            <div class="lg:col-span-7 bg-terminal-card border border-terminal-border rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col justify-between">
+    <!-- ==================== 畫面 1：單人開局大廳與規則說明區 ==================== -->
+    <main id="view-lobby" class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 flex flex-col gap-6 justify-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+            <!-- 左側 (6欄)：玩家暱稱設定與立即開局 -->
+            <div class="lg:col-span-6 bg-terminal-card border border-terminal-border rounded-2xl p-6 sm:p-7 shadow-2xl flex flex-col justify-between">
                 <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-4">
-                        <i class="fa-solid fa-bolt"></i> 支援 GitHub Pages 無伺服器多人連線
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold mb-4">
+                        <i class="fa-solid fa-robot"></i> 單人五回合 • 10 台策略 AI • 單回合 ±10% 漲跌停
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">進入交易大廳</h2>
-                    <p class="text-gray-400 text-sm mb-6">起始資金 <span class="text-white font-mono font-bold">$100,000</span>，歷經 5 回合新聞衝擊與玩家多空對決，資產最高者勝出！</p>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">準備好迎戰十台 AI 操盤手了嗎？</h2>
+                    <p class="text-xs sm:text-sm text-gray-400 leading-relaxed mb-6">
+                        初始資金 <span class="text-white font-mono font-bold">$100,000</span>。每回合先看 <span class="text-amber-300 font-semibold">30 秒財經新聞</span>（可隨時按「跳過新聞，提前開盤」），再進入 <span class="text-emerald-300 font-semibold">30 秒即時交易</span>。盤中會出現<span class="text-rose-300 font-semibold">臨時突發事件</span>造成雙向震盪，且每回合嚴格受 <span class="text-sky-300 font-semibold">±10% 漲跌停</span>限制！
+                    </p>
 
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">操盤手暱稱</label>
-                            <input type="text" id="input-nickname" maxlength="12" placeholder="例如：少年股神、華爾街之狼" 
-                                class="w-full bg-terminal-bg border border-terminal-border focus:border-blue-500 rounded-xl px-4 py-3 text-white font-medium outline-none transition">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">你的操盤手暱稱（將顯示於最終成果表）</label>
+                            <input type="text" id="input-nickname" maxlength="14" placeholder="例如：班級股神、漲停狙擊手、逆勢操盤手"
+                                class="w-full bg-terminal-bg border border-terminal-border focus:border-amber-400 rounded-xl px-4 py-3 text-white font-semibold outline-none transition">
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                            <!-- 單人 AI 模式 -->
-                            <div class="bg-terminal-bg/80 border border-terminal-border rounded-xl p-4 flex flex-col justify-between hover:border-indigo-500/50 transition">
-                                <div>
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-indigo-400 font-bold text-sm"><i class="fa-solid fa-robot mr-1.5"></i>單人實戰 (含 AI 對手)</span>
-                                        <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300">免設定即玩</span>
-                                    </div>
-                                    <p class="text-xs text-gray-400 mb-4">與 3 位不同風格的 AI 操盤手同場競技，AI 會根據新聞與盤勢自動下單影響股價。</p>
-                                </div>
-                                <button onclick="startSoloGame()" class="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/20 transition cursor-pointer">
-                                    立即開始單人局
-                                </button>
-                            </div>
-
-                            <!-- 線上多人模式 -->
-                            <div class="bg-terminal-bg/80 border border-terminal-border rounded-xl p-4 flex flex-col justify-between hover:border-blue-500/50 transition">
-                                <div>
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-blue-400 font-bold text-sm"><i class="fa-solid fa-users mr-1.5"></i>線上多人連線</span>
-                                        <span id="multiplayer-badge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">已就緒</span>
-                                    </div>
-                                    <input type="text" id="input-room-code" maxlength="6" placeholder="輸入 4~6 碼房號 (留空自動建立)" 
-                                        class="w-full bg-terminal-card border border-terminal-border focus:border-blue-500 rounded-lg px-3 py-2 text-white font-mono text-sm uppercase outline-none mb-3">
-                                </div>
-                                <button onclick="joinOrCreateMultiplayer()" class="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-600/20 transition cursor-pointer">
-                                    建立 / 加入多人房間
-                                </button>
-                            </div>
-                        </div>
+                        <button onclick="startNewGame()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-gray-950 font-extrabold text-base shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-play"></i> 開始五回合挑戰（對決 10 台 AI）
+                        </button>
                     </div>
                 </div>
 
-                <div class="mt-6 pt-4 border-t border-terminal-border flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
-                    <span><i class="fa-solid fa-shield-halved mr-1"></i>即時供需演算引擎 v2.5</span>
-                    <span>支援手機、平板與桌面瀏覽器</span>
+                <!-- 五支特色股票一覽 -->
+                <div class="mt-6 pt-4 border-t border-terminal-border">
+                    <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">本局五支不同特色股票</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70">
+                            <span class="font-bold text-white"><span class="font-mono text-sky-400 mr-1.5">2330</span>晶圓代工龍頭</span>
+                            <span class="font-mono text-gray-400">$100.00</span>
+                        </div>
+                        <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70">
+                            <span class="font-bold text-white"><span class="font-mono text-rose-400 mr-1.5">3017</span>AI 伺服器散熱</span>
+                            <span class="font-mono text-gray-400">$90.00</span>
+                        </div>
+                        <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70">
+                            <span class="font-bold text-white"><span class="font-mono text-emerald-400 mr-1.5">6446</span>創新製藥生技</span>
+                            <span class="font-mono text-gray-400">$75.00</span>
+                        </div>
+                        <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70">
+                            <span class="font-bold text-white"><span class="font-mono text-cyan-400 mr-1.5">2603</span>遠洋航運物流</span>
+                            <span class="font-mono text-gray-400">$60.00</span>
+                        </div>
+                        <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70 sm:col-span-2">
+                            <span class="font-bold text-white"><span class="font-mono text-amber-400 mr-1.5">1519</span>綠能儲能電網</span>
+                            <span class="font-mono text-gray-400">$80.00</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 右側：規則說明與 5 檔標的預覽 -->
-            <div class="lg:col-span-5 bg-terminal-card border border-terminal-border rounded-2xl p-6 flex flex-col justify-between">
+            <!-- 右側 (6欄)：完整規則說明區 -->
+            <div class="lg:col-span-6 bg-terminal-card border border-terminal-border rounded-2xl p-6 sm:p-7 shadow-2xl flex flex-col justify-between">
                 <div>
-                    <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-book-open text-blue-400"></i> 交易室規則與掛牌標的
-                    </h3>
-                    
-                    <div class="space-y-3 text-xs text-gray-300 mb-6">
-                        <div class="flex gap-3 items-start bg-terminal-bg p-3 rounded-xl border border-terminal-border/60">
-                            <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center shrink-0">1</span>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-list text-amber-400"></i> 遊戲規則說明區
+                        </h3>
+                        <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30 font-semibold">完整規範</span>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs sm:text-[13px] text-gray-300">
+                        <div class="p-3 rounded-xl bg-terminal-bg border border-terminal-border/80 flex gap-3">
+                            <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
                             <div>
-                                <p class="font-bold text-white">新聞快訊階段 (8 秒)</p>
-                                <p class="text-gray-400 mt-0.5">每回合開盤前發布突發新聞，包含產業利多、黑天鵝或政策轉向，預告本回合股價基本面趨勢。</p>
+                                <div class="font-bold text-white">五回合雙階段制（30s 新聞可跳過 ＋ 30s 交易）</div>
+                                <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
+                                    共 5 回合。每回合先顯示 <strong class="text-amber-300">30 秒不重複財經新聞</strong>（可隨時按「跳過新聞，提前開盤」），再進入 <strong class="text-emerald-300">30 秒交易階段</strong>。
+                                </p>
                             </div>
                         </div>
-                        <div class="flex gap-3 items-start bg-terminal-bg p-3 rounded-xl border border-terminal-border/60">
-                            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 font-bold flex items-center justify-center shrink-0">2</span>
+
+                        <div class="p-3 rounded-xl bg-terminal-bg border border-terminal-border/80 flex gap-3">
+                            <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-300 font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
                             <div>
-                                <p class="font-bold text-white">盤中即時交易 (30 秒)</p>
-                                <p class="text-gray-400 mt-0.5">股價每秒跳動！<span class="text-amber-400">新聞動能</span>加上<span class="text-emerald-400">所有線上玩家的即時買賣單</span>將直接推升或砸盤股價。</p>
+                                <div class="font-bold text-white">單回合嚴格 ±10% 漲跌停限制</div>
+                                <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
+                                    每回合以該回合「開盤參考價」為基準，漲幅上限 <strong class="text-red-400">+10.00%（漲停）</strong>、跌幅下限 <strong class="text-emerald-400">-10.00%（跌停）</strong>，股價絕不無止盡暴衝或暴跌。
+                                </p>
                             </div>
                         </div>
-                        <div class="flex gap-3 items-start bg-terminal-bg p-3 rounded-xl border border-terminal-border/60">
-                            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center shrink-0">3</span>
+
+                        <div class="p-3 rounded-xl bg-terminal-bg border border-terminal-border/80 flex gap-3">
+                            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-300 font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
                             <div>
-                                <p class="font-bold text-white">五回合最終結算</p>
-                                <p class="text-gray-400 mt-0.5">第 5 回合結束後強制平倉結算總淨值，爭奪「華爾街之狼」最高榮譽！</p>
+                                <div class="font-bold text-white">十台智慧 AI ＋ 臨時突發事件雙向震盪</div>
+                                <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
+                                    10 台 AI 各有策略（價值低接、動能追價、漲停獲利了結、逆勢均值回歸、事件狙擊、恐慌停損等），加上盤中<strong class="text-amber-300">臨時突發事件</strong>（如產線跳電、主力倒貨、急單搶貨、政策急轉），讓盤勢充滿震盪與攻防。
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-terminal-bg border border-terminal-border/80 flex gap-3">
+                            <span class="w-6 h-6 rounded-full bg-sky-500/20 text-sky-300 font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+                            <div>
+                                <div class="font-bold text-white">五回合結束成果表（方便截圖到班群比 ROI）</div>
+                                <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
+                                    第 5 回合結束自動結算持股與 <strong class="text-amber-300">投資報酬率（ROI %）</strong>，列出你與 10 台 AI 的名次、最終淨值與操作摘要，支援一鍵複製與整張截圖分享到班群！
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div>
-                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">掛牌交易標的 (5 檔)</div>
-                    <div class="grid grid-cols-1 gap-1.5 text-xs">
-                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
-                            <span class="font-bold text-white"><span class="text-blue-400 font-mono mr-1.5">TSMC</span>護國神山晶圓</span>
-                            <span class="text-gray-400 font-mono">起始 $100</span>
-                        </div>
-                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
-                            <span class="font-bold text-white"><span class="text-purple-400 font-mono mr-1.5">NVDA</span>超微算力科技</span>
-                            <span class="text-gray-400 font-mono">起始 $120</span>
-                        </div>
-                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
-                            <span class="font-bold text-white"><span class="text-emerald-400 font-mono mr-1.5">BIOX</span>基因生技醫療</span>
-                            <span class="text-gray-400 font-mono">起始 $60</span>
-                        </div>
-                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
-                            <span class="font-bold text-white"><span class="text-cyan-400 font-mono mr-1.5">SHIP</span>長榮綠能航運</span>
-                            <span class="text-gray-400 font-mono">起始 $50</span>
-                        </div>
-                        <div class="flex justify-between items-center px-3 py-1.5 rounded bg-terminal-bg border border-terminal-border/50">
-                            <span class="font-bold text-white"><span class="text-amber-400 font-mono mr-1.5">COIN</span>區塊鏈加密金控</span>
-                            <span class="text-gray-400 font-mono">起始 $80</span>
-                        </div>
-                    </div>
+                <div class="mt-4 pt-3 border-t border-terminal-border flex items-center justify-between text-[11px] text-gray-400">
+                    <span><i class="fa-solid fa-shield-halved text-sky-400 mr-1"></i> 18 則不重複新聞 × 10 台策略 AI</span>
+                    <span>支援 GitHub Pages 單檔匯出</span>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- ==================== 畫面 2: 多人等候室 (WAITING ROOM) ==================== -->
-    <section id="view-waiting" class="hidden flex-1 flex items-center justify-center p-4">
-        <div class="max-w-lg w-full bg-terminal-card border border-terminal-border rounded-2xl p-6 sm:p-8 shadow-2xl text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-3">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 多人連線房間已建立
-            </div>
-            <h2 class="text-xl font-bold text-white mb-1">邀請好友加入交易室</h2>
-            <p class="text-xs text-gray-400 mb-5">分享下方房間代碼給好友，全員到齊後由房主點擊開始</p>
-
-            <div class="bg-terminal-bg border border-terminal-border rounded-xl p-4 mb-6 flex items-center justify-between">
-                <div class="text-left">
-                    <div class="text-[11px] text-gray-400">房間代碼 (ROOM CODE)</div>
-                    <div id="display-room-code" class="text-3xl font-mono font-extrabold text-blue-400 tracking-widest">----</div>
-                </div>
-                <button onclick="copyRoomCode()" class="px-4 py-2 rounded-lg bg-terminal-card hover:bg-terminal-hover border border-terminal-border text-xs font-semibold text-white flex items-center gap-1.5 transition cursor-pointer">
-                    <i class="fa-regular fa-copy"></i> 複製房號
-                </button>
-            </div>
-
-            <div class="text-left mb-6">
-                <div class="flex justify-between items-center text-xs text-gray-400 mb-2">
-                    <span>已連線操盤手 (<span id="waiting-player-count">1</span> 人)</span>
-                    <span>初始資金 $100,000</span>
-                </div>
-                <div id="waiting-player-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                    <!-- 動態生成玩家列表 -->
-                </div>
-            </div>
-
-            <div class="flex gap-3">
-                <button onclick="leaveRoom()" class="px-4 py-3 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-gray-300 font-semibold text-sm transition cursor-pointer">
-                    離開房間
-                </button>
-                <button id="btn-host-start" onclick="hostStartGame()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/25 transition cursor-pointer">
-                    <i class="fa-solid fa-play mr-1.5"></i> 開始第 1 回合交易
-                </button>
-            </div>
-            <p id="waiting-guest-msg" class="hidden text-xs text-amber-400 mt-3 animate-pulse">
-                <i class="fa-solid fa-spinner fa-spin mr-1"></i> 等待房主開始遊戲...
-            </p>
-        </div>
-    </section>
-
-    <!-- ==================== 畫面 3: 主交易終端機 (TRADING ARENA) ==================== -->
+    <!-- ==================== 畫面 2：主交易戰情室 ==================== -->
     <section id="view-game" class="hidden flex-1 flex flex-col max-w-[1600px] w-full mx-auto p-3 sm:p-4 gap-3 sm:gap-4">
-        
-        <!-- 頂部狀態儀表板：回合數、階段倒數、個人資產總覽 -->
+
+        <!-- 頂部狀態列：回合、階段、倒數計時、個人資產與 ROI -->
         <div class="grid grid-cols-2 lg:grid-cols-12 gap-3">
             <!-- 回合與倒數計時器 -->
-            <div class="col-span-2 lg:col-span-4 bg-terminal-card border border-terminal-border rounded-xl p-3.5 flex items-center justify-between">
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span id="game-round-badge" class="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-mono font-bold text-xs">ROUND 1 / 5</span>
-                        <span id="game-phase-badge" class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-xs">新聞發布中</span>
+            <div class="col-span-2 lg:col-span-4 bg-terminal-card border border-terminal-border rounded-xl p-3.5 flex flex-col justify-between gap-2">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="hud-round-badge" class="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-mono font-extrabold text-xs">ROUND 1 / 5</span>
+                            <span id="hud-phase-badge" class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-xs">新聞階段 (30s)</span>
+                        </div>
+                        <div id="hud-phase-sub" class="text-[11px] text-gray-400 mt-1">研判新聞與單回合 ±10% 漲跌停空間</div>
                     </div>
-                    <div id="game-room-label" class="text-[11px] text-gray-400 font-mono mt-1.5">模式：單人實戰</div>
+                    <div class="text-right">
+                        <div class="text-[10px] text-gray-400 uppercase font-semibold">剩餘時間</div>
+                        <div id="hud-timer" class="text-3xl font-mono font-extrabold text-white leading-none">30<span class="text-sm text-gray-400 ml-0.5">s</span></div>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <div class="text-[10px] text-gray-400 uppercase font-semibold">階段剩餘時間</div>
-                    <div id="game-timer" class="text-3xl font-mono font-extrabold text-white leading-none mt-0.5">08<span class="text-sm text-gray-400 ml-0.5">s</span></div>
+                <div class="w-full h-1.5 bg-terminal-bg rounded-full overflow-hidden">
+                    <div id="hud-timer-bar" class="h-full bg-amber-400 transition-all duration-500" style="width: 100%"></div>
                 </div>
             </div>
 
-            <!-- 個人現金餘額 -->
-            <div class="col-span-1 lg:col-span-3 bg-terminal-card border border-terminal-border rounded-xl p-3.5 flex flex-col justify-center">
-                <div class="text-xs text-gray-400 flex items-center justify-between">
-                    <span>可用現金 (CASH)</span>
-                    <i class="fa-solid fa-wallet text-gray-500"></i>
-                </div>
-                <div id="player-cash" class="text-xl sm:text-2xl font-mono font-bold text-white mt-1">$100,000</div>
-            </div>
-
-            <!-- 股票持倉市值 -->
+            <!-- 可用現金 -->
             <div class="col-span-1 lg:col-span-2 bg-terminal-card border border-terminal-border rounded-xl p-3.5 flex flex-col justify-center">
                 <div class="text-xs text-gray-400 flex items-center justify-between">
-                    <span>持倉市值</span>
-                    <i class="fa-solid fa-briefcase text-gray-500"></i>
+                    <span>可用現金</span>
+                    <i class="fa-solid fa-wallet text-gray-500"></i>
                 </div>
-                <div id="player-stock-value" class="text-xl sm:text-2xl font-mono font-bold text-blue-400 mt-1">$0</div>
+                <div id="hud-cash" class="text-xl sm:text-2xl font-mono font-extrabold text-white mt-1">$100,000</div>
             </div>
 
-            <!-- 總資產淨值與報酬率 -->
-            <div class="col-span-2 lg:col-span-3 bg-gradient-to-r from-terminal-card to-[#181e2c] border border-blue-500/30 rounded-xl p-3.5 flex flex-col justify-center">
-                <div class="text-xs text-gray-300 flex items-center justify-between">
-                    <span>總資產淨值 (NET WORTH)</span>
-                    <span id="player-roi" class="font-mono font-bold text-xs px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">0.00%</span>
+            <!-- 持倉市值 -->
+            <div class="col-span-1 lg:col-span-2 bg-terminal-card border border-terminal-border rounded-xl p-3.5 flex flex-col justify-center">
+                <div class="text-xs text-gray-400 flex items-center justify-between">
+                    <span>股票市值</span>
+                    <i class="fa-solid fa-layer-group text-gray-500"></i>
                 </div>
-                <div id="player-net-worth" class="text-2xl sm:text-3xl font-mono font-extrabold text-white mt-0.5">$100,000</div>
+                <div id="hud-stock-value" class="text-xl sm:text-2xl font-mono font-extrabold text-sky-400 mt-1">$0</div>
+            </div>
+
+            <!-- 總資產與即時 ROI -->
+            <div class="col-span-2 lg:col-span-4 bg-gradient-to-r from-terminal-card to-[#182032] border border-amber-500/35 rounded-xl p-3.5 flex items-center justify-between">
+                <div>
+                    <div class="text-xs text-gray-300 font-semibold">總資產淨值 (NET WORTH)</div>
+                    <div id="hud-net-worth" class="text-2xl sm:text-3xl font-mono font-extrabold text-white mt-0.5">$100,000</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] text-gray-400 uppercase font-semibold">投資報酬率 ROI</div>
+                    <div id="hud-roi" class="text-lg sm:text-xl font-mono font-extrabold px-2.5 py-1 rounded-lg bg-gray-900/90 text-gray-300 mt-0.5">0.00%</div>
+                </div>
             </div>
         </div>
 
-        <!-- 當回合新聞快訊橫幅 -->
-        <div id="active-news-banner" class="bg-gradient-to-r from-amber-950/60 via-terminal-card to-terminal-card border border-amber-500/40 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <!-- 當回合新聞快訊列 -->
+        <div class="bg-gradient-to-r from-amber-950/55 via-terminal-card to-terminal-card border border-amber-500/40 rounded-xl p-3.5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
             <div class="flex items-start gap-3">
-                <div class="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center shrink-0 mt-0.5">
                     <i class="fa-solid fa-newspaper text-lg"></i>
                 </div>
                 <div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">第 <span id="banner-round-num">1</span> 回合頭條新聞</span>
-                        <span id="banner-news-tag" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">市場焦點</span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300">第 <span id="banner-round">1</span> 回合新聞</span>
+                        <span id="banner-category" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-200 font-semibold">財經快訊</span>
+                        <span id="banner-hints" class="text-[11px] font-mono text-gray-300"></span>
                     </div>
-                    <h3 id="banner-news-title" class="text-white font-bold text-sm sm:text-base mt-0.5">載入中...</h3>
-                    <p id="banner-news-desc" class="text-xs text-gray-300 mt-0.5">請留意新聞對各產業板塊的潛在衝擊。</p>
+                    <h3 id="banner-title" class="text-white font-extrabold text-sm sm:text-base mt-0.5">新聞載入中...</h3>
+                    <p id="banner-body" class="text-xs text-gray-300 mt-0.5 line-clamp-2 sm:line-clamp-none">新聞內容載入中...</p>
                 </div>
             </div>
-            <button onclick="reopenNewsModal()" class="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-semibold shrink-0 self-end sm:self-center transition cursor-pointer">
-                <i class="fa-solid fa-expand mr-1"></i> 檢視快訊詳情
-            </button>
+
+            <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+                <button onclick="openNewsModal()" class="px-3 py-2 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-amber-500/40 text-amber-300 text-xs font-bold transition cursor-pointer">
+                    <i class="fa-solid fa-maximize mr-1"></i> 放大閱讀
+                </button>
+                <button id="btn-skip-news" onclick="skipNewsToTrading()" class="px-3.5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-gray-950 text-xs font-extrabold shadow transition cursor-pointer">
+                    <i class="fa-solid fa-forward-step mr-1"></i> 跳過新聞，提前開盤
+                </button>
+            </div>
         </div>
 
-        <!-- 中央主要交易區：左側走勢圖 + 下單面板，右側 5 檔報價 + 排行榜 -->
+        <!-- 盤中臨時突發事件橫幅（觸發時顯示） -->
+        <div id="shock-event-banner" class="hidden bg-gradient-to-r from-rose-950/80 via-amber-950/70 to-terminal-card border border-rose-500/60 rounded-xl px-4 py-2.5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 text-xs sm:text-sm">
+                <span class="px-2 py-0.5 rounded bg-rose-600 text-white font-mono font-extrabold text-[11px] shrink-0">突發事件</span>
+                <span id="shock-event-text" class="font-bold text-rose-100"></span>
+            </div>
+            <span id="shock-event-tag" class="text-[11px] font-mono text-amber-300 shrink-0 hidden sm:inline"></span>
+        </div>
+
+        <!-- 主交易區：左側走勢圖 + 下單台；右側五檔股票報價 + 11 位排名 + AI 動態 -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
-            
-            <!-- 左側 (7欄)：即時走勢圖與交易執行面板 -->
+
+            <!-- 左側 (7欄) -->
             <div class="lg:col-span-7 flex flex-col gap-4">
                 <!-- 走勢圖卡片 -->
                 <div class="bg-terminal-card border border-terminal-border rounded-xl p-4 flex flex-col">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                         <div class="flex items-center gap-3">
-                            <span id="chart-stock-symbol" class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-400 font-mono font-bold text-sm">TSMC</span>
+                            <span id="chart-code" class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 font-mono font-extrabold text-sm">2330</span>
                             <div>
-                                <h3 id="chart-stock-name" class="text-white font-bold text-base leading-tight">護國神山晶圓</h3>
-                                <span id="chart-stock-sector" class="text-[11px] text-gray-400">半導體 / 晶圓代工</span>
+                                <div class="flex items-center gap-2">
+                                    <h3 id="chart-name" class="text-white font-extrabold text-base leading-tight">晶圓代工龍頭</h3>
+                                    <span id="chart-limit-badge" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-gray-800 text-gray-300 border border-gray-700">±10% 區間內</span>
+                                </div>
+                                <span id="chart-sector" class="text-[11px] text-gray-400">半導體晶圓代工</span>
                             </div>
                         </div>
                         <div class="text-right">
-                            <div id="chart-stock-price" class="text-2xl font-mono font-extrabold text-white">$100.00</div>
-                            <div id="chart-stock-change" class="text-xs font-mono font-semibold text-gray-400">0.00 (0.00%)</div>
+                            <div id="chart-price" class="text-2xl font-mono font-extrabold text-white">$100.00</div>
+                            <div id="chart-change" class="text-xs font-mono font-semibold text-gray-400">本回合 0.00 (0.00%)</div>
                         </div>
                     </div>
 
-                    <!-- Canvas 即時走勢圖 -->
-                    <div class="relative w-full h-56 sm:h-64 bg-[#090c10] rounded-lg border border-terminal-border/80 overflow-hidden">
+                    <!-- 本回合開盤價、跌停價、漲停價標示列 -->
+                    <div class="grid grid-cols-3 gap-2 text-[11px] font-mono bg-terminal-bg/90 border border-terminal-border/80 rounded-lg px-3 py-1.5 mb-2.5">
+                        <div>
+                            <span class="text-gray-400">跌停(-10%): </span>
+                            <span id="chart-limit-down" class="font-bold text-emerald-400">$90.00</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-gray-400">本回開盤: </span>
+                            <span id="chart-round-open" class="font-bold text-gray-200">$100.00</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-gray-400">漲停(+10%): </span>
+                            <span id="chart-limit-up" class="font-bold text-red-400">$110.00</span>
+                        </div>
+                    </div>
+
+                    <div class="relative w-full h-56 sm:h-64 bg-[#080b10] rounded-lg border border-terminal-border/80 overflow-hidden">
                         <canvas id="stock-chart-canvas" class="w-full h-full block"></canvas>
-                        <!-- 盤中買賣力道條 (Order Book Pressure) -->
-                        <div class="absolute bottom-2 left-3 right-3 flex items-center gap-2 bg-terminal-card/90 backdrop-blur px-2.5 py-1.5 rounded border border-terminal-border text-[11px]">
-                            <span class="text-gray-400 shrink-0">即時多空力道:</span>
+
+                        <!-- 即時供需力道條 -->
+                        <div class="absolute bottom-2 left-3 right-3 flex items-center gap-2 bg-terminal-card/95 backdrop-blur px-2.5 py-1.5 rounded-lg border border-terminal-border text-[11px]">
+                            <span class="text-gray-400 shrink-0">買賣力道:</span>
                             <div class="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden flex">
-                                <div id="pressure-buy-bar" class="bg-red-500 h-full transition-all duration-300" style="width: 50%"></div>
-                                <div id="pressure-sell-bar" class="bg-green-500 h-full transition-all duration-300" style="width: 50%"></div>
+                                <div id="pressure-up-bar" class="h-full transition-all duration-300" style="width: 50%"></div>
+                                <div id="pressure-down-bar" class="h-full transition-all duration-300" style="width: 50%"></div>
                             </div>
-                            <span id="pressure-text" class="font-mono text-gray-300 shrink-0">均衡</span>
+                            <span id="pressure-label" class="font-mono text-gray-300 shrink-0">多空均衡</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 快速下單操作面板 -->
+                <!-- 交易下單面板 -->
                 <div class="bg-terminal-card border border-terminal-border rounded-xl p-4">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <div class="text-sm font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-bolt text-amber-400"></i> 閃電下單交易台 (<span id="trade-panel-symbol" class="font-mono text-blue-400">TSMC</span>)
+                        <div class="text-sm font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-amber-400"></i> 即時下單台 — <span id="trade-symbol" class="font-mono text-sky-300">2330</span>
                         </div>
-                        <div class="text-xs text-gray-400">
-                            目前持有: <span id="trade-panel-owned" class="font-mono font-bold text-white">0</span> 股 
-                            (均價: <span id="trade-panel-avg" class="font-mono text-gray-300">$0.00</span>)
+                        <div class="text-xs text-gray-300 font-mono">
+                            持有: <span id="trade-owned" class="font-bold text-white">0</span> 股
+                            <span class="text-gray-500 mx-1">|</span>
+                            均價: <span id="trade-avg" class="text-gray-300">$0.00</span>
                         </div>
                     </div>
 
-                    <!-- 數量選擇快捷鍵 -->
+                    <!-- 股數快捷鍵 -->
                     <div class="grid grid-cols-5 gap-2 mb-3">
-                        <button onclick="setTradeQty(10)" class="qty-btn py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-mono font-semibold text-gray-300 transition cursor-pointer">10 股</button>
-                        <button onclick="setTradeQty(50)" class="qty-btn py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-mono font-semibold text-gray-300 transition cursor-pointer">50 股</button>
-                        <button onclick="setTradeQty(100)" class="qty-btn py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-blue-500/50 text-xs font-mono font-bold text-blue-400 transition cursor-pointer">100 股</button>
-                        <button onclick="setTradeQty('MAX_BUY')" class="py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-semibold text-amber-400 transition cursor-pointer">全倉買入</button>
-                        <button onclick="setTradeQty('MAX_SELL')" class="py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-semibold text-purple-400 transition cursor-pointer">全數清倉</button>
+                        <button onclick="setTradeQty(1)" class="py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-mono font-semibold text-gray-200 transition cursor-pointer">1 股</button>
+                        <button onclick="setTradeQty(10)" class="py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-mono font-semibold text-gray-200 transition cursor-pointer">10 股</button>
+                        <button onclick="setTradeQty(100)" class="py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-sky-500/50 text-xs font-mono font-bold text-sky-300 transition cursor-pointer">100 股</button>
+                        <button onclick="setTradeQty('ALL_IN')" class="py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-amber-500/40 text-xs font-bold text-amber-300 transition cursor-pointer">All-in 買進</button>
+                        <button onclick="setTradeQty('SELL_ALL')" class="py-1.5 rounded-lg bg-terminal-bg hover:bg-terminal-hover border border-purple-500/40 text-xs font-bold text-purple-300 transition cursor-pointer">全倉賣出</button>
                     </div>
 
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                        <div class="flex items-center bg-terminal-bg border border-terminal-border rounded-xl px-3 py-2 sm:w-44">
+                        <div class="flex items-center bg-terminal-bg border border-terminal-border focus-within:border-sky-400 rounded-xl px-3 py-2 sm:w-44">
                             <span class="text-xs text-gray-400 mr-2">股數</span>
-                            <input type="number" id="input-trade-qty" value="100" min="1" step="10" oninput="updateOrderPreview()"
+                            <input type="number" id="input-trade-qty" value="100" min="1" step="1" oninput="updateOrderPreview()"
                                 class="w-full bg-transparent text-white font-mono font-bold text-base outline-none text-right">
                         </div>
 
                         <div class="flex-1 grid grid-cols-2 gap-2.5">
-                            <button id="btn-execute-buy" onclick="executeTrade('BUY')" class="py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer">
-                                <span>買進做多 (BUY)</span>
-                                <span id="buy-cost-preview" class="text-[11px] font-mono opacity-90 font-normal">預估 $10,000</span>
+                            <button id="btn-buy" onclick="executeOrder('BUY')" class="py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer">
+                                <span>買進 (BUY)</span>
+                                <span id="preview-buy" class="text-[11px] font-mono opacity-95 font-normal">$10,000</span>
                             </button>
-                            <button id="btn-execute-sell" onclick="executeTrade('SELL')" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer">
-                                <span>賣出平倉 (SELL)</span>
-                                <span id="sell-gain-preview" class="text-[11px] font-mono opacity-90 font-normal">預估 $10,000</span>
+                            <button id="btn-sell" onclick="executeOrder('SELL')" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer">
+                                <span>賣出 (SELL)</span>
+                                <span id="preview-sell" class="text-[11px] font-mono opacity-95 font-normal">$10,000</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 右側 (5欄)：5檔股票即時報價表 + 玩家排行榜 + 成交紀錄 -->
+            <!-- 右側 (5欄)：五支股票報價 + 11 位排名 (玩家 + 10 AI) + AI 操盤動態 -->
             <div class="lg:col-span-5 flex flex-col gap-4">
-                
-                <!-- 5 檔股票報價清單 -->
+
+                <!-- 五支股票即時報價表 -->
                 <div class="bg-terminal-card border border-terminal-border rounded-xl p-4">
-                    <div class="flex items-center justify-between mb-2.5">
-                        <h3 class="text-sm font-bold text-white">盤中即時報價 (點擊切換圖表)</h3>
-                        <span class="text-[11px] text-gray-400">受新聞與玩家買賣驅動</span>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-extrabold text-white">五支股票報價（單回合 ±10% 漲跌停）</h3>
+                        <span class="text-[11px] text-gray-400">點選切換走勢</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="text-[11px] text-gray-400 border-b border-terminal-border">
-                                    <th class="pb-2 font-medium">標的</th>
-                                    <th class="pb-2 font-medium text-right">現價</th>
-                                    <th class="pb-2 font-medium text-right">漲跌幅</th>
+                                    <th class="pb-2 font-medium">股票</th>
+                                    <th class="pb-2 font-medium text-right">即時價</th>
+                                    <th class="pb-2 font-medium text-right">本回漲跌</th>
                                     <th class="pb-2 font-medium text-right">庫存 / 損益</th>
                                 </tr>
                             </thead>
-                            <tbody id="stock-list-tbody" class="divide-y divide-terminal-border/50 text-xs">
-                                <!-- JS 動態渲染 -->
+                            <tbody id="stock-table-body" class="divide-y divide-terminal-border/50 text-xs">
+                                <!-- 動態生成 5 檔股票 -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- 即時資產排行榜 -->
+                <!-- 玩家 + 10 台 AI 即時 ROI 排行榜 -->
                 <div class="bg-terminal-card border border-terminal-border rounded-xl p-4 flex-1 flex flex-col">
-                    <div class="flex items-center justify-between mb-2.5">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
-                            <i class="fa-solid fa-trophy text-amber-400"></i> 即時操盤手排行榜
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-extrabold text-white flex items-center gap-1.5">
+                            <i class="fa-solid fa-ranking-star text-amber-400"></i> 即時 ROI 排行榜（你 ＋ 10 台 AI）
                         </h3>
-                        <span id="online-count-badge" class="text-[11px] px-2 py-0.5 rounded bg-terminal-bg text-gray-400 font-mono">4 位在線</span>
+                        <span class="text-[11px] font-mono text-gray-400">共 11 位參賽者</span>
                     </div>
-                    <div id="leaderboard-list" class="space-y-2 overflow-y-auto max-h-48 pr-1">
-                        <!-- JS 動態渲染 -->
+                    <div id="live-leaderboard" class="space-y-1.5 overflow-y-auto max-h-44 pr-1 mb-3">
+                        <!-- 動態生成 11 位排名 -->
                     </div>
 
-                    <!-- 即時交易動態日誌 -->
-                    <div class="mt-4 pt-3 border-t border-terminal-border">
-                        <div class="text-[11px] font-semibold text-gray-400 mb-1.5">市場大單與新聞日誌</div>
-                        <div id="trade-log-feed" class="space-y-1 text-[11px] font-mono h-24 overflow-y-auto pr-1 text-gray-300">
-                            <!-- JS 動態渲染 -->
+                    <!-- 10 台 AI 與玩家成交動態 -->
+                    <div class="pt-2.5 border-t border-terminal-border">
+                        <div class="text-[11px] font-bold text-gray-400 mb-1.5 flex items-center justify-between">
+                            <span>AI 操盤手與突發事件動態</span>
+                            <span class="text-[10px] text-purple-300">10 AI 即時博弈中</span>
+                        </div>
+                        <div id="ai-feed" class="space-y-1 text-[11px] font-mono h-24 overflow-y-auto pr-1 text-gray-300">
+                            <!-- 動態生成成交與事件紀錄 -->
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
 
-    <!-- ==================== 畫面 4: 最終結算排行榜 (GAME OVER) ==================== -->
-    <section id="view-gameover" class="hidden flex-1 flex items-center justify-center p-4">
-        <div class="max-w-2xl w-full bg-terminal-card border border-terminal-border rounded-2xl p-6 sm:p-8 shadow-2xl">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 text-white flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg shadow-amber-500/30">
-                    <i class="fa-solid fa-crown"></i>
+    <!-- ==================== 畫面 3：最終結算成果表（方便截圖到班群比拚 ROI） ==================== -->
+    <section id="view-gameover" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+        <div id="results-capture-card" class="bg-terminal-card border-2 border-amber-500/45 rounded-2xl p-5 sm:p-7 shadow-2xl">
+            <!-- 成果表標題區 -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-terminal-border">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 text-gray-950 flex items-center justify-center text-2xl font-extrabold shadow-lg">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-300">5 ROUNDS COMPLETED • FINAL ROI REPORT</div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-white">華爾街五回合最終成果表</h2>
+                    </div>
                 </div>
-                <span class="text-xs font-bold uppercase tracking-widest text-amber-400">5 回合交易正式收盤</span>
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">最終資產結算榜</h2>
-                <p class="text-xs text-gray-400 mt-1">所有剩餘持股已依收盤價自動平倉換算為現金淨值</p>
+                <div id="result-player-summary" class="bg-terminal-bg border border-amber-500/30 rounded-xl px-4 py-2.5 text-right">
+                    <!-- 玩家最終排名與 ROI 摘要 -->
+                </div>
             </div>
 
-            <div id="final-standings-list" class="space-y-3 mb-6">
-                <!-- JS 動態渲染最終排名與稱號 -->
+            <!-- 11 位參賽者（玩家 + 10 台 AI）完整 ROI 表格 -->
+            <div class="overflow-x-auto mb-5">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead>
+                        <tr class="text-[11px] text-gray-400 uppercase border-b border-terminal-border bg-terminal-bg/60">
+                            <th class="py-2.5 px-3">名次</th>
+                            <th class="py-2.5 px-3">操盤手 / AI 策略</th>
+                            <th class="py-2.5 px-3 text-right">初始資金</th>
+                            <th class="py-2.5 px-3 text-right">最終淨值</th>
+                            <th class="py-2.5 px-3 text-right">淨損益</th>
+                            <th class="py-2.5 px-3 text-right">投資報酬率 (ROI)</th>
+                            <th class="py-2.5 px-3">操作摘要 / 評語</th>
+                        </tr>
+                    </thead>
+                    <tbody id="final-results-tbody" class="divide-y divide-terminal-border/60 font-mono">
+                        <!-- 動態生成 11 列結果 -->
+                    </tbody>
+                </table>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3">
-                <button onclick="returnToLobby()" class="flex-1 py-3 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-white font-bold text-sm transition cursor-pointer">
-                    返回遊戲大廳
-                </button>
-                <button id="btn-play-again" onclick="restartGame()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/25 transition cursor-pointer">
-                    <i class="fa-solid fa-rotate-right mr-1.5"></i> 原班人馬再戰五回合
-                </button>
+            <div class="text-[11px] text-gray-400 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-terminal-border/60">
+                <span><i class="fa-solid fa-camera text-amber-400 mr-1"></i> 提示：直接截圖此成果表即可分享到班群，比拚誰的投資報酬率（ROI）最高！</span>
+                <span id="result-timestamp" class="font-mono"></span>
             </div>
+        </div>
+
+        <!-- 結算操作按鈕列 -->
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <button onclick="copyResultsForClassGroup()" class="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-sm shadow-lg transition flex items-center gap-2 cursor-pointer">
+                <i class="fa-regular fa-copy"></i> 一鍵複製班群戰績文字
+            </button>
+            <button onclick="startNewGame()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-extrabold text-sm shadow-lg transition flex items-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-rotate-right"></i> 再玩一局（全新 5 則新聞）
+            </button>
+            <button onclick="backToLobby()" class="px-5 py-3 rounded-xl bg-terminal-card hover:bg-terminal-hover border border-terminal-border text-gray-200 font-bold text-sm transition flex items-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-house"></i> 回主畫面與規則
+            </button>
         </div>
     </section>
 
-    <!-- ==================== 彈窗 1: 每回合突發新聞快訊彈窗 ==================== -->
-    <div id="modal-news" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-        <div class="glass-modal border-2 border-amber-500/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl transform transition-all">
+    <!-- ==================== 彈窗 1：每回合 30 秒突發新聞彈窗（可隨時跳過） ==================== -->
+    <div id="modal-news" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glass-modal border-2 border-amber-400/70 rounded-2xl max-w-xl w-full p-6 shadow-2xl">
             <div class="flex items-center justify-between border-b border-terminal-border pb-3 mb-4">
                 <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-1 rounded bg-red-600 text-white font-bold text-xs animate-pulse">BREAKING NEWS</span>
-                    <span id="modal-news-round" class="font-mono text-amber-400 font-bold text-sm">ROUND 1 / 5</span>
+                    <span class="px-2.5 py-1 rounded bg-rose-600 text-white font-extrabold text-xs">BREAKING NEWS</span>
+                    <span id="modal-news-round" class="font-mono text-amber-300 font-bold text-sm">第 1 / 5 回合</span>
                 </div>
-                <div class="text-xs font-mono text-gray-400">
-                    開盤倒數: <span id="modal-news-countdown" class="text-white font-bold text-base">8</span>s
+                <div class="text-xs font-mono text-gray-300">
+                    新聞倒數: <span id="modal-news-timer" class="text-amber-300 font-extrabold text-lg">30</span>s
                 </div>
             </div>
 
-            <div class="mb-5">
-                <div id="modal-news-category" class="text-xs font-semibold text-amber-400 mb-1">【全球財經頭條】</div>
+            <div class="mb-4">
+                <div id="modal-news-category" class="text-xs font-bold text-amber-300 mb-1">【產業快訊】</div>
                 <h3 id="modal-news-headline" class="text-xl sm:text-2xl font-extrabold text-white leading-snug mb-3">
-                    新聞標題載入中...
+                    新聞標題
                 </h3>
-                <p id="modal-news-body" class="text-sm text-gray-300 leading-relaxed bg-terminal-bg/90 p-4 rounded-xl border border-terminal-border">
-                    新聞內文載入中...
+                <p id="modal-news-body" class="text-sm text-gray-200 leading-relaxed bg-terminal-bg/95 p-4 rounded-xl border border-terminal-border">
+                    新聞內文
                 </p>
             </div>
 
-            <div class="bg-blue-950/30 border border-blue-500/30 rounded-xl p-3 mb-5 flex items-center gap-3 text-xs text-blue-200">
-                <i class="fa-solid fa-lightbulb text-amber-400 text-base shrink-0"></i>
-                <span>分析師提示：新聞將持續影響本回合股價走勢，但若大量玩家同時搶買或拋售，短期供需力道將劇烈放大波動！</span>
+            <div id="modal-news-impact-box" class="bg-sky-950/35 border border-sky-500/30 rounded-xl p-3 mb-5 text-xs text-sky-200">
+                <div class="font-bold text-sky-300 mb-1"><i class="fa-solid fa-chart-line mr-1"></i> 市場風向解讀（本回合漲跌限 ±10%）</div>
+                <div id="modal-news-impact-text" class="leading-relaxed"></div>
             </div>
 
-            <button onclick="closeModal('modal-news')" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-sm transition cursor-pointer">
-                收到情報，準備進場交易！
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <button onclick="closeModal('modal-news')" class="px-4 py-3 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-gray-200 font-bold text-xs sm:text-sm transition cursor-pointer">
+                    先看盤面（背景倒數中）
+                </button>
+                <button onclick="skipNewsToTrading()" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-gray-950 font-extrabold text-sm shadow-lg transition flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-forward-step"></i> 跳過新聞，提前開盤（30s 交易）
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 彈窗 2：完整規則說明彈窗 ==================== -->
+    <div id="modal-rules" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glass-modal border border-terminal-border rounded-2xl max-w-xl w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-terminal-border pb-3 mb-4">
+                <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-amber-400"></i> 完整遊戲規則說明
+                </h3>
+                <button onclick="closeModal('modal-rules')" class="text-gray-400 hover:text-white text-lg cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs sm:text-sm text-gray-200 leading-relaxed">
+                <p><strong class="text-amber-300">1. 五回合雙階段：</strong>每局共 5 回合，起始資金 $100,000。每回合包含 <strong>30 秒新聞階段</strong>（可按「跳過新聞，提前開盤」）與 <strong>30 秒交易階段</strong>。</p>
+                <p><strong class="text-red-400">2. 單回合 ±10% 漲跌停限制：</strong>每回合以該回合開盤價為基準，最高漲至 <strong>+10.00%（漲停）</strong>、最低跌至 <strong>-10.00%（跌停）</strong>，達漲跌停時價格不會再超越極限。</p>
+                <p><strong class="text-purple-300">3. 十台策略 AI 對抗：</strong>10 台 AI 各有不同性格與策略（價值低接、動能追價、漲停獲利了結、逆勢均值回歸、事件狙擊、恐慌停損、大戶控盤等），會根據盤勢與漲跌停位置做出買賣反應。</p>
+                <p><strong class="text-rose-300">4. 臨時突發事件震盪：</strong>交易期間可能觸發「臨時突發事件」（如跳電停擺、大戶倒貨、急單搶貨、監管雜音），打破單邊走勢並製造雙向震盪。</p>
+                <p><strong class="text-emerald-300">5. 班群 ROI 結算：</strong>第 5 回合結束自動結算所有持股與 <strong>投資報酬率（ROI %）</strong>，支援一鍵複製戰績與整張截圖分享到班群。</p>
+            </div>
+
+            <button onclick="closeModal('modal-rules')" class="mt-5 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-sm transition cursor-pointer">
+                我知道了
             </button>
         </div>
     </div>
 
-    <!-- ==================== 彈窗 2: Firebase 連線設定 ==================== -->
-    <div id="modal-firebase" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <!-- ==================== 彈窗 3：匯出單檔 index.html 說明 ==================== -->
+    <div id="modal-github" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="glass-modal border border-terminal-border rounded-2xl max-w-lg w-full p-6 shadow-2xl">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-fire text-amber-500"></i> 線上多人連線設定 (Firebase)
+            <div class="flex items-center justify-between border-b border-terminal-border pb-3 mb-4">
+                <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-brands fa-github text-white"></i> 匯出 index.html 上傳 GitHub Pages
                 </h3>
-                <button onclick="closeModal('modal-firebase')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeModal('modal-github')" class="text-gray-400 hover:text-white text-lg cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <p class="text-xs text-gray-300 leading-relaxed mb-4">
-                由於 GitHub Pages 為純靜態網頁託管，若要與遠端朋友跨裝置即時連線，請貼上您免費申請的 <strong>Firebase Config JSON</strong>（支援 Realtime Database 或 Firestore）。若未設定，系統也會在同瀏覽器分頁間模擬同步，或可直接使用「單人 AI 模式」。
+            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed mb-4">
+                本遊戲已完整打包為單一 <code class="text-emerald-300 font-mono">index.html</code> 檔案。下載後直接上傳至 GitHub 儲存庫並啟用 <strong>GitHub Pages</strong>，即可在瀏覽器中直接遊玩。
             </p>
 
-            <div class="mb-4">
-                <label class="block text-xs font-semibold text-gray-400 mb-1.5">貼上 Firebase Config (JSON 格式或 JS 物件)</label>
-                <textarea id="input-firebase-config" rows="6" placeholder='{
-  "apiKey": "AIzaSy...",
-  "authDomain": "your-app.firebaseapp.com",
-  "databaseURL": "https://your-app-default-rtdb.firebaseio.com",
-  "projectId": "your-app",
-  "storageBucket": "your-app.appspot.com",
-  "messagingSenderId": "123456",
-  "appId": "1:123456:web:abcdef"
-}' class="w-full bg-terminal-bg border border-terminal-border focus:border-blue-500 rounded-xl p-3 text-xs font-mono text-emerald-400 outline-none"></textarea>
-            </div>
-
-            <div id="firebase-config-msg" class="text-xs mb-4 hidden"></div>
-
             <div class="flex gap-3">
-                <button onclick="clearFirebaseConfig()" class="px-4 py-2.5 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs text-gray-300 font-semibold cursor-pointer">
-                    清除設定
+                <button onclick="closeModal('modal-github')" class="px-4 py-2.5 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs font-bold text-gray-300 cursor-pointer">
+                    取消
                 </button>
-                <button onclick="saveFirebaseConfig()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold cursor-pointer">
-                    儲存並初始化多人連線
+                <button onclick="downloadIndexHtml()" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg cursor-pointer">
+                    <i class="fa-solid fa-download"></i> 下載完整 index.html
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== 彈窗 3: GitHub Pages 部署說明與匯出 ==================== -->
-    <div id="modal-github" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-        <div class="glass-modal border border-terminal-border rounded-2xl max-w-xl w-full p-6 shadow-2xl">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i class="fa-brands fa-github text-white"></i> 部署至 GitHub Pages 指南
-                </h3>
-                <button onclick="closeModal('modal-github')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="space-y-3 text-xs text-gray-300 mb-5">
-                <p>本遊戲已將所有 HTML、CSS 與多人連線邏輯打包為單一檔案，只需 3 步驟即可免費上線：</p>
-                <ol class="list-decimal list-inside space-y-2 bg-terminal-bg p-4 rounded-xl border border-terminal-border">
-                    <li>點擊下方按鈕下載 <code class="text-emerald-400 font-mono">index.html</code>（若您已填入 Firebase Config，下載的檔案會自動內嵌您的連線金鑰，好友打開網址即可直接連線！）。</li>
-                    <li>前往 GitHub 建立一個新的公開儲存庫 (Repository)，例如 <code class="text-blue-400 font-mono">stock-trading-game</code>，並上傳 <code class="text-emerald-400 font-mono">index.html</code>。</li>
-                    <li>進入儲存庫的 <strong>Settings → Pages</strong>，將 Branch 設為 <code class="text-amber-400 font-mono">main</code> 並儲存，約 1 分鐘後即可獲得專屬遊戲網址！</li>
-                </ol>
-            </div>
-
-            <div class="flex gap-3">
-                <button onclick="closeModal('modal-github')" class="px-4 py-2.5 rounded-xl bg-terminal-bg hover:bg-terminal-hover border border-terminal-border text-xs text-gray-300 font-semibold cursor-pointer">
-                    關閉
-                </button>
-                <button onclick="downloadStandaloneHTML()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer">
-                    <i class="fa-solid fa-download"></i> 下載完整 index.html (含目前連線設定)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 自訂 Toast 訊息提示框 (取代 alert) -->
+    <!-- 提示訊息 Toast -->
     <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-    <!-- Firebase SDK (Compat 版本便於動態初始化與 GitHub Pages 單檔部署) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
     <script>
         /**
          * ============================================================================
-         * 華爾街風雲：五回合操盤手 - 核心遊戲與即時多人同步引擎
+         * 華爾街風雲：十台AI操盤手對決 - 單人五回合股票模擬器核心引擎
          * ============================================================================
          */
 
-        // 內嵌 Firebase 設定區 (匯出 HTML 時會自動將使用者設定寫入此處)
-        const EMBEDDED_FIREBASE_CONFIG = null;
-
-        // 全域遊戲常數
         const TOTAL_ROUNDS = 5;
-        const NEWS_DURATION = 8;      // 每回合新聞閱讀秒數
-        const TRADING_DURATION = 30;  // 每回合交易秒數
-        const INITIAL_CASH = 100000;  // 起始資金 $100,000
+        const NEWS_SECONDS = 30;
+        const TRADING_SECONDS = 30;
+        const INITIAL_CAPITAL = 100000;
+        const ROUND_LIMIT_RATE = 0.10; // 單回合嚴格 ±10% 漲跌停限制
 
-        // 5 檔掛牌股票定義
-        const INITIAL_STOCKS = [
-            { id: 'TSMC', name: '護國神山晶圓', sector: '半導體製造', price: 100.00, basePrice: 100.00, volatility: 0.018, color: '#3b82f6' },
-            { id: 'NVDA', name: '超微算力科技', sector: 'AI 伺服器', price: 120.00, basePrice: 120.00, volatility: 0.025, color: '#a855f7' },
-            { id: 'BIOX', name: '基因生技醫療', sector: '新藥研發', price: 60.00,  basePrice: 60.00,  volatility: 0.030, color: '#10b981' },
-            { id: 'SHIP', name: '長榮綠能航運', sector: '全球海運', price: 50.00,  basePrice: 50.00,  volatility: 0.022, color: '#06b6d4' },
-            { id: 'COIN', name: '區塊鏈加密金控', sector: '數位資產', price: 80.00,  basePrice: 80.00,  volatility: 0.035, color: '#f59e0b' }
+        // 五支不同特色股票
+        const BASE_STOCKS = [
+            { code: '2330', name: '晶圓代工龍頭', sector: '半導體晶圓代工', initPrice: 100.00, volatility: 0.017, color: '#38bdf8' },
+            { code: '3017', name: 'AI 伺服器散熱', sector: '液冷與機櫃散熱', initPrice: 90.00,  volatility: 0.023, color: '#fb7185' },
+            { code: '6446', name: '創新製藥生技', sector: '生技新藥研發',   initPrice: 75.00,  volatility: 0.028, color: '#34d399' },
+            { code: '2603', name: '遠洋航運物流', sector: '貨櫃海運與物流', initPrice: 60.00,  volatility: 0.022, color: '#22d3ee' },
+            { code: '1519', name: '綠能儲能電網', sector: '儲能系統與電網', initPrice: 80.00,  volatility: 0.020, color: '#fbbf24' }
         ];
 
-        // 豐富的財經新聞事件庫 (每回合隨機抽取不重複新聞，影響各股票基本面漂移率 drift)
-        const NEWS_POOL = [
+        // 10 台不同性格與策略的 AI 操盤手
+        const AI_PROFILES = [
+            { id: 'ai_1',  name: '價值低接 AI',   style: '價值低接型',   desc: '回檔深蹲買進、逢高分批獲利',   cashFactor: 1.05 },
+            { id: 'ai_2',  name: '動能追價 AI',   style: '動能追價型',   desc: '順勢強勢追價、接近漲停轉保守', cashFactor: 1.15 },
+            { id: 'ai_3',  name: '漲停獲利 AI',   style: '高檔了結型',   desc: '漲幅達標或逼近漲停果斷鎖利',   cashFactor: 1.00 },
+            { id: 'ai_4',  name: '逆勢均值 AI',   style: '逆勢均值回歸', desc: '過度拉升時反手壓盤、急跌低接', cashFactor: 1.10 },
+            { id: 'ai_5',  name: '事件狙擊 AI',   style: '事件狙擊型',   desc: '緊盯新聞與突發事件快速進出',   cashFactor: 1.12 },
+            { id: 'ai_6',  name: '風控停損 AI',   style: '風控停損型',   desc: '遇到利空或下殺嚴格執行停損',   cashFactor: 0.92 },
+            { id: 'ai_7',  name: '高頻量化 AI',   style: '高頻量化型',   desc: '高頻雙向報價、製造盤中活水',   cashFactor: 1.00 },
+            { id: 'ai_8',  name: '散熱晶片 AI',   style: '科技算力型',   desc: '專注晶圓代工與 AI 散熱雙主軸', cashFactor: 1.08 },
+            { id: 'ai_9',  name: '生技航運 AI',   style: '題材輪動型',   desc: '靈活切換生技新藥與航運題材',   cashFactor: 1.05 },
+            { id: 'ai_10', name: '主力大戶 AI',   style: '大戶控盤型',   desc: '資金雄厚、偶爾敲出大單震盪盤面', cashFactor: 1.40 }
+        ];
+
+        // 18 則各不相同的財經新聞事件庫
+        const NEWS_LIBRARY = [
             {
-                category: '【半導體重磅】',
-                title: '全球 AI 巨头追加 2 奈米先進製程大單，晶圓產能全面滿載！',
-                body: '北美雲端大廠宣布明年資本支出翻倍，護國神山晶圓與超微算力科技訂單能見度直達年底，法人機構紛紛調升目標價。',
-                impacts: { TSMC: 0.028, NVDA: 0.024, BIOX: -0.004, SHIP: 0.005, COIN: 0.004 }
+                category: '【晶圓代工】',
+                title: '先進製程 2 奈米試產良率超標，晶圓代工龍頭迎追加投片！',
+                body: '國際晶片大廠加快次世代處理器導入進度，晶圓代工龍頭產能利用率維持高檔，供應鏈拉貨動能轉強。',
+                hint: '偏多 2330、3017，留意漲幅接近 +10% 獲利了結賣壓',
+                impacts: { '2330': 0.028, '3017': 0.014, '6446': -0.004, '2603': 0.002, '1519': 0.005 }
             },
             {
-                category: '【地緣黑天鵝】',
-                title: '紅海與蘇伊士運河航道突發封鎖，全球貨櫃運價單週飆漲 45%！',
-                body: '國際航商被迫繞道好望角，船期延誤導致全球供應鏈吃緊，綠能航運迎來暴利時代，但科技硬體出口面臨物流成本上升壓力。',
-                impacts: { TSMC: -0.008, NVDA: -0.006, BIOX: 0.002, SHIP: 0.036, COIN: 0.006 }
+                category: '【AI 散熱】',
+                title: '高功耗 AI 機櫃全面轉向液冷方案，散熱模組訂單大增！',
+                body: '資料中心熱密度攀升帶動水冷板與快接頭需求，AI 伺服器散熱廠第四季出貨量看增。',
+                hint: '偏多 3017、2330，短線波動度放大',
+                impacts: { '2330': 0.012, '3017': 0.032, '6446': -0.003, '2603': 0.001, '1519': 0.006 }
             },
             {
-                category: '【生技醫療突破】',
-                title: '基因生技醫療第三期臨床試驗大獲成功，獲 FDA 加速核准上市！',
-                body: '旗下阿茲海默症與抗癌新藥療效遠超市場預期，國際藥廠傳出天價併購邀約，資金大幅從高估值科技股輪動至生技板塊。',
-                impacts: { TSMC: -0.005, NVDA: -0.010, BIOX: 0.038, SHIP: -0.002, COIN: -0.005 }
+                category: '【生技新藥】',
+                title: '創新製藥生技抗體偶聯新藥解盲正向，授權談判升溫！',
+                body: '臨床數據展現良好療效與安全性，生技族群吸引短線與波段買盤關注，但籌碼換手亦相當快速。',
+                hint: '強力題材 6446，高波動震盪',
+                impacts: { '2330': -0.003, '3017': -0.004, '6446': 0.035, '2603': 0.002, '1519': 0.001 }
             },
             {
-                category: '【金融監管風暴】',
-                title: '多國央行聯手頒布加密貨幣嚴格儲備金新規，市場流動性驟降！',
-                body: '大型交易所面臨合規審查，投資人恐慌性撤出高風險數位資產，避險資金轉向實體晶片與傳統航運股。',
-                impacts: { TSMC: 0.006, NVDA: -0.005, BIOX: 0.004, SHIP: 0.005, COIN: -0.038 }
+                category: '【航運物流】',
+                title: '紅海繞道與塞港延誤未解，遠洋貨櫃運價指數再度走揚！',
+                body: '船舶繞行拉長航程週期，遠洋航運物流營收動能獲得支撐，航運股成為盤面資金輪動焦點。',
+                hint: '偏多 2603，微幅影響進出口成本',
+                impacts: { '2330': -0.002, '3017': -0.005, '6446': 0.002, '2603': 0.032, '1519': 0.004 }
             },
             {
-                category: '【算力泡沫疑慮】',
-                title: '華爾街空頭機構發布報告質疑 AI 變現能力，算力晶片遭遇獲利了結！',
-                body: '報告指出企業導入 AI 軟體營收成長不如預期，超微算力科技首當其衝遭外資大舉調節，連鎖效應波及晶圓代工。',
-                impacts: { TSMC: -0.014, NVDA: -0.032, BIOX: 0.008, SHIP: 0.004, COIN: -0.008 }
+                category: '【綠能儲能】',
+                title: '強化電網韌性計畫加速推進，大型儲能案場標案陸續開出！',
+                body: '再生能源併網與削峰填谷需求提升，綠能儲能電網廠商在手訂單能見度看升。',
+                hint: '偏多 1519，防禦與能源題材受矚目',
+                impacts: { '2330': 0.004, '3017': 0.005, '6446': 0.003, '2603': 0.002, '1519': 0.030 }
             },
             {
-                category: '【華爾街史詩利多】',
-                title: '主權財富基金宣布將比特幣與加密金控納入外匯儲備資產！',
-                body: '機構資金大舉湧入數位金融領域，區塊鏈加密金控交易量暴增三倍，同時帶動高階算力伺服器需求回溫。',
-                impacts: { TSMC: 0.005, NVDA: 0.012, BIOX: -0.003, SHIP: -0.003, COIN: 0.038 }
+                category: '【出口管制】',
+                title: '海外監管單位研議擴大高階運算晶片出口審查，科技股承壓！',
+                body: '市場擔憂跨國管制影響科技供應鏈出貨節奏，晶圓代工與 AI 散熱出現逢高調節壓力。',
+                hint: '利空 2330、3017，資金可能轉向 6446 或 1519',
+                impacts: { '2330': -0.026, '3017': -0.022, '6446': 0.007, '2603': 0.006, '1519': 0.009 }
             },
             {
-                category: '【全球降息循環】',
-                title: '聯準會宣布超預期降息 2 碼，全球資金派對正式啟動！',
-                body: '無風險利率大幅下滑，高成長科技、生技研發與數位資產全面受惠，市場風險偏好達到頂峰！',
-                impacts: { TSMC: 0.015, NVDA: 0.018, BIOX: 0.016, SHIP: 0.008, COIN: 0.020 }
+                category: '【運價雜音】',
+                title: '新造貨櫃船陸續交付下水，市場憂慮明年海運供給增加！',
+                body: '部分機構提醒運價高檔震盪風險，遠洋航運物流股價遭遇短線獲利了結賣壓。',
+                hint: '偏空 2603，注意回檔支撐',
+                impacts: { '2330': 0.004, '3017': 0.003, '6446': 0.004, '2603': -0.028, '1519': 0.005 }
             },
             {
-                category: '【貿易關稅壁壘】',
-                title: '歐美宣布對進口商品加徵高額懲罰性關稅，全球貿易量萎縮！',
-                body: '跨國貨運需求急凍，航運股面臨運價崩跌危機；同時半導體設備出口管制升級，科技股承壓。',
-                impacts: { TSMC: -0.015, NVDA: -0.012, BIOX: 0.006, SHIP: -0.034, COIN: 0.004 }
+                category: '【藥價審查】',
+                title: '主管機關啟動新年度藥價核價檢討，生技股短線震盪加劇！',
+                body: '市場重新評估藥品給付價格變動對獲利的影響，創新製藥生技多空分歧擴大。',
+                hint: '偏空 6446，留意逆勢抄底與停損單',
+                impacts: { '2330': 0.005, '3017': 0.004, '6446': -0.028, '2603': 0.003, '1519': 0.004 }
+            },
+            {
+                category: '【高檔震盪】',
+                title: '指數波段漲幅已大，法人啟動高檔調節與部位再平衡！',
+                body: '部分漲多股票出現獲利了結單，盤面不再無腦一路往上衝，轉為個股表現與多空拉鋸。',
+                hint: '高檔震盪：各股漲跌互見，切忌盲目追高',
+                impacts: { '2330': -0.011, '3017': -0.013, '6446': -0.008, '2603': -0.007, '1519': -0.006 }
+            },
+            {
+                category: '【利率預期】',
+                title: '最新通膨數據略高於市場預期，高估值成長股面臨評價修正！',
+                body: '市場重新定價利率路徑，高本益比族群波動加大，防禦型與低基期標的相對抗跌。',
+                hint: '壓抑 3017、6446，2603、1519 震盪整理',
+                impacts: { '2330': -0.012, '3017': -0.019, '6446': -0.015, '2603': -0.004, '1519': -0.005 }
+            },
+            {
+                category: '【邊緣 AI】',
+                title: '智慧終端裝置導入輕量化 AI 模型，帶動零組件升級潮！',
+                body: '終端換機需求回溫，晶圓代工與散熱、電能管理模組同步受惠，多空交投熱絡。',
+                hint: '偏多 2330、1519、3017',
+                impacts: { '2330': 0.019, '3017': 0.016, '6446': 0.002, '2603': 0.004, '1519': 0.012 }
+            },
+            {
+                category: '【生技併購】',
+                title: '跨國藥廠積極尋找罕見病與腫瘤新藥標的，生技族群點火！',
+                body: '併購題材推升生技股人氣，創新製藥生技盤中量能放大，短線沖銷與追價並存。',
+                hint: '利多 6446，留意震盪洗盤',
+                impacts: { '2330': 0.002, '3017': 0.001, '6446': 0.029, '2603': 0.003, '1519': 0.004 }
+            },
+            {
+                category: '【港口調度】',
+                title: '亞洲主要轉運港作業吃緊，貨櫃船期延誤推升短期運價！',
+                body: '船期不穩使市場有效運力收斂，遠洋航運物流迎來短線急單與運價支撐。',
+                hint: '利多 2603，其他族群溫和波動',
+                impacts: { '2330': 0.003, '3017': -0.002, '6446': 0.002, '2603': 0.025, '1519': 0.004 }
+            },
+            {
+                category: '【儲能政策】',
+                title: '表後儲能與工商用電大戶備援規範上路，儲能設備需求增溫！',
+                body: '企業強化用電安全帶動儲能系統安裝潮，綠能儲能電網股價獲得買盤青睞。',
+                hint: '利多 1519，微幅帶動 2330',
+                impacts: { '2330': 0.007, '3017': 0.004, '6446': 0.002, '2603': 0.003, '1519': 0.028 }
+            },
+            {
+                category: '【散熱良率】',
+                title: '液冷散熱管路滲漏測試趨嚴，部分新廠商交期遞延！',
+                body: '品質驗證門檻提高使訂單集中於技術成熟大廠，盤中散熱族群出現劇烈洗盤。',
+                hint: '3017 高波動震盪，2330 相對穩健',
+                impacts: { '2330': 0.008, '3017': -0.017, '6446': 0.003, '2603': 0.002, '1519': 0.006 }
+            },
+            {
+                category: '【匯率波動】',
+                title: '新台幣與美元匯率急升急貶，外銷族群面臨匯兌評價震盪！',
+                body: '匯市雙向波動使外銷廠毛利出現變數，法人提醒留意追高風險與停利紀律。',
+                hint: '全面震盪：留意雙向刷洗',
+                impacts: { '2330': -0.009, '3017': -0.007, '6446': -0.005, '2603': -0.011, '1519': -0.006 }
+            },
+            {
+                category: '【法說會焦點】',
+                title: '法說會釋出審慎樂觀展望，強調穩健擴產不盲目擴張！',
+                body: '管理層強調資本支出控管與獲利品質，市場解讀為中長線穩健但短線不躁進。',
+                hint: '溫和偏多 2330、1519，盤勢節奏平穩',
+                impacts: { '2330': 0.014, '3017': 0.008, '6446': 0.005, '2603': 0.006, '1519': 0.013 }
+            },
+            {
+                category: '【資金輪動】',
+                title: '強勢股漲多拉回，中低基期族群接棒輪動演出！',
+                body: '資金從先前強勢股流出並轉向其他板塊，盤面呈現「漲多回檔、落後補漲」的震盪格局。',
+                hint: '輪動震盪：留意強弱轉換',
+                impacts: { '2330': -0.008, '3017': -0.010, '6446': 0.014, '2603': 0.012, '1519': 0.009 }
             }
         ];
 
-        // 遊戲狀態管理
-        let state = {
-            mode: 'SOLO', // 'SOLO' | 'MULTI'
-            colorScheme: 'TW', // 'TW' (紅漲綠跌) | 'US' (綠漲紅跌)
-            roomCode: '',
-            isHost: true,
-            myId: 'player_' + Math.random().toString(36).substring(2, 9),
-            myName: '操盤手',
-            
-            // 回合與階段狀態
-            status: 'LOBBY', // 'LOBBY' | 'WAITING' | 'NEWS' | 'TRADING' | 'GAMEOVER'
+        // 交易中隨機觸發的「臨時突發事件」（製造震盪、避免單邊一直往上衝）
+        const SHOCK_EVENTS = [
+            {
+                title: '突發跳電短暫影響產線！',
+                tag: '空方突襲 • 急跌震盪',
+                targetCode: '2330',
+                priceShock: -0.035,
+                flowShock: -320,
+                cls: 'text-emerald-300'
+            },
+            {
+                title: '主力大戶盤中反手倒貨！',
+                tag: '獲利了結 • 賣壓湧現',
+                targetCode: '3017',
+                priceShock: -0.038,
+                flowShock: -350,
+                cls: 'text-emerald-300'
+            },
+            {
+                title: '生技臨床數據出現雜音，短線急殺！',
+                tag: '消息震盪 • 多空交戰',
+                targetCode: '6446',
+                priceShock: -0.040,
+                flowShock: -300,
+                cls: 'text-emerald-300'
+            },
+            {
+                title: '航線調度突發延誤，運價出現回檔！',
+                tag: '短線壓回 • 震盪洗盤',
+                targetCode: '2603',
+                priceShock: -0.035,
+                flowShock: -280,
+                cls: 'text-emerald-300'
+            },
+            {
+                title: '儲能標案審查延後，盤中出現賣壓！',
+                tag: '政策雜音 • 震盪回檔',
+                targetCode: '1519',
+                priceShock: -0.034,
+                flowShock: -260,
+                cls: 'text-emerald-300'
+            },
+            {
+                title: '機構大單突發回補抄底，買盤湧入！',
+                tag: '低接反彈 • 多方急攻',
+                targetCode: null,
+                priceShock: 0.032,
+                flowShock: 300,
+                cls: 'text-rose-300'
+            },
+            {
+                title: '量化程式觸發停利停損，全市場震盪！',
+                tag: '雙向震盪 • 波動放大',
+                targetCode: null,
+                priceShock: -0.022,
+                flowShock: -220,
+                cls: 'text-amber-300'
+            }
+        ];
+
+        // 遊戲狀態
+        let game = {
+            status: 'LOBBY', // LOBBY | NEWS | TRADING | GAMEOVER
+            colorScheme: 'TW', // TW (紅漲綠跌) | US (綠漲紅跌)
+            playerName: '操盤手',
             round: 1,
-            timeLeft: NEWS_DURATION,
+            timeLeft: NEWS_SECONDS,
             currentNews: null,
+            activeShock: null,
+            shockCooldown: 0,
             usedNewsIndices: [],
-            
-            // 市場與股票狀態
-            stocks: JSON.parse(JSON.stringify(INITIAL_STOCKS)),
-            priceHistory: {}, // { TSMC: [100, 101.2, ...], ... }
-            selectedStockId: 'TSMC',
-            
-            // 即時供需力道池 (累積本秒內所有玩家的淨買賣股數)
-            netOrderFlow: { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 },
-            recentPressure: { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 },
-            
-            // 玩家狀態表 { playerId: { id, name, isAI, cash, holdings: { TSMC: { qty, avgPrice } }, netWorth } }
-            players: {},
-            tradeLogs: []
+            stocks: [],
+            priceHistory: {},
+            selectedCode: '2330',
+            netOrderFlow: {},
+            recentPressure: {},
+            participants: [],
+            feeds: []
         };
 
-        // Firebase 變數
-        let fbApp = null;
-        let fbDb = null;
-        let fbAuth = null;
-        let fbUnsubscribeRoom = null;
-        let fbUnsubscribeOrders = null;
-        let processedOrderIds = new Set();
-        let gameLoopInterval = null;
-        let broadcastChannel = null; // 支援同瀏覽器多分頁免 Firebase 測試多人連線
+        let timerInterval = null;
 
-        // 初始化歷史價格陣列
-        function resetPriceHistory() {
-            state.priceHistory = {};
-            state.stocks.forEach(s => {
-                state.priceHistory[s.id] = [s.price];
-            });
-        }
-
-        // 頁面載入初始化
         window.onload = function () {
-            resetPriceHistory();
-            initFirebaseIfConfigured();
-            initBroadcastChannel();
-            
-            // 讀取上次輸入的暱稱
-            const savedName = sessionStorage.getItem('ws_nickname');
+            const savedName = localStorage.getItem('ws_solo_nickname');
             if (savedName) {
                 document.getElementById('input-nickname').value = savedName;
             }
-
-            // 監聽視窗縮放重繪圖表
-            window.addEventListener('resize', drawStockChart);
+            window.addEventListener('resize', drawChart);
         };
 
         /**
          * ============================================================================
-         * Firebase 與跨分頁連線初始化
+         * 遊戲初始化與回合控制（5 回合 × 30s 新聞（可跳過）＋ 30s 交易）
          * ============================================================================
          */
-        function getStoredFirebaseConfig() {
-            if (EMBEDDED_FIREBASE_CONFIG) return EMBEDDED_FIREBASE_CONFIG;
-            try {
-                const raw = sessionStorage.getItem('ws_firebase_config');
-                return raw ? JSON.parse(raw) : null;
-            } catch (e) {
-                return null;
-            }
-        }
+        function startNewGame() {
+            if (timerInterval) clearInterval(timerInterval);
 
-        async function initFirebaseIfConfigured() {
-            const config = getStoredFirebaseConfig();
-            const statusText = document.getElementById('conn-status-text');
-            const badge = document.getElementById('multiplayer-badge');
+            const rawName = document.getElementById('input-nickname').value.trim();
+            const playerName = rawName || '操盤手一號';
+            localStorage.setItem('ws_solo_nickname', playerName);
+            game.playerName = playerName;
 
-            if (!config || !config.projectId) {
-                statusText.textContent = '本地/分頁連線模式';
-                badge.textContent = '同瀏覽器多開 / 單人';
-                badge.className = 'text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300';
-                return;
-            }
-
-            try {
-                if (!firebase.apps.length) {
-                    fbApp = firebase.initializeApp(config);
-                } else {
-                    fbApp = firebase.app();
-                }
-                fbAuth = firebase.auth();
-                fbDb = firebase.firestore();
-
-                await fbAuth.signInAnonymously();
-                state.myId = fbAuth.currentUser.uid;
-
-                statusText.textContent = 'Firebase 雲端已連線';
-                badge.textContent = '全球即時連線已啟用';
-                badge.className = 'text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300';
-                document.getElementById('input-firebase-config').value = JSON.stringify(config, null, 2);
-            } catch (err) {
-                console.error('Firebase 初始化失敗:', err);
-                showToast('Firebase 設定無效，已切換為本地模式', 'error');
-                statusText.textContent = '連線設定錯誤';
-            }
-        }
-
-        function saveFirebaseConfig() {
-            const raw = document.getElementById('input-firebase-config').value.trim();
-            const msgEl = document.getElementById('firebase-config-msg');
-            try {
-                // 允許貼上包含 const firebaseConfig = {...}; 的字串，自動擷取大括號內容
-                const jsonMatch = raw.match(/\{[\s\S]*\}/);
-                if (!jsonMatch) throw new Error('找不到有效的 JSON 物件');
-                
-                // 將未加引號的 key 轉為標準 JSON
-                const sanitized = jsonMatch[0].replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2":').replace(/'/g, '"');
-                const parsed = JSON.parse(sanitized);
-                if (!parsed.apiKey || !parsed.projectId) {
-                    throw new Error('缺少 apiKey 或 projectId 欄位');
-                }
-                sessionStorage.setItem('ws_firebase_config', JSON.stringify(parsed));
-                msgEl.textContent = '設定已儲存！正在初始化雲端連線...';
-                msgEl.className = 'text-xs mb-4 text-emerald-400 block';
-                initFirebaseIfConfigured().then(() => {
-                    setTimeout(() => closeModal('modal-firebase'), 800);
-                });
-            } catch (e) {
-                msgEl.textContent = '格式錯誤：' + e.message;
-                msgEl.className = 'text-xs mb-4 text-red-400 block';
-            }
-        }
-
-        function clearFirebaseConfig() {
-            sessionStorage.removeItem('ws_firebase_config');
-            document.getElementById('input-firebase-config').value = '';
-            fbDb = null;
-            showToast('已清除雲端設定，恢復為本地模式', 'info');
-            initFirebaseIfConfigured();
-            closeModal('modal-firebase');
-        }
-
-        // 同瀏覽器分頁廣播通道 (方便無 Firebase 時開兩個分頁測試多人連線)
-        function initBroadcastChannel() {
-            if ('BroadcastChannel' in window) {
-                broadcastChannel = new BroadcastChannel('wall_street_5round_sync');
-                broadcastChannel.onmessage = (event) => {
-                    const msg = event.data;
-                    if (!msg || msg.roomCode !== state.roomCode) return;
-                    handleLocalSyncMessage(msg);
+            // 初始化五支股票
+            game.stocks = BASE_STOCKS.map(s => {
+                const roundOpen = s.initPrice;
+                return {
+                    ...s,
+                    price: s.initPrice,
+                    roundOpenPrice: roundOpen,
+                    limitUp: Number((roundOpen * (1 + ROUND_LIMIT_RATE)).toFixed(2)),
+                    limitDown: Number((roundOpen * (1 - ROUND_LIMIT_RATE)).toFixed(2)),
+                    lastDiff: 0
                 };
-            }
+            });
+
+            game.priceHistory = {};
+            game.netOrderFlow = {};
+            game.recentPressure = {};
+            game.stocks.forEach(s => {
+                game.priceHistory[s.code] = [s.price];
+                game.netOrderFlow[s.code] = 0;
+                game.recentPressure[s.code] = 0;
+            });
+
+            game.selectedCode = '2330';
+            game.usedNewsIndices = [];
+            game.feeds = [];
+            game.activeShock = null;
+            game.shockCooldown = 0;
+
+            // 建立 1 位玩家 + 10 位 AI（共 11 位）
+            game.participants = [
+                createParticipant('player', playerName, '人類操盤手', '自主交易', false, INITIAL_CAPITAL)
+            ];
+            AI_PROFILES.forEach(ai => {
+                const startCash = Math.round(INITIAL_CAPITAL * ai.cashFactor);
+                game.participants.push(
+                    createParticipant(ai.id, ai.name, ai.style, ai.desc, true, startCash)
+                );
+            });
+
+            switchView('view-game');
+            startRound(1);
         }
 
-        /**
-         * ============================================================================
-         * 遊戲大廳與房間建立邏輯
-         * ============================================================================
-         */
-        function getPlayerNickname() {
-            let name = document.getElementById('input-nickname').value.trim();
-            if (!name) {
-                const randomTitles = ['華爾街新秀', '多頭總司令', '當沖小王子', '價值投資客', '量化交易員'];
-                name = randomTitles[Math.floor(Math.random() * randomTitles.length)] + Math.floor(10 + Math.random() * 89);
-                document.getElementById('input-nickname').value = name;
-            }
-            sessionStorage.setItem('ws_nickname', name);
-            state.myName = name;
-            return name;
-        }
-
-        function createInitialPlayerObj(id, name, isAI = false, aiStyle = '') {
+        function createParticipant(id, name, style, desc, isAI, initialCash) {
             const holdings = {};
-            INITIAL_STOCKS.forEach(s => {
-                holdings[s.id] = { qty: 0, avgPrice: 0 };
+            BASE_STOCKS.forEach(s => {
+                holdings[s.code] = { qty: 0, avgCost: 0, trades: 0 };
             });
             return {
                 id,
                 name,
+                style,
+                desc,
                 isAI,
-                aiStyle,
-                cash: INITIAL_CASH,
+                initialCapital: initialCash,
+                cash: initialCash,
                 holdings,
-                netWorth: INITIAL_CASH
+                netWorth: initialCash,
+                totalTrades: 0
             };
         }
 
-        // 1. 啟動單人 AI 實戰模式
-        function startSoloGame() {
-            const myName = getPlayerNickname();
-            state.mode = 'SOLO';
-            state.isHost = true;
-            state.roomCode = 'SOLO';
-            state.stocks = JSON.parse(JSON.stringify(INITIAL_STOCKS));
-            resetPriceHistory();
-            state.usedNewsIndices = [];
-            state.tradeLogs = [];
-            state.netOrderFlow = { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 };
+        function startRound(roundNum) {
+            game.round = roundNum;
+            game.status = 'NEWS';
+            game.timeLeft = NEWS_SECONDS;
+            game.activeShock = null;
+            game.shockCooldown = 4;
+            document.getElementById('shock-event-banner').classList.add('hidden');
 
-            // 建立自己與 3 位 AI 對手
-            state.players = {};
-            state.players[state.myId] = createInitialPlayerObj(state.myId, myName, false);
-            state.players['ai_buffett'] = createInitialPlayerObj('ai_buffett', '巴菲特 AI (價值派)', true, 'VALUE');
-            state.players['ai_soros'] = createInitialPlayerObj('ai_soros', '索羅斯 AI (順勢派)', true, 'MOMENTUM');
-            state.players['ai_yolo'] = createInitialPlayerObj('ai_yolo', '馬斯克 AI (激進派)', true, 'AGGRESSIVE');
+            // 設定本回合「開盤參考價」與嚴格 ±10% 漲跌停上下限
+            game.stocks.forEach(s => {
+                s.roundOpenPrice = s.price;
+                s.limitUp = Number((s.roundOpenPrice * (1 + ROUND_LIMIT_RATE)).toFixed(2));
+                s.limitDown = Number((s.roundOpenPrice * (1 - ROUND_LIMIT_RATE)).toFixed(2));
+            });
 
-            switchView('view-game');
-            document.getElementById('game-room-label').textContent = '模式：單人實戰 (含 3 位 AI 操盤手)';
-            startNewRound(1);
+            // 抽出不重複新聞
+            let candidates = NEWS_LIBRARY.map((_, idx) => idx).filter(idx => !game.usedNewsIndices.includes(idx));
+            if (candidates.length === 0) {
+                game.usedNewsIndices = [];
+                candidates = NEWS_LIBRARY.map((_, idx) => idx);
+            }
+            const pickIdx = candidates[Math.floor(Math.random() * candidates.length)];
+            game.usedNewsIndices.push(pickIdx);
+            game.currentNews = NEWS_LIBRARY[pickIdx];
+
+            pushFeed(`📰 第 ${roundNum} 回合新聞：${game.currentNews.title}`, 'text-amber-300');
+            showNewsModal();
+            renderGameUI();
+
+            timerInterval = setInterval(onSecondTick, 1000);
         }
 
-        // 2. 建立或加入線上多人房間
-        async function joinOrCreateMultiplayer() {
-            const myName = getPlayerNickname();
-            let code = document.getElementById('input-room-code').value.trim().toUpperCase();
-            const isCreating = !code;
-            if (isCreating) {
-                code = Math.random().toString(36).substring(2, 6).toUpperCase();
-            }
+        function skipNewsToTrading() {
+            if (game.status !== 'NEWS') return;
+            closeModal('modal-news');
+            enterTradingPhase();
+        }
 
-            state.mode = 'MULTI';
-            state.roomCode = code;
-            state.stocks = JSON.parse(JSON.stringify(INITIAL_STOCKS));
-            resetPriceHistory();
-            state.usedNewsIndices = [];
-            state.tradeLogs = [];
-            processedOrderIds.clear();
+        function enterTradingPhase() {
+            game.status = 'TRADING';
+            game.timeLeft = TRADING_SECONDS;
+            pushFeed(`🔔 第 ${game.round} 回合開盤！單回合漲跌限 ±10%，30 秒即時交易開始`, 'text-sky-300');
+            showToast(`第 ${game.round} 回合開盤！單回合漲跌限 ±10%`, 'info');
+            renderGameUI();
+        }
 
-            const myPlayer = createInitialPlayerObj(state.myId, myName, false);
+        function onSecondTick() {
+            if (game.status === 'NEWS') {
+                game.timeLeft -= 1;
+                document.getElementById('modal-news-timer').textContent = Math.max(0, game.timeLeft);
 
-            if (fbDb) {
-                // 使用 Firebase Firestore 雲端多人連線
-                const roomRef = fbDb.collection('ws_rooms').doc(code);
-                try {
-                    const docSnap = await roomRef.get();
-                    if (!docSnap.exists) {
-                        // 建立新房間 (成為房主)
-                        state.isHost = true;
-                        state.players = { [state.myId]: myPlayer };
-                        await roomRef.set({
-                            roomCode: code,
-                            hostId: state.myId,
-                            status: 'WAITING',
-                            round: 1,
-                            timeLeft: NEWS_DURATION,
-                            currentNews: null,
-                            stocks: state.stocks,
-                            players: state.players,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
+                if (game.timeLeft <= 0) {
+                    closeModal('modal-news');
+                    enterTradingPhase();
+                }
+                renderGameUI();
+            } else if (game.status === 'TRADING') {
+                game.timeLeft -= 1;
+
+                // 1. 隨機觸發「臨時突發事件」製造雙向震盪
+                maybeTriggerShockEvent();
+
+                // 2. 10 台智慧 AI 操盤手即時攻防下單
+                runAITradingStep();
+
+                // 3. 更新股價（受新聞、突發事件、玩家與 10 台 AI 供需影響，並嚴格限制於 ±10% 漲跌停內）
+                updateStockPrices();
+
+                // 4. 更新所有參賽者總資產與 ROI
+                recalculateNetWorths();
+
+                if (game.timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (game.round < TOTAL_ROUNDS) {
+                        startRound(game.round + 1);
                     } else {
-                        // 加入現有房間
-                        const data = docSnap.data();
-                        if (data.status !== 'WAITING' && data.hostId !== state.myId) {
-                            showToast('該房間已經開盤交易中，請輸入其他房號或留空建立新房', 'error');
-                            return;
-                        }
-                        state.isHost = (data.hostId === state.myId);
-                        await roomRef.update({
-                            [`players.${state.myId}`]: myPlayer
-                        });
+                        finishFiveRounds();
                     }
-                    subscribeToFirebaseRoom(code);
-                } catch (err) {
-                    console.error(err);
-                    showToast('雲端房間連線失敗，請檢查 Firebase 權限規則', 'error');
                     return;
                 }
-            } else {
-                // 無 Firebase 時，透過 BroadcastChannel 支援同瀏覽器多分頁即時對戰
-                state.isHost = isCreating;
-                state.players = { [state.myId]: myPlayer };
-                if (!isCreating && broadcastChannel) {
-                    broadcastChannel.postMessage({
-                        type: 'JOIN_REQUEST',
-                        roomCode: code,
-                        player: myPlayer
-                    });
-                }
+                renderGameUI();
             }
-
-            enterWaitingRoom();
-        }
-
-        function enterWaitingRoom() {
-            switchView('view-waiting');
-            document.getElementById('display-room-code').textContent = state.roomCode;
-            updateWaitingRoomUI();
-        }
-
-        function updateWaitingRoomUI() {
-            const listEl = document.getElementById('waiting-player-list');
-            const playerArr = Object.values(state.players);
-            document.getElementById('waiting-player-count').textContent = playerArr.length;
-
-            listEl.innerHTML = playerArr.map((p, idx) => `
-                <div class="flex items-center justify-between bg-terminal-bg border border-terminal-border px-3.5 py-2.5 rounded-xl">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-full bg-blue-600/30 text-blue-400 font-bold text-xs flex items-center justify-center">
-                            ${p.name.charAt(0)}
-                        </div>
-                        <span class="text-sm font-bold text-white">${escapeHtml(p.name)}</span>
-                        ${p.id === state.myId ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300">你</span>' : ''}
-                    </div>
-                    <span class="text-xs text-gray-400 font-mono">${idx === 0 ? '<i class="fa-solid fa-crown text-amber-400 mr-1"></i>房主' : '已準備'}</span>
-                </div>
-            `).join('');
-
-            const startBtn = document.getElementById('btn-host-start');
-            const guestMsg = document.getElementById('waiting-guest-msg');
-            if (state.isHost) {
-                startBtn.classList.remove('hidden');
-                guestMsg.classList.add('hidden');
-            } else {
-                startBtn.classList.add('hidden');
-                guestMsg.classList.remove('hidden');
-            }
-        }
-
-        // 處理本地分頁同步訊息
-        function handleLocalSyncMessage(msg) {
-            if (msg.type === 'JOIN_REQUEST' && state.isHost && state.status === 'LOBBY') {
-                state.players[msg.player.id] = msg.player;
-                updateWaitingRoomUI();
-                broadcastChannel.postMessage({
-                    type: 'ROOM_STATE',
-                    roomCode: state.roomCode,
-                    stateSnapshot: extractSyncSnapshot()
-                });
-            } else if (msg.type === 'ROOM_STATE' && !state.isHost) {
-                applySyncSnapshot(msg.stateSnapshot);
-            } else if (msg.type === 'PLAYER_ORDER' && state.isHost) {
-                processIncomingOrder(msg.order);
-            }
-        }
-
-        // Firebase 即時監聽房間狀態與玩家下單
-        function subscribeToFirebaseRoom(code) {
-            if (fbUnsubscribeRoom) fbUnsubscribeRoom();
-            if (fbUnsubscribeOrders) fbUnsubscribeOrders();
-
-            const roomRef = fbDb.collection('ws_rooms').doc(code);
-            fbUnsubscribeRoom = roomRef.onSnapshot((doc) => {
-                if (!doc.exists) return;
-                const data = doc.data();
-                state.isHost = (data.hostId === state.myId);
-
-                if (state.isHost) {
-                    // 房主只同步新加入的玩家列表
-                    if (data.players) {
-                        Object.keys(data.players).forEach(pid => {
-                            if (!state.players[pid]) {
-                                state.players[pid] = data.players[pid];
-                            }
-                        });
-                        if (document.getElementById('view-waiting').classList.contains('hidden') === false) {
-                            updateWaitingRoomUI();
-                        }
-                    }
-                } else {
-                    // 非房主完全跟隨房主廣播的市場與回合狀態
-                    applySyncSnapshot(data);
-                }
-            }, (err) => console.error('Room snapshot error:', err));
-
-            // 房主監聽所有玩家的即時買賣委託單 (影響股價供需)
-            fbUnsubscribeOrders = roomRef.collection('orders').onSnapshot((snapshot) => {
-                if (!state.isHost) return;
-                snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        const orderId = change.doc.id;
-                        if (!processedOrderIds.has(orderId)) {
-                            processedOrderIds.add(orderId);
-                            processIncomingOrder(change.doc.data());
-                        }
-                    }
-                });
-            }, (err) => console.error('Orders snapshot error:', err));
-        }
-
-        function extractSyncSnapshot() {
-            return {
-                status: state.status,
-                round: state.round,
-                timeLeft: state.timeLeft,
-                currentNews: state.currentNews,
-                stocks: state.stocks,
-                players: state.players,
-                recentPressure: state.recentPressure,
-                latestLog: state.tradeLogs[0] || null
-            };
-        }
-
-        function applySyncSnapshot(snap) {
-            const prevStatus = state.status;
-            const prevRound = state.round;
-
-            state.status = snap.status;
-            state.round = snap.round;
-            state.timeLeft = snap.timeLeft;
-            state.currentNews = snap.currentNews;
-            if (snap.stocks) {
-                state.stocks = snap.stocks;
-                state.stocks.forEach(s => {
-                    if (!state.priceHistory[s.id]) state.priceHistory[s.id] = [];
-                    const hist = state.priceHistory[s.id];
-                    if (hist[hist.length - 1] !== s.price) {
-                        hist.push(s.price);
-                        if (hist.length > 160) hist.shift();
-                    }
-                });
-            }
-            if (snap.players) state.players = snap.players;
-            if (snap.recentPressure) state.recentPressure = snap.recentPressure;
-            if (snap.latestLog && (!state.tradeLogs[0] || state.tradeLogs[0].id !== snap.latestLog.id)) {
-                state.tradeLogs.unshift(snap.latestLog);
-                if (state.tradeLogs.length > 30) state.tradeLogs.pop();
-            }
-
-            if (state.status === 'WAITING') {
-                updateWaitingRoomUI();
-            } else if (state.status === 'NEWS' || state.status === 'TRADING') {
-                if (document.getElementById('view-game').classList.contains('hidden')) {
-                    switchView('view-game');
-                    document.getElementById('game-room-label').textContent = `房號：${state.roomCode} (線上多人)`;
-                }
-                if (state.status === 'NEWS' && (prevStatus !== 'NEWS' || prevRound !== state.round)) {
-                    showNewsPopup(state.currentNews, state.round);
-                }
-                if (state.status === 'TRADING' && prevStatus === 'NEWS') {
-                    closeModal('modal-news');
-                }
-                renderAllGameUI();
-            } else if (state.status === 'GAMEOVER' && prevStatus !== 'GAMEOVER') {
-                closeModal('modal-news');
-                showGameOverScreen();
-            }
-        }
-
-        async function syncHostStateToClients() {
-            if (state.mode !== 'MULTI' || !state.isHost) return;
-            const snap = extractSyncSnapshot();
-            if (fbDb) {
-                try {
-                    await fbDb.collection('ws_rooms').doc(state.roomCode).update(snap);
-                } catch (e) {
-                    console.error('Sync update failed:', e);
-                }
-            } else if (broadcastChannel) {
-                broadcastChannel.postMessage({
-                    type: 'ROOM_STATE',
-                    roomCode: state.roomCode,
-                    stateSnapshot: snap
-                });
-            }
-        }
-
-        function hostStartGame() {
-            if (!state.isHost) return;
-            switchView('view-game');
-            document.getElementById('game-room-label').textContent = `房號：${state.roomCode} (線上多人)`;
-            startNewRound(1);
-        }
-
-        function leaveRoom() {
-            if (gameLoopInterval) clearInterval(gameLoopInterval);
-            if (fbUnsubscribeRoom) fbUnsubscribeRoom();
-            if (fbUnsubscribeOrders) fbUnsubscribeOrders();
-            state.status = 'LOBBY';
-            switchView('view-lobby');
-        }
-
-        function copyRoomCode() {
-            const temp = document.createElement('input');
-            temp.value = state.roomCode;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            showToast(`已複製房間代碼：${state.roomCode}`, 'success');
         }
 
         /**
          * ============================================================================
-         * 五回合制核心迴圈 (新聞階段 -> 交易階段 -> 動態股價演算 -> 結算)
+         * 臨時突發事件與 10 台智慧 AI 攻防邏輯
          * ============================================================================
          */
-        function startNewRound(roundNum) {
-            state.round = roundNum;
-            state.status = 'NEWS';
-            state.timeLeft = NEWS_DURATION;
-            state.netOrderFlow = { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 };
-            state.recentPressure = { TSMC: 0, NVDA: 0, BIOX: 0, SHIP: 0, COIN: 0 };
-
-            // 挑選一則本局尚未出現過的新聞
-            let availableIndices = NEWS_POOL.map((_, i) => i).filter(i => !state.usedNewsIndices.includes(i));
-            if (availableIndices.length === 0) {
-                state.usedNewsIndices = [];
-                availableIndices = NEWS_POOL.map((_, i) => i);
+        function maybeTriggerShockEvent() {
+            if (game.shockCooldown > 0) {
+                game.shockCooldown -= 1;
+                return;
             }
-            const chosenIdx = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-            state.usedNewsIndices.push(chosenIdx);
-            state.currentNews = NEWS_POOL[chosenIdx];
+            // 每秒約 16% 機率觸發臨時事件，觸發後冷卻 6 秒避免連續轟炸
+            if (Math.random() < 0.16) {
+                const ev = SHOCK_EVENTS[Math.floor(Math.random() * SHOCK_EVENTS.length)];
+                const targetStock = ev.targetCode ? getStock(ev.targetCode) : pickRandomStock();
 
-            addTradeLog(`📰 第 ${roundNum} 回合頭條：${state.currentNews.title}`, 'text-amber-400');
-            showNewsPopup(state.currentNews, roundNum);
-            renderAllGameUI();
-            syncHostStateToClients();
+                game.activeShock = {
+                    code: targetStock.code,
+                    name: targetStock.name,
+                    title: ev.title,
+                    tag: ev.tag,
+                    priceShock: ev.priceShock
+                };
+                game.shockCooldown = 6;
+                game.netOrderFlow[targetStock.code] += ev.flowShock;
 
-            if (gameLoopInterval) clearInterval(gameLoopInterval);
-            gameLoopInterval = setInterval(gameTick, 1000);
+                const banner = document.getElementById('shock-event-banner');
+                banner.classList.remove('hidden');
+                document.getElementById('shock-event-text').textContent = `${targetStock.code} ${targetStock.name}：${ev.title}`;
+                document.getElementById('shock-event-tag').textContent = ev.tag;
+
+                pushFeed(`⚡ 突發事件【${targetStock.code} ${targetStock.name}】${ev.title} (${ev.tag})`, ev.cls);
+                showToast(`突發事件：${targetStock.code} ${ev.title}`, 'info');
+            }
         }
 
-        // 每秒核心時脈 (僅房主或單人模式執行演算)
-        function gameTick() {
-            if (!state.isHost) return;
+        function runAITradingStep() {
+            const impacts = game.currentNews ? game.currentNews.impacts : {};
+            const ais = game.participants.filter(p => p.isAI);
 
-            state.timeLeft -= 1;
+            ais.forEach(ai => {
+                const actProb = ai.style === '高頻量化型' ? 0.80 : (ai.style === '大戶控盤型' ? 0.55 : 0.65);
+                if (Math.random() > actProb) return;
 
-            if (state.status === 'NEWS') {
-                document.getElementById('modal-news-countdown').textContent = Math.max(0, state.timeLeft);
-                if (state.timeLeft <= 0) {
-                    // 切換進入交易階段
-                    state.status = 'TRADING';
-                    state.timeLeft = TRADING_DURATION;
-                    closeModal('modal-news');
-                    addTradeLog(`🔔 第 ${state.round} 回合正式開盤！交易時間 ${TRADING_DURATION} 秒`, 'text-blue-400');
-                    showToast(`第 ${state.round} 回合開盤！請把握 30 秒進行買賣`, 'info');
-                }
-            } else if (state.status === 'TRADING') {
-                // 1. 若為單人模式，AI 對手根據新聞與盤勢自動下單
-                if (state.mode === 'SOLO') {
-                    simulateAITrades();
+                // 挑選目標股票
+                let stock = null;
+                if (game.activeShock && ai.style === '事件狙擊型' && Math.random() < 0.75) {
+                    stock = getStock(game.activeShock.code);
+                } else if (ai.style === '科技算力型') {
+                    stock = Math.random() < 0.5 ? getStock('2330') : getStock('3017');
+                } else if (ai.style === '題材輪動型') {
+                    stock = Math.random() < 0.5 ? getStock('6446') : getStock('2603');
+                } else {
+                    stock = pickRandomStock();
                 }
 
-                // 2. 動態股價演算：結合「新聞基本面漂移」+「玩家即時買賣供需衝擊」+「隨機市場雜訊」
-                updateMarketPrices();
+                const roundPct = (stock.price - stock.roundOpenPrice) / stock.roundOpenPrice;
+                const nearLimitUp = stock.price >= stock.limitUp * 0.985;
+                const nearLimitDown = stock.price <= stock.limitDown * 1.015;
+                const impact = impacts[stock.code] || 0;
+                const holding = ai.holdings[stock.code];
 
-                // 3. 更新所有玩家最新總資產淨值
-                recalculateAllPlayersNetWorth();
+                let side = null;
 
-                if (state.timeLeft <= 0) {
-                    if (state.round < TOTAL_ROUNDS) {
-                        startNewRound(state.round + 1);
-                        return;
+                // 若接近漲停（+10%），獲利了結型與逆勢均值 AI 會傾向賣出壓盤，避免無腦追高
+                if (nearLimitUp) {
+                    if ((ai.style === '高檔了結型' || ai.style === '逆勢均值回歸' || ai.style === '價值低接型') && holding.qty > 0) {
+                        side = 'SELL';
+                    } else if (ai.style === '動能追價型' && stock.price < stock.limitUp && ai.cash > stock.price * 5) {
+                        side = Math.random() < 0.35 ? 'BUY' : null;
+                    }
+                } else if (nearLimitDown) {
+                    // 若接近跌停（-10%），價值低接與逆勢均值 AI 會試圖承接，恐慌停損型則可能割肉
+                    if ((ai.style === '價值低接型' || ai.style === '逆勢均值回歸') && ai.cash > stock.price * 10) {
+                        side = Math.random() < 0.6 ? 'BUY' : null;
+                    } else if (ai.style === '風控停損型' && holding.qty > 0) {
+                        side = Math.random() < 0.5 ? 'SELL' : null;
+                    }
+                } else {
+                    // 一般區間內依策略決定買賣
+                    if (ai.style === '動能追價型' || ai.style === '科技算力型' || ai.style === '題材輪動型') {
+                        if ((impact > 0.006 || roundPct > 0.015) && ai.cash > stock.price * 8) side = 'BUY';
+                        else if (holding.qty > 0 && (impact < -0.008 || roundPct > 0.055)) side = 'SELL';
+                    } else if (ai.style === '價值低接型' || ai.style === '逆勢均值回歸') {
+                        if (roundPct < -0.025 && ai.cash > stock.price * 10) side = 'BUY';
+                        else if (roundPct > 0.045 && holding.qty > 0) side = 'SELL';
+                        else if (holding.qty > 0 && stock.price > holding.avgCost * 1.06) side = 'SELL';
+                    } else if (ai.style === '高檔了結型') {
+                        if (roundPct > 0.03 && holding.qty > 0) side = 'SELL';
+                        else if (roundPct < -0.015 && ai.cash > stock.price * 10) side = 'BUY';
+                    } else if (ai.style === '風控停損型') {
+                        if ((roundPct < -0.035 || impact < -0.01) && holding.qty > 0) side = 'SELL';
+                        else if (impact > 0.012 && roundPct < 0.02 && ai.cash > stock.price * 8) side = 'BUY';
+                    } else if (ai.style === '事件狙擊型') {
+                        if (game.activeShock && game.activeShock.code === stock.code) {
+                            side = game.activeShock.priceShock < 0 ? 'BUY' : 'SELL';
+                        } else {
+                            side = Math.random() < 0.5 ? 'BUY' : 'SELL';
+                        }
                     } else {
-                        // 5 回合結束，進入最終結算
-                        clearInterval(gameLoopInterval);
-                        finalizeGameOver();
-                        return;
+                        // 高頻量化型 & 大戶控盤型
+                        side = Math.random() < 0.5 ? 'BUY' : 'SELL';
                     }
                 }
-            }
 
-            renderAllGameUI();
-            syncHostStateToClients();
-        }
-
-        /**
-         * 核心股價動態演算模型
-         * 股價變動 = 新聞基本面趨勢 (News Drift) + 玩家即時買賣盤供需衝擊 (Order Flow Impact) + 隨機波動
-         */
-        function updateMarketPrices() {
-            const newsImpacts = state.currentNews ? state.currentNews.impacts : {};
-
-            state.stocks.forEach(stock => {
-                const prevPrice = stock.price;
-                
-                // A. 新聞基本面影響 (每秒漸進釋放新聞利多/利空)
-                const newsDrift = (newsImpacts[stock.id] || 0) * 0.45;
-
-                // B. 玩家現場買賣供需力道 (每淨買入 100 股推升約 0.65% 股價，賣出則壓低)
-                const netShares = state.netOrderFlow[stock.id] || 0;
-                // 使用 tanh 函數平滑化超大單衝擊，避免單秒暴漲暴跌失控，同時保留明顯推升感
-                const orderImpact = Math.tanh(netShares / 600) * 0.032;
-
-                // 記錄平滑後的多空力道供 UI 顯示
-                state.recentPressure[stock.id] = (state.recentPressure[stock.id] * 0.5) + (netShares * 0.5);
-                // 清空本秒已消化的委託量
-                state.netOrderFlow[stock.id] = 0;
-
-                // C. 市場隨機微幅波動
-                const randomShock = (Math.random() - 0.5) * stock.volatility * 0.9;
-
-                // 綜合變動率
-                let totalChangeRate = newsDrift + orderImpact + randomShock;
-                // 限制單秒最大漲跌幅在 ±6% 內
-                totalChangeRate = Math.max(-0.06, Math.min(0.06, totalChangeRate));
-
-                let newPrice = prevPrice * (1 + totalChangeRate);
-                // 最低股價保護 ($5.00)
-                newPrice = Math.max(5.00, Number(newPrice.toFixed(2)));
-                
-                stock.lastTickDiff = newPrice - prevPrice;
-                stock.price = newPrice;
-
-                // 寫入歷史走勢
-                state.priceHistory[stock.id].push(newPrice);
-                if (state.priceHistory[stock.id].length > 160) {
-                    state.priceHistory[stock.id].shift();
+                if (side === 'BUY') {
+                    const maxQty = Math.floor(ai.cash / stock.price);
+                    if (maxQty <= 0) return;
+                    const lot = ai.style === '大戶控盤型' ? (Math.floor(Math.random() * 5) + 2) * 35 : (Math.floor(Math.random() * 4) + 1) * 15;
+                    const qty = Math.min(maxQty, Math.max(1, lot));
+                    settleTrade(ai, stock, 'BUY', qty, qty >= 65);
+                } else if (side === 'SELL' && holding.qty > 0) {
+                    const ratio = (ai.style === '高檔了結型' || ai.style === '風控停損型') ? 0.75 : (Math.random() * 0.45 + 0.25);
+                    const qty = Math.min(holding.qty, Math.max(1, Math.floor(holding.qty * ratio)));
+                    settleTrade(ai, stock, 'SELL', qty, qty >= 65);
                 }
             });
         }
 
-        // AI 對手行為模擬 (單人實戰模式)
-        function simulateAITrades() {
-            const newsImpacts = state.currentNews ? state.currentNews.impacts : {};
-            const aiPlayers = Object.values(state.players).filter(p => p.isAI);
+        function updateStockPrices() {
+            const impacts = game.currentNews ? game.currentNews.impacts : {};
 
-            aiPlayers.forEach(ai => {
-                // 每秒約 55% 機率出手交易
-                if (Math.random() > 0.55) return;
+            game.stocks.forEach(stock => {
+                const prev = stock.price;
+                const newsDrift = (impacts[stock.code] || 0) * 0.35;
 
-                // 挑選一檔股票評估
-                const stock = state.stocks[Math.floor(Math.random() * state.stocks.length)];
-                const impact = newsImpacts[stock.id] || 0;
-                const holding = ai.holdings[stock.id];
+                // 玩家與 10 台 AI 淨買賣供需
+                const netShares = game.netOrderFlow[stock.code] || 0;
+                const supplyDemandImpact = Math.tanh(netShares / 700) * 0.028;
 
-                let action = null;
-                if (ai.aiStyle === 'MOMENTUM') {
-                    // 順勢派：看新聞利多就追買，利空就賣出
-                    if (impact > 0.01 && ai.cash > stock.price * 50) action = 'BUY';
-                    else if (impact < -0.01 && holding.qty > 0) action = 'SELL';
-                } else if (ai.aiStyle === 'VALUE') {
-                    // 價值派：低於起始價就買，獲利超過 12% 就停利
-                    if (stock.price < stock.basePrice * 0.95 && ai.cash > stock.price * 60) action = 'BUY';
-                    else if (holding.qty > 0 && stock.price > holding.avgPrice * 1.12) action = 'SELL';
-                } else {
-                    // 激進派：隨機大單炒作或獲利了結
-                    if (Math.random() > 0.45 && ai.cash > stock.price * 80) action = 'BUY';
-                    else if (holding.qty > 0) action = 'SELL';
+                // 若本秒剛發生針對此股的突發事件衝擊，套用一次性震盪力道並清除
+                let shockImpulse = 0;
+                if (game.activeShock && game.activeShock.code === stock.code) {
+                    shockImpulse = game.activeShock.priceShock;
+                    game.activeShock = null;
                 }
 
-                if (action === 'BUY') {
-                    const maxAffordable = Math.floor(ai.cash / stock.price);
-                    const qty = Math.min(maxAffordable, (Math.floor(Math.random() * 4) + 1) * 40);
-                    if (qty >= 10) {
-                        applyTradeToPlayer(ai, stock, 'BUY', qty);
-                    }
-                } else if (action === 'SELL' && holding.qty > 0) {
-                    const qty = Math.min(holding.qty, Math.max(10, Math.floor(holding.qty * 0.6)));
-                    applyTradeToPlayer(ai, stock, 'SELL', qty);
+                // 輕微向本回合開盤價回歸的震盪張力，避免單邊死衝
+                const meanReversion = ((stock.roundOpenPrice - prev) / stock.roundOpenPrice) * 0.08;
+                const noise = (Math.random() - 0.5) * stock.volatility * 0.9;
+
+                let rawRate = newsDrift + supplyDemandImpact + shockImpulse + meanReversion + noise;
+                rawRate = Math.max(-0.055, Math.min(0.055, rawRate));
+
+                let nextPrice = Number((prev * (1 + rawRate)).toFixed(2));
+
+                // 嚴格執行單回合 ±10% 漲跌停上下限
+                if (nextPrice > stock.limitUp) nextPrice = stock.limitUp;
+                if (nextPrice < stock.limitDown) nextPrice = stock.limitDown;
+
+                // 記錄有效買賣力道顯示
+                const effectiveFlow = netShares + (nextPrice > prev ? 140 : (nextPrice < prev ? -140 : 0));
+                game.recentPressure[stock.code] = game.recentPressure[stock.code] * 0.45 + effectiveFlow * 0.55;
+                game.netOrderFlow[stock.code] = 0;
+
+                stock.lastDiff = Number((nextPrice - prev).toFixed(2));
+                stock.price = nextPrice;
+
+                game.priceHistory[stock.code].push(nextPrice);
+                if (game.priceHistory[stock.code].length > 160) {
+                    game.priceHistory[stock.code].shift();
                 }
             });
         }
 
         /**
          * ============================================================================
-         * 玩家下單交易與供需寫入
+         * 玩家下單與撮合
          * ============================================================================
          */
-        function selectStock(stockId) {
-            state.selectedStockId = stockId;
-            renderAllGameUI();
+        function selectStock(code) {
+            game.selectedCode = code;
+            renderGameUI();
         }
 
-        function setTradeQty(val) {
+        function setTradeQty(modeOrQty) {
             const input = document.getElementById('input-trade-qty');
-            const stock = state.stocks.find(s => s.id === state.selectedStockId);
-            const me = state.players[state.myId];
+            const stock = getStock(game.selectedCode);
+            const me = game.participants[0];
             if (!stock || !me) return;
 
-            if (val === 'MAX_BUY') {
-                const maxShares = Math.floor(me.cash / stock.price);
-                input.value = Math.max(1, maxShares);
-            } else if (val === 'MAX_SELL') {
-                const owned = me.holdings[stock.id]?.qty || 0;
+            if (modeOrQty === 'ALL_IN') {
+                const maxAffordable = Math.floor(me.cash / stock.price);
+                input.value = Math.max(1, maxAffordable);
+            } else if (modeOrQty === 'SELL_ALL') {
+                const owned = me.holdings[stock.code].qty;
                 input.value = Math.max(1, owned);
             } else {
-                input.value = val;
+                input.value = modeOrQty;
             }
             updateOrderPreview();
         }
 
         function updateOrderPreview() {
-            const qty = Math.max(1, parseInt(document.getElementById('input-trade-qty').value) || 0);
-            const stock = state.stocks.find(s => s.id === state.selectedStockId);
-            const me = state.players[state.myId];
+            const stock = getStock(game.selectedCode);
+            const me = game.participants[0];
             if (!stock || !me) return;
 
-            const totalAmount = qty * stock.price;
-            document.getElementById('buy-cost-preview').textContent = `預估 $${formatMoney(totalAmount)}`;
-            document.getElementById('sell-gain-preview').textContent = `預估 $${formatMoney(totalAmount)}`;
+            const qty = Math.max(1, parseInt(document.getElementById('input-trade-qty').value, 10) || 0);
+            const est = qty * stock.price;
 
-            const isTradingOpen = (state.status === 'TRADING');
-            const ownedQty = me.holdings[stock.id]?.qty || 0;
+            document.getElementById('preview-buy').textContent = `約 $${formatNum(est)}`;
+            document.getElementById('preview-sell').textContent = `約 $${formatNum(est)}`;
 
-            document.getElementById('btn-execute-buy').disabled = !isTradingOpen || (me.cash < stock.price);
-            document.getElementById('btn-execute-sell').disabled = !isTradingOpen || (ownedQty <= 0);
+            const isTrading = game.status === 'TRADING';
+            const owned = me.holdings[stock.code].qty;
+            document.getElementById('btn-buy').disabled = !isTrading || me.cash < stock.price;
+            document.getElementById('btn-sell').disabled = !isTrading || owned <= 0;
         }
 
-        async function executeTrade(side) {
-            if (state.status !== 'TRADING') {
-                showToast('目前為新聞發布階段，請等待開盤倒數結束後下單！', 'error');
+        function executeOrder(side) {
+            if (game.status !== 'TRADING') {
+                showToast('目前非交易階段，請等待開盤後下單！', 'error');
                 return;
             }
-
-            const stock = state.stocks.find(s => s.id === state.selectedStockId);
-            const me = state.players[state.myId];
+            const stock = getStock(game.selectedCode);
+            const me = game.participants[0];
             let qty = Math.floor(Number(document.getElementById('input-trade-qty').value));
 
             if (!stock || !me || isNaN(qty) || qty <= 0) {
-                showToast('請輸入有效的交易股數', 'error');
+                showToast('請輸入有效股數（至少 1 股）', 'error');
                 return;
             }
 
             if (side === 'BUY') {
-                const maxAffordable = Math.floor(me.cash / stock.price);
-                if (maxAffordable <= 0) {
-                    showToast('可用現金不足，無法買進！', 'error');
+                const maxCanBuy = Math.floor(me.cash / stock.price);
+                if (maxCanBuy <= 0) {
+                    showToast('現金不足，無法買進！', 'error');
                     return;
                 }
-                if (qty > maxAffordable) qty = maxAffordable;
-            } else if (side === 'SELL') {
-                const owned = me.holdings[stock.id]?.qty || 0;
+                if (qty > maxCanBuy) qty = maxCanBuy;
+            } else {
+                const owned = me.holdings[stock.code].qty;
                 if (owned <= 0) {
-                    showToast(`您目前沒有 ${stock.id} 的持股可賣出！`, 'error');
+                    showToast(`目前沒有 ${stock.code} 持股可賣出！`, 'error');
                     return;
                 }
                 if (qty > owned) qty = owned;
             }
 
-            // 執行本地端帳戶扣款/入帳，提供零延遲手感
-            applyTradeToPlayer(me, stock, side, qty);
-            recalculateAllPlayersNetWorth();
-            renderAllGameUI();
-
-            // 若為非房主的多人模式，將委託單發送給房主計入全球供需池
-            if (state.mode === 'MULTI' && !state.isHost) {
-                const orderPayload = {
-                    playerId: state.myId,
-                    playerName: state.myName,
-                    stockId: stock.id,
-                    side,
-                    qty,
-                    price: stock.price,
-                    timestamp: Date.now()
-                };
-                if (fbDb) {
-                    try {
-                        await fbDb.collection('ws_rooms').doc(state.roomCode).collection('orders').add(orderPayload);
-                    } catch (e) {
-                        console.error('Send order error:', e);
-                    }
-                } else if (broadcastChannel) {
-                    broadcastChannel.postMessage({
-                        type: 'PLAYER_ORDER',
-                        roomCode: state.roomCode,
-                        order: orderPayload
-                    });
-                }
-            }
+            settleTrade(me, stock, side, qty, true);
+            recalculateNetWorths();
+            renderGameUI();
         }
 
-        // 房主收到其他玩家的委託單後，更新其帳戶並寫入供需力道池
-        function processIncomingOrder(order) {
-            const player = state.players[order.playerId];
-            const stock = state.stocks.find(s => s.id === order.stockId);
-            if (!player || !stock) return;
-            if (order.playerId === state.myId) return; // 房主自己已在本地扣款
-
-            applyTradeToPlayer(player, stock, order.side, order.qty);
-        }
-
-        // 實際撮合帳戶變化並推動市場供需力道
-        function applyTradeToPlayer(player, stock, side, qty) {
+        function settleTrade(participant, stock, side, qty, logNotable) {
             const amount = qty * stock.price;
-            const holding = player.holdings[stock.id];
+            const h = participant.holdings[stock.code];
 
             if (side === 'BUY') {
-                if (player.cash < amount - 0.01) return;
-                const totalCost = (holding.qty * holding.avgPrice) + amount;
-                holding.qty += qty;
-                holding.avgPrice = totalCost / holding.qty;
-                player.cash -= amount;
+                if (participant.cash < amount - 0.01) return;
+                const totalCost = h.qty * h.avgCost + amount;
+                h.qty += qty;
+                h.avgCost = h.qty > 0 ? totalCost / h.qty : 0;
+                h.trades += 1;
+                participant.cash -= amount;
+                participant.totalTrades += 1;
+                game.netOrderFlow[stock.code] += qty;
 
-                // 買盤推升股價供需池
-                state.netOrderFlow[stock.id] = (state.netOrderFlow[stock.id] || 0) + qty;
-                if (qty >= 50 || player.id === state.myId) {
-                    addTradeLog(`📈 ${player.name} 買進 ${stock.id} ${qty} 股 (@$${stock.price.toFixed(2)})`, 'text-red-400');
+                if (logNotable && !participant.isAI) {
+                    pushFeed(`🟢 ${participant.name} 買進 ${stock.code} ${qty} 股 @ $${stock.price.toFixed(2)}`, 'text-rose-300');
+                } else if (logNotable) {
+                    pushFeed(`🤖 ${participant.name} 買進 ${stock.code} ${qty} 股 @ $${stock.price.toFixed(2)}`, 'text-gray-300');
                 }
-            } else if (side === 'SELL') {
-                if (holding.qty < qty) return;
-                holding.qty -= qty;
-                if (holding.qty === 0) holding.avgPrice = 0;
-                player.cash += amount;
+            } else {
+                if (h.qty < qty) return;
+                h.qty -= qty;
+                if (h.qty === 0) h.avgCost = 0;
+                h.trades += 1;
+                participant.cash += amount;
+                participant.totalTrades += 1;
+                game.netOrderFlow[stock.code] -= qty;
 
-                // 賣盤壓低股價供需池
-                state.netOrderFlow[stock.id] = (state.netOrderFlow[stock.id] || 0) - qty;
-                if (qty >= 50 || player.id === state.myId) {
-                    addTradeLog(`📉 ${player.name} 賣出 ${stock.id} ${qty} 股 (@$${stock.price.toFixed(2)})`, 'text-emerald-400');
+                if (logNotable && !participant.isAI) {
+                    pushFeed(`🔵 ${participant.name} 賣出 ${stock.code} ${qty} 股 @ $${stock.price.toFixed(2)}`, 'text-emerald-300');
+                } else if (logNotable) {
+                    pushFeed(`🤖 ${participant.name} 賣出 ${stock.code} ${qty} 股 @ $${stock.price.toFixed(2)}`, 'text-gray-400');
                 }
             }
         }
 
-        function recalculateAllPlayersNetWorth() {
-            Object.values(state.players).forEach(p => {
+        function recalculateNetWorths() {
+            game.participants.forEach(p => {
                 let stockVal = 0;
-                state.stocks.forEach(s => {
-                    const qty = p.holdings[s.id]?.qty || 0;
-                    stockVal += qty * s.price;
+                game.stocks.forEach(s => {
+                    stockVal += p.holdings[s.code].qty * s.price;
                 });
                 p.netWorth = p.cash + stockVal;
             });
         }
 
+        function getROI(p) {
+            return ((p.netWorth - p.initialCapital) / p.initialCapital) * 100;
+        }
+
         /**
          * ============================================================================
-         * 遊戲結束與結算頒獎
+         * 五回合結束與最終成果表（方便截圖到班群比 ROI）
          * ============================================================================
          */
-        function finalizeGameOver() {
-            state.status = 'GAMEOVER';
-            // 強制依收盤價結算所有玩家持股為現金
-            Object.values(state.players).forEach(p => {
-                state.stocks.forEach(s => {
-                    const h = p.holdings[s.id];
-                    if (h && h.qty > 0) {
+        function finishFiveRounds() {
+            game.status = 'GAMEOVER';
+
+            // 第 5 回合結束，依最終收盤價將剩餘持股換算為現金
+            game.participants.forEach(p => {
+                game.stocks.forEach(s => {
+                    const h = p.holdings[s.code];
+                    if (h.qty > 0) {
                         p.cash += h.qty * s.price;
                         h.qty = 0;
-                        h.avgPrice = 0;
+                        h.avgCost = 0;
                     }
                 });
                 p.netWorth = p.cash;
             });
 
-            syncHostStateToClients();
-            showGameOverScreen();
+            switchView('view-gameover');
+            renderFinalResultsTable();
         }
 
-        function showGameOverScreen() {
-            switchView('view-gameover');
-            const sorted = Object.values(state.players).sort((a, b) => b.netWorth - a.netWorth);
-            const listEl = document.getElementById('final-standings-list');
+        function renderFinalResultsTable() {
+            const ranked = [...game.participants].sort((a, b) => getROI(b) - getROI(a));
+            const myRankIndex = ranked.findIndex(p => !p.isAI);
+            const me = ranked[myRankIndex];
+            const myROI = getROI(me);
 
-            listEl.innerHTML = sorted.map((p, idx) => {
-                const roi = ((p.netWorth - INITIAL_CASH) / INITIAL_CASH) * 100;
-                const roiSign = roi >= 0 ? '+' : '';
-                const roiColor = getTrendTextColor(roi);
-                
-                // 頒發趣味操盤稱號
-                let badgeTitle = '穩健交易員';
-                let badgeClass = 'bg-gray-700 text-gray-200';
-                if (idx === 0 && roi > 15) {
-                    badgeTitle = '🏆 華爾街之狼';
-                    badgeClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
-                } else if (idx === 0) {
-                    badgeTitle = '👑 盤面總冠軍';
-                    badgeClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
-                } else if (roi >= 20) {
-                    badgeTitle = '🚀 少年股神';
-                    badgeClass = 'bg-purple-500/20 text-purple-300 border border-purple-500/40';
-                } else if (roi < -15) {
-                    badgeTitle = '🥬 頂級韭菜王';
-                    badgeClass = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-                } else if (roi < 0) {
-                    badgeTitle = '💸 慈善家操盤手';
-                    badgeClass = 'bg-blue-500/20 text-blue-300 border border-blue-500/40';
-                }
+            document.getElementById('result-player-summary').innerHTML = `
+                <div class="text-[11px] text-gray-400">${escapeHtml(me.name)} 的最終名次</div>
+                <div class="text-lg sm:text-xl font-mono font-extrabold text-amber-300">
+                    第 ${myRankIndex + 1} / 11 名 • ROI ${myROI >= 0 ? '+' : ''}${myROI.toFixed(2)}%
+                </div>
+            `;
 
-                const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+            document.getElementById('result-timestamp').textContent = `結算時間：${new Date().toLocaleString('zh-TW', { hour12: false })}`;
+
+            const tbody = document.getElementById('final-results-tbody');
+            tbody.innerHTML = ranked.map((p, idx) => {
+                const roi = getROI(p);
+                const pnl = p.netWorth - p.initialCapital;
+                const isMe = !p.isAI;
+                const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+                const roiClass = getTrendClass(roi);
+
+                let summary = `${p.totalTrades} 筆成交`;
+                if (idx === 0 && roi > 0) summary = `🔥 冠軍 • ${p.totalTrades} 筆成交`;
+                else if (roi >= 12) summary = `🚀 高報酬 • ${p.totalTrades} 筆成交`;
+                else if (roi > 0) summary = `📈 獲利收官 • ${p.totalTrades} 筆成交`;
+                else if (roi > -10) summary = `🛡️ 震盪小虧 • ${p.totalTrades} 筆成交`;
+                else summary = `📉 逆風承壓 • ${p.totalTrades} 筆成交`;
 
                 return `
-                    <div class="flex items-center justify-between p-4 rounded-xl bg-terminal-bg border ${p.id === state.myId ? 'border-blue-500' : 'border-terminal-border'}">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xl font-bold w-8 text-center">${rankIcon}</span>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-white text-sm sm:text-base">${escapeHtml(p.name)}</span>
-                                    ${p.id === state.myId ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">你</span>' : ''}
-                                </div>
-                                <span class="inline-block mt-1 text-[11px] px-2 py-0.5 rounded font-semibold ${badgeClass}">${badgeTitle}</span>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-lg sm:text-xl font-mono font-extrabold text-white">$${formatMoney(p.netWorth)}</div>
-                            <div class="text-xs font-mono font-bold ${roiColor}">${roiSign}${roi.toFixed(2)}%</div>
-                        </div>
-                    </div>
+                    <tr class="${isMe ? 'bg-amber-500/15 font-bold' : 'hover:bg-terminal-hover/60'}">
+                        <td class="py-2.5 px-3 font-bold text-white">${medal}</td>
+                        <td class="py-2.5 px-3 font-sans">
+                            <span class="text-white font-bold">${escapeHtml(p.name)}</span>
+                            ${isMe ? '<span class="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-amber-400 text-gray-950 font-extrabold">你</span>' : `<span class="ml-1.5 text-[11px] text-gray-400">(${p.style})</span>`}
+                        </td>
+                        <td class="py-2.5 px-3 text-right text-gray-300">$${formatNum(p.initialCapital)}</td>
+                        <td class="py-2.5 px-3 text-right text-white font-bold">$${formatNum(p.netWorth)}</td>
+                        <td class="py-2.5 px-3 text-right ${roiClass}">${pnl >= 0 ? '+' : ''}$${formatNum(pnl)}</td>
+                        <td class="py-2.5 px-3 text-right font-extrabold ${roiClass}">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</td>
+                        <td class="py-2.5 px-3 font-sans text-xs text-gray-200">${summary}</td>
+                    </tr>
                 `;
             }).join('');
-
-            const restartBtn = document.getElementById('btn-play-again');
-            if (state.isHost) {
-                restartBtn.classList.remove('hidden');
-            } else {
-                restartBtn.classList.add('hidden');
-            }
         }
 
-        function restartGame() {
-            if (!state.isHost) return;
-            state.stocks = JSON.parse(JSON.stringify(INITIAL_STOCKS));
-            resetPriceHistory();
-            state.usedNewsIndices = [];
-            state.tradeLogs = [];
-            Object.keys(state.players).forEach(pid => {
-                const old = state.players[pid];
-                state.players[pid] = createInitialPlayerObj(old.id, old.name, old.isAI, old.aiStyle);
-            });
-            switchView('view-game');
-            startNewRound(1);
+        function copyResultsForClassGroup() {
+            const ranked = [...game.participants].sort((a, b) => getROI(b) - getROI(a));
+            const myIdx = ranked.findIndex(p => !p.isAI);
+            const me = ranked[myIdx];
+            const myROI = getROI(me);
+
+            const lines = [
+                `📊《華爾街風雲：十台AI操盤手對決》五回合戰績`,
+                `操盤手：${me.name}｜名次：第 ${myIdx + 1}/11 名`,
+                `最終淨值：$${formatNum(me.netWorth)}｜投資報酬率(ROI)：${myROI >= 0 ? '+' : ''}${myROI.toFixed(2)}%`,
+                `--- 榜單前三名 ---`,
+                ...ranked.slice(0, 3).map((p, i) => `${i + 1}. ${p.name}：ROI ${getROI(p) >= 0 ? '+' : ''}${getROI(p).toFixed(2)}% ($${formatNum(p.netWorth)})`)
+            ];
+
+            const ta = document.createElement('textarea');
+            ta.value = lines.join('\n');
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('已複製班群戰績文字，可直接貼上分享！', 'success');
         }
 
-        function returnToLobby() {
-            leaveRoom();
+        function backToLobby() {
+            if (timerInterval) clearInterval(timerInterval);
+            game.status = 'LOBBY';
+            switchView('view-lobby');
         }
 
         /**
          * ============================================================================
-         * UI 渲染與即時走勢圖繪製 (Canvas)
+         * 畫面渲染、漲跌停狀態與走勢圖繪製
          * ============================================================================
          */
-        function renderAllGameUI() {
-            // 1. 頂部回合與倒數
-            document.getElementById('game-round-badge').textContent = `ROUND ${state.round} / ${TOTAL_ROUNDS}`;
-            const phaseBadge = document.getElementById('game-phase-badge');
-            if (state.status === 'NEWS') {
-                phaseBadge.textContent = '📰 新聞發布中';
-                phaseBadge.className = 'px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-xs';
+        function renderGameUI() {
+            const isNews = game.status === 'NEWS';
+            const totalPhaseSec = isNews ? NEWS_SECONDS : TRADING_SECONDS;
+            const pctLeft = Math.max(0, Math.min(100, (game.timeLeft / totalPhaseSec) * 100));
+
+            document.getElementById('hud-round-badge').textContent = `ROUND ${game.round} / ${TOTAL_ROUNDS}`;
+            const phaseBadge = document.getElementById('hud-phase-badge');
+            const phaseSub = document.getElementById('hud-phase-sub');
+            const skipBtn = document.getElementById('btn-skip-news');
+            const timerBar = document.getElementById('hud-timer-bar');
+
+            if (isNews) {
+                phaseBadge.textContent = '📰 新聞階段 (30s)';
+                phaseBadge.className = 'px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-xs';
+                phaseSub.textContent = '研判財經新聞，可隨時按「跳過新聞，提前開盤」';
+                skipBtn.disabled = false;
+                skipBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+                timerBar.className = 'h-full bg-amber-400 transition-all duration-500';
             } else {
-                phaseBadge.textContent = '⚡ 盤中即時交易';
-                phaseBadge.className = 'px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold text-xs animate-pulse';
+                phaseBadge.textContent = '⚡ 交易階段 (30s)';
+                phaseBadge.className = 'px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold text-xs animate-pulse';
+                phaseSub.textContent = '單回合 ±10% 漲跌停 • 10 台 AI 與突發事件同步運作';
+                skipBtn.disabled = true;
+                skipBtn.classList.add('opacity-40', 'cursor-not-allowed');
+                timerBar.className = 'h-full bg-emerald-400 transition-all duration-500';
             }
 
-            const timerEl = document.getElementById('game-timer');
-            timerEl.innerHTML = `${String(Math.max(0, state.timeLeft)).padStart(2, '0')}<span class="text-sm text-gray-400 ml-0.5">s</span>`;
-            if (state.status === 'TRADING' && state.timeLeft <= 5) {
-                timerEl.classList.add('text-red-500');
-                timerEl.classList.remove('text-white');
-            } else {
-                timerEl.classList.add('text-white');
-                timerEl.classList.remove('text-red-500');
+            document.getElementById('hud-timer').innerHTML = `${String(Math.max(0, game.timeLeft)).padStart(2, '0')}<span class="text-sm text-gray-400 ml-0.5">s</span>`;
+            timerBar.style.width = `${pctLeft}%`;
+
+            // 新聞橫幅
+            if (game.currentNews) {
+                document.getElementById('banner-round').textContent = game.round;
+                document.getElementById('banner-category').textContent = game.currentNews.category;
+                document.getElementById('banner-hints').textContent = `• ${game.currentNews.hint}`;
+                document.getElementById('banner-title').textContent = game.currentNews.title;
+                document.getElementById('banner-body').textContent = game.currentNews.body;
             }
 
-            // 2. 新聞橫幅
-            if (state.currentNews) {
-                document.getElementById('banner-round-num').textContent = state.round;
-                document.getElementById('banner-news-tag').textContent = state.currentNews.category;
-                document.getElementById('banner-news-title').textContent = state.currentNews.title;
-                document.getElementById('banner-news-desc').textContent = state.currentNews.body;
-            }
-
-            // 3. 個人資產統計
-            const me = state.players[state.myId];
+            // 玩家資產與 ROI
+            const me = game.participants[0];
             if (me) {
                 let stockVal = 0;
-                state.stocks.forEach(s => {
-                    stockVal += (me.holdings[s.id]?.qty || 0) * s.price;
+                game.stocks.forEach(s => {
+                    stockVal += me.holdings[s.code].qty * s.price;
                 });
-                const netWorth = me.cash + stockVal;
-                const roi = ((netWorth - INITIAL_CASH) / INITIAL_CASH) * 100;
+                const roi = getROI(me);
+                document.getElementById('hud-cash').textContent = `$${formatNum(me.cash)}`;
+                document.getElementById('hud-stock-value').textContent = `$${formatNum(stockVal)}`;
+                document.getElementById('hud-net-worth').textContent = `$${formatNum(me.netWorth)}`;
 
-                document.getElementById('player-cash').textContent = `$${formatMoney(me.cash)}`;
-                document.getElementById('player-stock-value').textContent = `$${formatMoney(stockVal)}`;
-                document.getElementById('player-net-worth').textContent = `$${formatMoney(netWorth)}`;
-
-                const roiEl = document.getElementById('player-roi');
-                const sign = roi >= 0 ? '+' : '';
-                roiEl.textContent = `${sign}${roi.toFixed(2)}%`;
-                roiEl.className = `font-mono font-bold text-xs px-1.5 py-0.5 rounded bg-gray-900 ${getTrendTextColor(roi)}`;
+                const roiEl = document.getElementById('hud-roi');
+                roiEl.textContent = `${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%`;
+                roiEl.className = `text-lg sm:text-xl font-mono font-extrabold px-2.5 py-1 rounded-lg bg-gray-900/90 ${getTrendClass(roi)}`;
             }
 
-            // 4. 選中股票詳情與下單台
-            const selected = state.stocks.find(s => s.id === state.selectedStockId) || state.stocks[0];
-            if (selected) {
-                const diffFromBase = selected.price - selected.basePrice;
-                const pctFromBase = (diffFromBase / selected.basePrice) * 100;
-                const sign = diffFromBase >= 0 ? '+' : '';
-                const trendColor = getTrendTextColor(diffFromBase);
+            // 選中股票詳情與本回合 ±10% 漲跌停標示
+            const selected = getStock(game.selectedCode);
+            if (selected && me) {
+                const diff = selected.price - selected.roundOpenPrice;
+                const pct = (diff / selected.roundOpenPrice) * 100;
+                const trendCls = getTrendClass(diff);
 
-                document.getElementById('chart-stock-symbol').textContent = selected.id;
-                document.getElementById('chart-stock-name').textContent = selected.name;
-                document.getElementById('chart-stock-sector').textContent = selected.sector;
-                document.getElementById('chart-stock-price').textContent = `$${selected.price.toFixed(2)}`;
-                document.getElementById('chart-stock-price').className = `text-2xl font-mono font-extrabold ${trendColor}`;
-                document.getElementById('chart-stock-change').textContent = `${sign}${diffFromBase.toFixed(2)} (${sign}${pctFromBase.toFixed(2)}%)`;
-                document.getElementById('chart-stock-change').className = `text-xs font-mono font-semibold ${trendColor}`;
+                document.getElementById('chart-code').textContent = selected.code;
+                document.getElementById('chart-name').textContent = selected.name;
+                document.getElementById('chart-sector').textContent = selected.sector;
+                document.getElementById('chart-price').textContent = `$${selected.price.toFixed(2)}`;
+                document.getElementById('chart-price').className = `text-2xl font-mono font-extrabold ${trendCls}`;
+                document.getElementById('chart-change').textContent = `本回 ${diff >= 0 ? '+' : ''}${diff.toFixed(2)} (${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%)`;
+                document.getElementById('chart-change').className = `text-xs font-mono font-semibold ${trendCls}`;
 
-                document.getElementById('trade-panel-symbol').textContent = selected.id;
-                const myHolding = me?.holdings[selected.id] || { qty: 0, avgPrice: 0 };
-                document.getElementById('trade-panel-owned').textContent = myHolding.qty;
-                document.getElementById('trade-panel-avg').textContent = `$${myHolding.avgPrice.toFixed(2)}`;
+                document.getElementById('chart-limit-down').textContent = `$${selected.limitDown.toFixed(2)}`;
+                document.getElementById('chart-round-open').textContent = `$${selected.roundOpenPrice.toFixed(2)}`;
+                document.getElementById('chart-limit-up').textContent = `$${selected.limitUp.toFixed(2)}`;
+
+                const limitBadge = document.getElementById('chart-limit-badge');
+                if (selected.price >= selected.limitUp - 0.001) {
+                    limitBadge.textContent = '🔒 已達漲停 (+10%)';
+                    limitBadge.className = 'text-[10px] px-2 py-0.5 rounded font-mono font-extrabold bg-red-500/20 text-red-300 border border-red-500/40';
+                } else if (selected.price <= selected.limitDown + 0.001) {
+                    limitBadge.textContent = '🔒 已達跌停 (-10%)';
+                    limitBadge.className = 'text-[10px] px-2 py-0.5 rounded font-mono font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+                } else {
+                    limitBadge.textContent = '±10% 漲跌停區間內';
+                    limitBadge.className = 'text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-gray-800 text-gray-300 border border-gray-700';
+                }
+
+                document.getElementById('trade-symbol').textContent = selected.code;
+                const h = me.holdings[selected.code];
+                document.getElementById('trade-owned').textContent = h.qty;
+                document.getElementById('trade-avg').textContent = `$${h.avgCost.toFixed(2)}`;
 
                 // 多空力道條
-                const pressure = state.recentPressure[selected.id] || 0;
-                const buyPct = Math.max(10, Math.min(90, 50 + (pressure / 15)));
-                document.getElementById('pressure-buy-bar').style.width = `${buyPct}%`;
-                document.getElementById('pressure-sell-bar').style.width = `${100 - buyPct}%`;
-                document.getElementById('pressure-buy-bar').className = `h-full transition-all duration-300 ${state.colorScheme === 'TW' ? 'bg-red-500' : 'bg-emerald-500'}`;
-                document.getElementById('pressure-sell-bar').className = `h-full transition-all duration-300 ${state.colorScheme === 'TW' ? 'bg-emerald-500' : 'bg-red-500'}`;
-                
-                const pText = document.getElementById('pressure-text');
-                if (pressure > 25) pText.textContent = '買盤強勁推升';
-                else if (pressure < -25) pText.textContent = '賣壓湧現下探';
-                else pText.textContent = '多空均衡';
+                const p = game.recentPressure[selected.code] || 0;
+                const upPct = Math.max(12, Math.min(88, 50 + p / 18));
+                const upBar = document.getElementById('pressure-up-bar');
+                const downBar = document.getElementById('pressure-down-bar');
+                upBar.style.width = `${upPct}%`;
+                downBar.style.width = `${100 - upPct}%`;
+
+                if (game.colorScheme === 'TW') {
+                    upBar.className = 'h-full bg-red-500 transition-all duration-300';
+                    downBar.className = 'h-full bg-emerald-500 transition-all duration-300';
+                } else {
+                    upBar.className = 'h-full bg-emerald-500 transition-all duration-300';
+                    downBar.className = 'h-full bg-red-500 transition-all duration-300';
+                }
+
+                const pLabel = document.getElementById('pressure-label');
+                if (p > 35) pLabel.textContent = '買盤強勢推升';
+                else if (p < -35) pLabel.textContent = '賣壓湧現下探';
+                else pLabel.textContent = '多空震盪拉鋸';
             }
 
             updateOrderPreview();
             renderStockTable();
-            renderLeaderboard();
-            renderTradeLogs();
-            drawStockChart();
+            renderLiveLeaderboard();
+            renderFeeds();
+            drawChart();
         }
 
         function renderStockTable() {
-            const tbody = document.getElementById('stock-list-tbody');
-            const me = state.players[state.myId];
+            const tbody = document.getElementById('stock-table-body');
+            const me = game.participants[0];
 
-            tbody.innerHTML = state.stocks.map(s => {
-                const isSelected = s.id === state.selectedStockId;
-                const diff = s.price - s.basePrice;
-                const pct = (diff / s.basePrice) * 100;
-                const sign = diff >= 0 ? '+' : '';
-                const trendColor = getTrendTextColor(diff);
+            tbody.innerHTML = game.stocks.map(s => {
+                const active = s.code === game.selectedCode;
+                const diff = s.price - s.roundOpenPrice;
+                const pct = (diff / s.roundOpenPrice) * 100;
+                const trendCls = getTrendClass(diff);
+                const h = me.holdings[s.code];
+                const pnl = h.qty > 0 ? (s.price - h.avgCost) * h.qty : 0;
 
-                const holding = me?.holdings[s.id] || { qty: 0, avgPrice: 0 };
-                let unrealizedPnL = 0;
-                if (holding.qty > 0) {
-                    unrealizedPnL = (s.price - holding.avgPrice) * holding.qty;
+                const isLimitUp = s.price >= s.limitUp - 0.001;
+                const isLimitDown = s.price <= s.limitDown + 0.001;
+
+                let flash = '';
+                if (s.lastDiff > 0.005) {
+                    flash = game.colorScheme === 'TW' ? 'flash-tw-up' : 'flash-us-up';
+                } else if (s.lastDiff < -0.005) {
+                    flash = game.colorScheme === 'TW' ? 'flash-tw-down' : 'flash-us-down';
                 }
-                const pnlColor = getTrendTextColor(unrealizedPnL);
+                s.lastDiff = 0;
 
-                // 單秒價格跳動閃爍效果
-                let flashClass = '';
-                if (s.lastTickDiff > 0.01) {
-                    flashClass = state.colorScheme === 'TW' ? 'flash-red' : 'flash-us-up';
-                } else if (s.lastTickDiff < -0.01) {
-                    flashClass = state.colorScheme === 'TW' ? 'flash-green' : 'flash-us-down';
+                let statusBadge = '';
+                if (isLimitUp) {
+                    statusBadge = '<span class="ml-1 text-[10px] px-1.5 py-0.2 rounded bg-red-500/25 text-red-300 font-mono font-bold">漲停</span>';
+                } else if (isLimitDown) {
+                    statusBadge = '<span class="ml-1 text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/25 text-emerald-300 font-mono font-bold">跌停</span>';
                 }
-                s.lastTickDiff = 0;
 
                 return `
-                    <tr onclick="selectStock('${s.id}')" class="cursor-pointer transition ${isSelected ? 'bg-blue-500/15' : 'hover:bg-terminal-hover'} ${flashClass}">
-                        <td class="py-2.5 pr-2">
-                            <div class="font-bold text-white flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full" style="background-color: ${s.color}"></span>
-                                ${s.id}
+                    <tr onclick="selectStock('${s.code}')" class="cursor-pointer transition ${active ? 'bg-sky-500/15' : 'hover:bg-terminal-hover'} ${flash}">
+                        <td class="py-2 pr-2">
+                            <div class="font-bold text-white flex items-center gap-1">
+                                <span class="font-mono text-xs" style="color: ${s.color}">${s.code}</span>
+                                <span>${s.name}</span>
+                                ${statusBadge}
                             </div>
-                            <div class="text-[11px] text-gray-400">${s.name}</div>
+                            <div class="text-[10px] text-gray-400 font-mono">限 $${s.limitDown.toFixed(1)} ~ $${s.limitUp.toFixed(1)}</div>
                         </td>
-                        <td class="py-2.5 text-right font-mono font-bold text-white">$${s.price.toFixed(2)}</td>
-                        <td class="py-2.5 text-right font-mono font-semibold ${trendColor}">${sign}${pct.toFixed(2)}%</td>
-                        <td class="py-2.5 text-right font-mono">
-                            <div class="text-white font-semibold">${holding.qty} 股</div>
-                            ${holding.qty > 0 
-                                ? `<div class="text-[10px] ${pnlColor}">${unrealizedPnL >= 0 ? '+' : ''}$${Math.round(unrealizedPnL)}</div>` 
-                                : '<div class="text-[10px] text-gray-500">-</div>'}
+                        <td class="py-2 text-right font-mono font-bold text-white">$${s.price.toFixed(2)}</td>
+                        <td class="py-2 text-right font-mono font-semibold ${trendCls}">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</td>
+                        <td class="py-2 text-right font-mono">
+                            <div class="text-white font-semibold">${h.qty} 股</div>
+                            ${h.qty > 0 ? `<div class="text-[10px] ${getTrendClass(pnl)}">${pnl >= 0 ? '+' : ''}$${Math.round(pnl)}</div>` : '<div class="text-[10px] text-gray-500">—</div>'}
                         </td>
                     </tr>
                 `;
             }).join('');
         }
 
-        function renderLeaderboard() {
-            const listEl = document.getElementById('leaderboard-list');
-            const sorted = Object.values(state.players).sort((a, b) => b.netWorth - a.netWorth);
-            document.getElementById('online-count-badge').textContent = `${sorted.length} 位在線`;
+        function renderLiveLeaderboard() {
+            const container = document.getElementById('live-leaderboard');
+            const sorted = [...game.participants].sort((a, b) => getROI(b) - getROI(a));
 
-            listEl.innerHTML = sorted.map((p, idx) => {
-                const roi = ((p.netWorth - INITIAL_CASH) / INITIAL_CASH) * 100;
-                const roiColor = getTrendTextColor(roi);
-                const isMe = p.id === state.myId;
-
+            container.innerHTML = sorted.map((p, idx) => {
+                const roi = getROI(p);
+                const isMe = !p.isAI;
                 return `
-                    <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border ${isMe ? 'border-blue-500/60' : 'border-terminal-border/60'} text-xs">
+                    <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-terminal-bg border ${isMe ? 'border-amber-400/70' : 'border-terminal-border/60'} text-xs">
                         <div class="flex items-center gap-2 truncate">
-                            <span class="font-mono font-bold w-4 text-gray-400">${idx + 1}.</span>
+                            <span class="font-mono font-bold text-gray-400 w-5">${idx + 1}.</span>
                             <span class="font-bold text-white truncate">${escapeHtml(p.name)}</span>
-                            ${isMe ? '<span class="text-[9px] px-1 rounded bg-blue-600 text-white shrink-0">我</span>' : ''}
+                            ${isMe ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-400 text-gray-950 font-extrabold shrink-0">你</span>' : `<span class="text-[10px] text-gray-500 hidden sm:inline">${p.style}</span>`}
                         </div>
-                        <div class="flex items-center gap-2.5 shrink-0 font-mono">
-                            <span class="text-[11px] ${roiColor}">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</span>
-                            <span class="font-bold text-white">$${formatMoney(p.netWorth)}</span>
+                        <div class="flex items-center gap-2.5 font-mono shrink-0">
+                            <span class="font-bold ${getTrendClass(roi)}">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</span>
+                            <span class="text-gray-200">$${formatNum(p.netWorth)}</span>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // 繪製即時股票走勢折線圖 (響應式高解析度 Canvas)
-        function drawStockChart() {
+        function drawChart() {
             const canvas = document.getElementById('stock-chart-canvas');
             if (!canvas || canvas.offsetParent === null) return;
 
@@ -1821,185 +1684,189 @@
             const h = rect.height;
             ctx.clearRect(0, 0, w, h);
 
-            const stock = state.stocks.find(s => s.id === state.selectedStockId);
+            const stock = getStock(game.selectedCode);
             if (!stock) return;
 
-            const prices = state.priceHistory[stock.id] || [stock.price];
-            const padTop = 20, padBottom = 38, padLeft = 14, padRight = 54;
-            const plotW = w - padLeft - padRight;
-            const plotH = h - padTop - padBottom;
+            const series = game.priceHistory[stock.code] || [stock.price];
+            const padL = 12, padR = 54, padT = 18, padB = 38;
+            const plotW = w - padL - padR;
+            const plotH = h - padT - padB;
 
-            let minP = Math.min(...prices, stock.basePrice);
-            let maxP = Math.max(...prices, stock.basePrice);
-            if (maxP - minP < 2) {
-                minP -= 1;
-                maxP += 1;
+            // 包含本回合漲跌停上下限作為刻度參考
+            let minVal = Math.min(...series, stock.limitDown);
+            let maxVal = Math.max(...series, stock.limitUp);
+            if (maxVal - minVal < 2) {
+                minVal -= 1;
+                maxVal += 1;
             }
-            const margin = (maxP - minP) * 0.12;
-            minP -= margin;
-            maxP += margin;
+            const pad = (maxVal - minVal) * 0.08;
+            minVal -= pad;
+            maxVal += pad;
 
-            const getY = (val) => padTop + plotH - ((val - minP) / (maxP - minP)) * plotH;
-            const getX = (idx) => padLeft + (prices.length > 1 ? (idx / (prices.length - 1)) * plotW : plotW / 2);
+            const toX = (i) => padL + (series.length > 1 ? (i / (series.length - 1)) * plotW : plotW / 2);
+            const toY = (v) => padT + plotH - ((v - minVal) / (maxVal - minVal)) * plotH;
 
-            // 背景水平網格線與右側價格刻度
-            ctx.strokeStyle = '#1e222d';
+            // 網格與價格刻度
+            ctx.strokeStyle = '#1b2232';
             ctx.lineWidth = 1;
             ctx.font = '10px JetBrains Mono';
             ctx.fillStyle = '#6b7280';
             ctx.textAlign = 'left';
 
-            const gridSteps = 4;
-            for (let i = 0; i <= gridSteps; i++) {
-                const val = minP + ((maxP - minP) / gridSteps) * i;
-                const y = getY(val);
+            for (let i = 0; i <= 4; i++) {
+                const v = minVal + ((maxVal - minVal) / 4) * i;
+                const y = toY(v);
                 ctx.beginPath();
-                ctx.moveTo(padLeft, y);
-                ctx.lineTo(w - padRight, y);
+                ctx.moveTo(padL, y);
+                ctx.lineTo(w - padR, y);
                 ctx.stroke();
-                ctx.fillText('$' + val.toFixed(1), w - padRight + 6, y + 3);
+                ctx.fillText('$' + v.toFixed(1), w - padR + 6, y + 3);
             }
 
-            // 起始基準價虛線
-            const baseY = getY(stock.basePrice);
+            // 漲停 (+10%) 與跌停 (-10%) 參考線
+            const upY = toY(stock.limitUp);
+            const downY = toY(stock.limitDown);
             ctx.save();
-            ctx.setLineDash([4, 4]);
-            ctx.strokeStyle = '#4b5563';
+            ctx.setLineDash([3, 3]);
+
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.45)';
             ctx.beginPath();
-            ctx.moveTo(padLeft, baseY);
-            ctx.lineTo(w - padRight, baseY);
+            ctx.moveTo(padL, upY);
+            ctx.lineTo(w - padR, upY);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
+            ctx.beginPath();
+            ctx.moveTo(padL, downY);
+            ctx.lineTo(w - padR, downY);
             ctx.stroke();
             ctx.restore();
 
-            // 走勢線顏色 (依據目前漲跌與台美股配色)
-            const isUp = stock.price >= stock.basePrice;
-            let lineColor = '#ef4444'; // 預設紅漲
-            if (state.colorScheme === 'TW') {
-                lineColor = isUp ? '#ef4444' : '#10b981';
-            } else {
-                lineColor = isUp ? '#10b981' : '#ef4444';
-            }
+            const isUp = stock.price >= stock.roundOpenPrice;
+            const strokeColor = game.colorScheme === 'TW'
+                ? (isUp ? '#ef4444' : '#10b981')
+                : (isUp ? '#10b981' : '#ef4444');
 
-            if (prices.length > 1) {
-                // 漸層填充區域
-                const grad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
-                grad.addColorStop(0, lineColor + '44');
-                grad.addColorStop(1, lineColor + '00');
+            if (series.length > 1) {
+                const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+                grad.addColorStop(0, strokeColor + '44');
+                grad.addColorStop(1, strokeColor + '00');
 
                 ctx.beginPath();
-                ctx.moveTo(getX(0), padTop + plotH);
-                prices.forEach((p, idx) => ctx.lineTo(getX(idx), getY(p)));
-                ctx.lineTo(getX(prices.length - 1), padTop + plotH);
+                ctx.moveTo(toX(0), padT + plotH);
+                series.forEach((v, i) => ctx.lineTo(toX(i), toY(v)));
+                ctx.lineTo(toX(series.length - 1), padT + plotH);
                 ctx.closePath();
                 ctx.fillStyle = grad;
                 ctx.fill();
 
-                // 主折線
                 ctx.beginPath();
-                prices.forEach((p, idx) => {
-                    if (idx === 0) ctx.moveTo(getX(idx), getY(p));
-                    else ctx.lineTo(getX(idx), getY(p));
+                series.forEach((v, i) => {
+                    if (i === 0) ctx.moveTo(toX(i), toY(v));
+                    else ctx.lineTo(toX(i), toY(v));
                 });
-                ctx.strokeStyle = lineColor;
+                ctx.strokeStyle = strokeColor;
                 ctx.lineWidth = 2.5;
                 ctx.lineJoin = 'round';
                 ctx.stroke();
             }
 
-            // 最新價格光點
-            const lastX = getX(prices.length - 1);
-            const lastY = getY(prices[prices.length - 1]);
+            // 最新價光點
+            const lx = toX(series.length - 1);
+            const ly = toY(series[series.length - 1]);
             ctx.beginPath();
-            ctx.arc(lastX, lastY, 4.5, 0, Math.PI * 2);
+            ctx.arc(lx, ly, 4.5, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
             ctx.fill();
-            ctx.strokeStyle = lineColor;
+            ctx.strokeStyle = strokeColor;
             ctx.lineWidth = 2.5;
             ctx.stroke();
         }
 
         /**
          * ============================================================================
-         * 輔助工具、新聞彈窗、色彩切換與 HTML 匯出
+         * 輔助函式、新聞彈窗、配色切換與匯出 index.html
          * ============================================================================
          */
-        function showNewsPopup(news, roundNum) {
-            if (!news) return;
-            document.getElementById('modal-news-round').textContent = `ROUND ${roundNum} / ${TOTAL_ROUNDS}`;
-            document.getElementById('modal-news-countdown').textContent = state.timeLeft;
-            document.getElementById('modal-news-category').textContent = news.category;
-            document.getElementById('modal-news-headline').textContent = news.title;
-            document.getElementById('modal-news-body').textContent = news.body;
+        function showNewsModal() {
+            if (!game.currentNews) return;
+            document.getElementById('modal-news-round').textContent = `第 ${game.round} / ${TOTAL_ROUNDS} 回合`;
+            document.getElementById('modal-news-timer').textContent = game.timeLeft;
+            document.getElementById('modal-news-category').textContent = game.currentNews.category;
+            document.getElementById('modal-news-headline').textContent = game.currentNews.title;
+            document.getElementById('modal-news-body').textContent = game.currentNews.body;
+            document.getElementById('modal-news-impact-text').textContent = game.currentNews.hint;
             openModal('modal-news');
         }
 
-        function reopenNewsModal() {
-            if (state.currentNews) {
-                showNewsPopup(state.currentNews, state.round);
-            }
+        function openNewsModal() {
+            showNewsModal();
         }
 
-        function addTradeLog(text, colorClass = 'text-gray-300') {
-            const logItem = {
-                id: Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-                time: new Date().toLocaleTimeString('zh-TW', { hour12: false, minute: '2-digit', second: '2-digit' }),
-                text,
-                colorClass
-            };
-            state.tradeLogs.unshift(logItem);
-            if (state.tradeLogs.length > 35) state.tradeLogs.pop();
+        function pushFeed(text, cls = 'text-gray-300') {
+            const time = new Date().toLocaleTimeString('zh-TW', { hour12: false, minute: '2-digit', second: '2-digit' });
+            game.feeds.unshift({ time, text, cls });
+            if (game.feeds.length > 45) game.feeds.pop();
 
-            // 同步更新頂部跑馬燈
-            document.getElementById('ticker-content').textContent = state.tradeLogs.slice(0, 5).map(l => `[${l.time}] ${l.text}`).join('   |   ');
-            renderTradeLogs();
+            document.getElementById('ticker-content').textContent = game.feeds
+                .slice(0, 6)
+                .map(item => `[${item.time}] ${item.text}`)
+                .join('   ★   ');
         }
 
-        function renderTradeLogs() {
-            const feed = document.getElementById('trade-log-feed');
-            feed.innerHTML = state.tradeLogs.map(item => `
-                <div class="${item.colorClass} leading-snug">
-                    <span class="text-gray-500">[${item.time}]</span> ${escapeHtml(item.text)}
-                </div>
+        function renderFeeds() {
+            const box = document.getElementById('ai-feed');
+            box.innerHTML = game.feeds.map(f => `
+                <div class="${f.cls} leading-snug"><span class="text-gray-500">[${f.time}]</span> ${escapeHtml(f.text)}</div>
             `).join('');
         }
 
         function toggleColorScheme() {
-            state.colorScheme = state.colorScheme === 'TW' ? 'US' : 'TW';
-            const indicator = document.getElementById('color-scheme-indicator');
-            const textEl = document.getElementById('color-scheme-text');
-            const buyBtn = document.getElementById('btn-execute-buy');
-            const sellBtn = document.getElementById('btn-execute-sell');
+            game.colorScheme = game.colorScheme === 'TW' ? 'US' : 'TW';
+            const dot = document.getElementById('color-scheme-dot');
+            const label = document.getElementById('color-scheme-label');
+            const buyBtn = document.getElementById('btn-buy');
+            const sellBtn = document.getElementById('btn-sell');
 
-            if (state.colorScheme === 'TW') {
-                indicator.className = 'w-2.5 h-2.5 rounded-full bg-red-500';
-                textEl.textContent = '台股配色 (紅漲綠跌)';
-                buyBtn.className = 'py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
-                sellBtn.className = 'py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
+            if (game.colorScheme === 'TW') {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-red-500';
+                label.textContent = '台股紅漲綠跌';
+                buyBtn.className = 'py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
+                sellBtn.className = 'py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
             } else {
-                indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
-                textEl.textContent = '美股配色 (綠漲紅跌)';
-                buyBtn.className = 'py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
-                sellBtn.className = 'py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+                label.textContent = '美股綠漲紅跌';
+                buyBtn.className = 'py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
+                sellBtn.className = 'py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm shadow-lg transition flex flex-col items-center justify-center cursor-pointer';
             }
-            renderAllGameUI();
+            if (game.status !== 'LOBBY') {
+                renderGameUI();
+            }
         }
 
-        function getTrendTextColor(val) {
-            if (Math.abs(val) < 0.001) return 'text-gray-400';
-            if (state.colorScheme === 'TW') {
+        function getTrendClass(val) {
+            if (Math.abs(val) < 0.0001) return 'text-gray-400';
+            if (game.colorScheme === 'TW') {
                 return val > 0 ? 'text-red-400' : 'text-emerald-400';
-            } else {
-                return val > 0 ? 'text-emerald-400' : 'text-red-400';
             }
+            return val > 0 ? 'text-emerald-400' : 'text-red-400';
+        }
+
+        function getStock(code) {
+            return game.stocks.find(s => s.code === code) || game.stocks[0];
+        }
+
+        function pickRandomStock() {
+            return game.stocks[Math.floor(Math.random() * game.stocks.length)];
         }
 
         function switchView(viewId) {
-            ['view-lobby', 'view-waiting', 'view-game', 'view-gameover'].forEach(id => {
+            ['view-lobby', 'view-game', 'view-gameover'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
             document.getElementById(viewId).classList.remove('hidden');
             if (viewId === 'view-game') {
-                setTimeout(drawStockChart, 50);
+                setTimeout(drawChart, 40);
             }
         }
 
@@ -2011,30 +1878,25 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        function showToast(message, type = 'info') {
+        function showToast(msg, type = 'info') {
             const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const colors = {
-                info: 'bg-blue-600 text-white border-blue-400',
-                success: 'bg-emerald-600 text-white border-emerald-400',
-                error: 'bg-red-600 text-white border-red-400'
+            const el = document.createElement('div');
+            const styleMap = {
+                info: 'bg-sky-600 text-white border-sky-400',
+                success: 'bg-emerald-500 text-gray-950 border-emerald-300',
+                error: 'bg-rose-600 text-white border-rose-400'
             };
-            toast.className = `px-4 py-2.5 rounded-xl border shadow-xl text-xs font-bold flex items-center gap-2 transition-all transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
-            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${escapeHtml(message)}</span>`;
-            container.appendChild(toast);
-
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            });
-
+            el.className = `px-4 py-2.5 rounded-xl border shadow-xl text-xs font-extrabold flex items-center gap-2 transition-all ${styleMap[type] || styleMap.info}`;
+            el.innerHTML = `<i class="fa-solid fa-bell"></i> <span>${escapeHtml(msg)}</span>`;
+            container.appendChild(el);
             setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+                el.classList.add('opacity-0');
+                setTimeout(() => el.remove(), 250);
+            }, 2600);
         }
 
-        function formatMoney(num) {
-            return Math.round(num).toLocaleString('en-US');
+        function formatNum(n) {
+            return Math.round(n).toLocaleString('en-US');
         }
 
         function escapeHtml(str) {
@@ -2045,26 +1907,18 @@
                 .replace(/"/g, '&quot;');
         }
 
-        // 一鍵下載可直接部署至 GitHub Pages 的 index.html (並自動內嵌使用者設定的 Firebase Config)
-        function downloadStandaloneHTML() {
-            let htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-            const currentConfig = getStoredFirebaseConfig();
-            if (currentConfig) {
-                htmlContent = htmlContent.replace(
-                    'const EMBEDDED_FIREBASE_CONFIG = null;',
-                    `const EMBEDDED_FIREBASE_CONFIG = ${JSON.stringify(currentConfig)};`
-                );
-            }
-            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        function downloadIndexHtml() {
+            const content = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'index.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'index.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            showToast('已下載 index.html！可直接上傳至 GitHub Repository 開啟 Pages', 'success');
+            showToast('已下載完整 index.html，可直接上傳至 GitHub Pages！', 'success');
         }
     </script>
 </body>
