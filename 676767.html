@@ -90,6 +90,15 @@
         .flash-us-up { animation: flashUpUS 0.65s ease-out; }
         .flash-us-down { animation: flashDownUS 0.65s ease-out; }
 
+        /* 突發事件劇烈震盪閃光 */
+        @keyframes shockPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(244, 63, 94, 0); }
+            50% { box-shadow: 0 0 24px rgba(244, 63, 94, 0.55); }
+        }
+        .shock-pulse {
+            animation: shockPulse 0.9s ease-in-out 2;
+        }
+
         .glass-modal {
             background: rgba(16, 21, 32, 0.96);
             backdrop-filter: blur(14px);
@@ -107,9 +116,9 @@
             <div>
                 <h1 class="font-extrabold text-white text-sm sm:text-lg tracking-tight flex items-center gap-2">
                     華爾街風雲：十台AI操盤手對決
-                    <span class="hidden md:inline-block text-[11px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono">±10% LIMIT • 10 AI ARENA</span>
+                    <span class="hidden md:inline-block text-[11px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono">±10% LIMIT • 40s TRADE</span>
                 </h1>
-                <p class="text-[11px] text-gray-400 hidden sm:block">每回合 30s 新聞（可跳過）＋ 30s 交易 × 10 台智慧 AI × 臨時突發事件 × 單回合 ±10% 漲跌停</p>
+                <p class="text-[11px] text-gray-400 hidden sm:block">30s 新聞（可跳過）＋ 40s 交易 × 10 台千萬級 AI ＋ 匿名深度資金池 × 盤後三大法人統計</p>
             </div>
         </div>
 
@@ -134,12 +143,12 @@
         </div>
     </header>
 
-    <!-- 即時盤中、突發事件與 AI 操盤跑馬燈 -->
+    <!-- 即時盤中、突發事件與市場成交跑馬燈 -->
     <div class="bg-[#06080c] border-b border-terminal-border py-1.5 px-4 flex items-center gap-3 text-xs font-mono overflow-hidden">
         <span class="px-2 py-0.5 rounded bg-amber-500 text-gray-950 font-extrabold text-[10px] shrink-0">盤中戰情</span>
         <div class="overflow-hidden w-full relative h-4">
             <div id="ticker-content" class="animate-ticker text-gray-300">
-                歡迎來到華爾街操盤競技場！每回合單日漲跌限 ±10%，小心 10 台 AI 操盤手與盤中突發事件！
+                真實市場模擬啟動！10 台百萬至三千萬級機構 AI 與龐大匿名市場資金同場博弈，單日漲跌限 ±10%！
             </div>
         </div>
     </div>
@@ -152,49 +161,49 @@
             <div class="lg:col-span-6 bg-terminal-card border border-terminal-border rounded-2xl p-6 sm:p-7 shadow-2xl flex flex-col justify-between">
                 <div>
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold mb-4">
-                        <i class="fa-solid fa-robot"></i> 單人五回合 • 10 台策略 AI • 單回合 ±10% 漲跌停
+                        <i class="fa-solid fa-robot"></i> 5 個交易日 • 40 秒即時撮合 • 單日 ±10% 漲跌停
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">準備好迎戰十台 AI 操盤手了嗎？</h2>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">準備好進入真實擬真股市了嗎？</h2>
                     <p class="text-xs sm:text-sm text-gray-400 leading-relaxed mb-6">
-                        初始資金 <span class="text-white font-mono font-bold">$100,000</span>。每回合先看 <span class="text-amber-300 font-semibold">30 秒財經新聞</span>（可隨時按「跳過新聞，提前開盤」），再進入 <span class="text-emerald-300 font-semibold">30 秒即時交易</span>。盤中會出現<span class="text-rose-300 font-semibold">臨時突發事件</span>造成雙向震盪，且每回合嚴格受 <span class="text-sky-300 font-semibold">±10% 漲跌停</span>限制！
+                        你將以初始資金 <span class="text-white font-mono font-bold">$100,000</span> 挑戰 10 台資金高達 <span class="text-purple-300 font-mono font-bold">$100 萬 ～ $3,000 萬</span> 的機構 AI，並與幕後不顯示名單的龐大匿名市場資金（數十萬至數千萬）同盤撮合！每回合先看 <span class="text-amber-300 font-semibold">30 秒財經新聞</span>（可隨時跳過），再進行 <span class="text-emerald-300 font-semibold">40 秒交易</span>，盤中隨時可能發生 <span class="text-rose-300 font-semibold">2%～3% 瞬間突發震盪</span>，每日盤後公布<span class="text-sky-300 font-semibold">成交量與三大法人買賣超</span>！
                     </p>
 
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">你的操盤手暱稱（將顯示於最終成果表）</label>
-                            <input type="text" id="input-nickname" maxlength="14" placeholder="例如：班級股神、漲停狙擊手、逆勢操盤手"
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">你的操盤手暱稱（將印製於防竄改成果圖）</label>
+                            <input type="text" id="input-nickname" maxlength="14" placeholder="例如：班級股神、漲停狙擊手、波段贏家"
                                 class="w-full bg-terminal-bg border border-terminal-border focus:border-amber-400 rounded-xl px-4 py-3 text-white font-semibold outline-none transition">
                         </div>
 
                         <button onclick="startNewGame()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-gray-950 font-extrabold text-base shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
-                            <i class="fa-solid fa-play"></i> 開始五回合挑戰（對決 10 台 AI）
+                            <i class="fa-solid fa-play"></i> 開始五回合挑戰（對決 10 台機構 AI）
                         </button>
                     </div>
                 </div>
 
                 <!-- 五支特色股票一覽 -->
                 <div class="mt-6 pt-4 border-t border-terminal-border">
-                    <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">本局五支不同特色股票</div>
+                    <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">本局五支不同產業特色股票</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70">
-                            <span class="font-bold text-white"><span class="font-mono text-sky-400 mr-1.5">2330</span>晶圓代工龍頭</span>
+                            <span class="font-bold text-white"><span class="font-mono text-sky-400 mr-1.5">TSM</span>台積晶圓</span>
                             <span class="font-mono text-gray-400">$100.00</span>
                         </div>
                         <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70">
-                            <span class="font-bold text-white"><span class="font-mono text-rose-400 mr-1.5">3017</span>AI 伺服器散熱</span>
-                            <span class="font-mono text-gray-400">$90.00</span>
+                            <span class="font-bold text-white"><span class="font-mono text-rose-400 mr-1.5">FOX</span>鴻海AI伺服器</span>
+                            <span class="font-mono text-gray-400">$85.00</span>
                         </div>
                         <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70">
-                            <span class="font-bold text-white"><span class="font-mono text-emerald-400 mr-1.5">6446</span>創新製藥生技</span>
-                            <span class="font-mono text-gray-400">$75.00</span>
+                            <span class="font-bold text-white"><span class="font-mono text-cyan-400 mr-1.5">EVR</span>長榮航運</span>
+                            <span class="font-mono text-gray-400">$65.00</span>
                         </div>
                         <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70">
-                            <span class="font-bold text-white"><span class="font-mono text-cyan-400 mr-1.5">2603</span>遠洋航運物流</span>
-                            <span class="font-mono text-gray-400">$60.00</span>
+                            <span class="font-bold text-white"><span class="font-mono text-purple-400 mr-1.5">MTK</span>聯發晶片</span>
+                            <span class="font-mono text-gray-400">$95.00</span>
                         </div>
                         <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-terminal-bg border border-terminal-border/70 sm:col-span-2">
-                            <span class="font-bold text-white"><span class="font-mono text-amber-400 mr-1.5">1519</span>綠能儲能電網</span>
-                            <span class="font-mono text-gray-400">$80.00</span>
+                            <span class="font-bold text-white"><span class="font-mono text-emerald-400 mr-1.5">CTB</span>國泰金控</span>
+                            <span class="font-mono text-gray-400">$55.00</span>
                         </div>
                     </div>
                 </div>
@@ -214,9 +223,9 @@
                         <div class="p-3 rounded-xl bg-terminal-bg border border-terminal-border/80 flex gap-3">
                             <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
                             <div>
-                                <div class="font-bold text-white">五回合雙階段制（30s 新聞可跳過 ＋ 30s 交易）</div>
+                                <div class="font-bold text-white">5 個交易日（30s 新聞可跳過 ＋ 40s 交易）</div>
                                 <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
-                                    共 5 回合。每回合先顯示 <strong class="text-amber-300">30 秒不重複財經新聞</strong>（可隨時按「跳過新聞，提前開盤」），再進入 <strong class="text-emerald-300">30 秒交易階段</strong>。
+                                    每回合先顯示 <strong class="text-amber-300">30 秒不重複財經新聞</strong>（可隨時按「跳過新聞，提前開盤」），接著進入 <strong class="text-emerald-300">40 秒即時交易階段</strong>，收盤後檢視當日籌碼與三大法人報告。
                                 </p>
                             </div>
                         </div>
@@ -224,9 +233,9 @@
                         <div class="p-3 rounded-xl bg-terminal-bg border border-terminal-border/80 flex gap-3">
                             <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-300 font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
                             <div>
-                                <div class="font-bold text-white">單回合嚴格 ±10% 漲跌停限制</div>
+                                <div class="font-bold text-white">盤中 2%～3% 瞬間突發震盪 ＋ 單日 ±10% 漲跌停</div>
                                 <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
-                                    每回合以該回合「開盤參考價」為基準，漲幅上限 <strong class="text-red-400">+10.00%（漲停）</strong>、跌幅下限 <strong class="text-emerald-400">-10.00%（跌停）</strong>，股價絕不無止盡暴衝或暴跌。
+                                    交易中隨機觸發突發事件，造成股價<strong class="text-rose-300">瞬間跳空震盪 2.0%～3.0%</strong> 並引發 AI 連鎖追殺或低接；單日最高漲 <strong class="text-red-400">+10%</strong>、最低跌 <strong class="text-emerald-400">-10%</strong>。
                                 </p>
                             </div>
                         </div>
@@ -234,9 +243,9 @@
                         <div class="p-3 rounded-xl bg-terminal-bg border border-terminal-border/80 flex gap-3">
                             <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-300 font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
                             <div>
-                                <div class="font-bold text-white">十台智慧 AI ＋ 臨時突發事件雙向震盪</div>
+                                <div class="font-bold text-white">百萬至三千萬級 AI ＋ 隱藏匿名真實市場資金</div>
                                 <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
-                                    10 台 AI 各有策略（價值低接、動能追價、漲停獲利了結、逆勢均值回歸、事件狙擊、恐慌停損等），加上盤中<strong class="text-amber-300">臨時突發事件</strong>（如產線跳電、主力倒貨、急單搶貨、政策急轉），讓盤勢充滿震盪與攻防。
+                                    10 台公開 AI 資金為 <strong class="text-purple-300">$100 萬 ～ $3,000 萬</strong>，幕後還有數十位不顯示名單的匿名散戶與主力大戶（數十萬至數千萬）持續撮合，加上 <strong class="text-gray-200">0.15% 稅費</strong>與短線刷單滑價，杜絕小額洗盤操控。
                                 </p>
                             </div>
                         </div>
@@ -244,9 +253,9 @@
                         <div class="p-3 rounded-xl bg-terminal-bg border border-terminal-border/80 flex gap-3">
                             <span class="w-6 h-6 rounded-full bg-sky-500/20 text-sky-300 font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
                             <div>
-                                <div class="font-bold text-white">五回合結束成果表（方便截圖到班群比 ROI）</div>
+                                <div class="font-bold text-white">每日三大法人買賣超 ＋ 終局防竄改 PNG 成果圖</div>
                                 <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
-                                    第 5 回合結束自動結算持股與 <strong class="text-amber-300">投資報酬率（ROI %）</strong>，列出你與 10 台 AI 的名次、最終淨值與操作摘要，支援一鍵複製與整張截圖分享到班群！
+                                    每天收盤公布<strong class="text-sky-300">當日成交量與三大法人（外資、投信、自營商）買賣超</strong>；第 5 日結束自動生成含防偽驗證碼的 <strong class="text-amber-300">PNG 戰績成果圖</strong>供班群比拚 ROI！
                                 </p>
                             </div>
                         </div>
@@ -254,7 +263,7 @@
                 </div>
 
                 <div class="mt-4 pt-3 border-t border-terminal-border flex items-center justify-between text-[11px] text-gray-400">
-                    <span><i class="fa-solid fa-shield-halved text-sky-400 mr-1"></i> 18 則不重複新聞 × 10 台策略 AI</span>
+                    <span><i class="fa-solid fa-shield-halved text-sky-400 mr-1"></i> 22 則不重複新聞 × 雙層真實市場資金深度</span>
                     <span>支援 GitHub Pages 單檔匯出</span>
                 </div>
             </div>
@@ -271,10 +280,10 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span id="hud-round-badge" class="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-mono font-extrabold text-xs">ROUND 1 / 5</span>
+                            <span id="hud-round-badge" class="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-mono font-extrabold text-xs">DAY 1 / 5</span>
                             <span id="hud-phase-badge" class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-xs">新聞階段 (30s)</span>
                         </div>
-                        <div id="hud-phase-sub" class="text-[11px] text-gray-400 mt-1">研判新聞與單回合 ±10% 漲跌停空間</div>
+                        <div id="hud-phase-sub" class="text-[11px] text-gray-400 mt-1">研判新聞與單日 ±10% 漲跌停空間</div>
                     </div>
                     <div class="text-right">
                         <div class="text-[10px] text-gray-400 uppercase font-semibold">剩餘時間</div>
@@ -325,7 +334,7 @@
                 </div>
                 <div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300">第 <span id="banner-round">1</span> 回合新聞</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300">第 <span id="banner-round">1</span> 交易日新聞</span>
                         <span id="banner-category" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-200 font-semibold">財經快訊</span>
                         <span id="banner-hints" class="text-[11px] font-mono text-gray-300"></span>
                     </div>
@@ -344,16 +353,16 @@
             </div>
         </div>
 
-        <!-- 盤中臨時突發事件橫幅（觸發時顯示） -->
-        <div id="shock-event-banner" class="hidden bg-gradient-to-r from-rose-950/80 via-amber-950/70 to-terminal-card border border-rose-500/60 rounded-xl px-4 py-2.5 flex items-center justify-between gap-3">
+        <!-- 盤中臨時突發事件橫幅（觸發 2%~3% 瞬間跳空震盪時顯示） -->
+        <div id="shock-event-banner" class="hidden bg-gradient-to-r from-rose-950/90 via-amber-950/80 to-terminal-card border-2 border-rose-500/80 rounded-xl px-4 py-2.5 flex items-center justify-between gap-3 shock-pulse">
             <div class="flex items-center gap-2.5 text-xs sm:text-sm">
-                <span class="px-2 py-0.5 rounded bg-rose-600 text-white font-mono font-extrabold text-[11px] shrink-0">突發事件</span>
-                <span id="shock-event-text" class="font-bold text-rose-100"></span>
+                <span class="px-2 py-0.5 rounded bg-rose-600 text-white font-mono font-extrabold text-[11px] shrink-0 animate-pulse">盤中突發震盪</span>
+                <span id="shock-event-text" class="font-extrabold text-rose-100"></span>
             </div>
-            <span id="shock-event-tag" class="text-[11px] font-mono text-amber-300 shrink-0 hidden sm:inline"></span>
+            <span id="shock-event-tag" class="text-xs font-mono font-extrabold text-amber-300 shrink-0"></span>
         </div>
 
-        <!-- 主交易區：左側走勢圖 + 下單台；右側五檔股票報價 + 11 位排名 + AI 動態 -->
+        <!-- 主交易區：左側走勢圖 + 下單台；右側五檔股票報價 + 11 位排名 + 市場動態 -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
 
             <!-- 左側 (7欄) -->
@@ -362,34 +371,38 @@
                 <div class="bg-terminal-card border border-terminal-border rounded-xl p-4 flex flex-col">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                         <div class="flex items-center gap-3">
-                            <span id="chart-code" class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 font-mono font-extrabold text-sm">2330</span>
+                            <span id="chart-code" class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 font-mono font-extrabold text-sm">TSM</span>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <h3 id="chart-name" class="text-white font-extrabold text-base leading-tight">晶圓代工龍頭</h3>
+                                    <h3 id="chart-name" class="text-white font-extrabold text-base leading-tight">台積晶圓</h3>
                                     <span id="chart-limit-badge" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-gray-800 text-gray-300 border border-gray-700">±10% 區間內</span>
                                 </div>
-                                <span id="chart-sector" class="text-[11px] text-gray-400">半導體晶圓代工</span>
+                                <span id="chart-sector" class="text-[11px] text-gray-400">先進半導體晶圓代工</span>
                             </div>
                         </div>
                         <div class="text-right">
                             <div id="chart-price" class="text-2xl font-mono font-extrabold text-white">$100.00</div>
-                            <div id="chart-change" class="text-xs font-mono font-semibold text-gray-400">本回合 0.00 (0.00%)</div>
+                            <div id="chart-change" class="text-xs font-mono font-semibold text-gray-400">當日 0.00 (0.00%)</div>
                         </div>
                     </div>
 
-                    <!-- 本回合開盤價、跌停價、漲停價標示列 -->
-                    <div class="grid grid-cols-3 gap-2 text-[11px] font-mono bg-terminal-bg/90 border border-terminal-border/80 rounded-lg px-3 py-1.5 mb-2.5">
+                    <!-- 當日開盤價、跌停價、漲停價與累計成交量標示列 -->
+                    <div class="grid grid-cols-4 gap-2 text-[11px] font-mono bg-terminal-bg/90 border border-terminal-border/80 rounded-lg px-3 py-1.5 mb-2.5">
                         <div>
-                            <span class="text-gray-400">跌停(-10%): </span>
+                            <span class="text-gray-400">跌停: </span>
                             <span id="chart-limit-down" class="font-bold text-emerald-400">$90.00</span>
                         </div>
                         <div class="text-center">
-                            <span class="text-gray-400">本回開盤: </span>
+                            <span class="text-gray-400">開盤: </span>
                             <span id="chart-round-open" class="font-bold text-gray-200">$100.00</span>
                         </div>
-                        <div class="text-right">
-                            <span class="text-gray-400">漲停(+10%): </span>
+                        <div class="text-center">
+                            <span class="text-gray-400">漲停: </span>
                             <span id="chart-limit-up" class="font-bold text-red-400">$110.00</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-gray-400">量: </span>
+                            <span id="chart-volume" class="font-bold text-amber-300">0 張</span>
                         </div>
                     </div>
 
@@ -398,7 +411,7 @@
 
                         <!-- 即時供需力道條 -->
                         <div class="absolute bottom-2 left-3 right-3 flex items-center gap-2 bg-terminal-card/95 backdrop-blur px-2.5 py-1.5 rounded-lg border border-terminal-border text-[11px]">
-                            <span class="text-gray-400 shrink-0">買賣力道:</span>
+                            <span class="text-gray-400 shrink-0">多空力道:</span>
                             <div class="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden flex">
                                 <div id="pressure-up-bar" class="h-full transition-all duration-300" style="width: 50%"></div>
                                 <div id="pressure-down-bar" class="h-full transition-all duration-300" style="width: 50%"></div>
@@ -412,7 +425,8 @@
                 <div class="bg-terminal-card border border-terminal-border rounded-xl p-4">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                         <div class="text-sm font-extrabold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-bolt text-amber-400"></i> 即時下單台 — <span id="trade-symbol" class="font-mono text-sky-300">2330</span>
+                            <i class="fa-solid fa-bolt text-amber-400"></i> 即時下單台 — <span id="trade-symbol" class="font-mono text-sky-300">TSM</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-gray-800 text-gray-400 font-mono font-normal">含 0.15% 手續費/稅</span>
                         </div>
                         <div class="text-xs text-gray-300 font-mono">
                             持有: <span id="trade-owned" class="font-bold text-white">0</span> 股
@@ -451,22 +465,22 @@
                 </div>
             </div>
 
-            <!-- 右側 (5欄)：五支股票報價 + 11 位排名 (玩家 + 10 AI) + AI 操盤動態 -->
+            <!-- 右側 (5欄)：五支股票報價 + 11 位排名 (玩家 + 10 AI) + 盤中成交明細 -->
             <div class="lg:col-span-5 flex flex-col gap-4">
 
                 <!-- 五支股票即時報價表 -->
                 <div class="bg-terminal-card border border-terminal-border rounded-xl p-4">
                     <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-sm font-extrabold text-white">五支股票報價（單回合 ±10% 漲跌停）</h3>
+                        <h3 class="text-sm font-extrabold text-white">五支股票報價（單日 ±10% 漲跌停）</h3>
                         <span class="text-[11px] text-gray-400">點選切換走勢</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="text-[11px] text-gray-400 border-b border-terminal-border">
-                                    <th class="pb-2 font-medium">股票</th>
+                                    <th class="pb-2 font-medium">股票 / 成交量</th>
                                     <th class="pb-2 font-medium text-right">即時價</th>
-                                    <th class="pb-2 font-medium text-right">本回漲跌</th>
+                                    <th class="pb-2 font-medium text-right">當日漲跌</th>
                                     <th class="pb-2 font-medium text-right">庫存 / 損益</th>
                                 </tr>
                             </thead>
@@ -477,23 +491,23 @@
                     </div>
                 </div>
 
-                <!-- 玩家 + 10 台 AI 即時 ROI 排行榜 -->
+                <!-- 玩家 + 10 台千萬級 AI 即時 ROI 排行榜 -->
                 <div class="bg-terminal-card border border-terminal-border rounded-xl p-4 flex-1 flex flex-col">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-sm font-extrabold text-white flex items-center gap-1.5">
-                            <i class="fa-solid fa-ranking-star text-amber-400"></i> 即時 ROI 排行榜（你 ＋ 10 台 AI）
+                            <i class="fa-solid fa-ranking-star text-amber-400"></i> 即時 ROI 排行榜（你 ＋ 10 台機構 AI）
                         </h3>
-                        <span class="text-[11px] font-mono text-gray-400">共 11 位參賽者</span>
+                        <span class="text-[11px] font-mono text-gray-400">共 11 位公開席次</span>
                     </div>
                     <div id="live-leaderboard" class="space-y-1.5 overflow-y-auto max-h-44 pr-1 mb-3">
                         <!-- 動態生成 11 位排名 -->
                     </div>
 
-                    <!-- 10 台 AI 與玩家成交動態 -->
+                    <!-- 盤中機構大單、突發事件與市場成交動態（隱藏匿名者不顯示名字，僅顯示大單成交量） -->
                     <div class="pt-2.5 border-t border-terminal-border">
                         <div class="text-[11px] font-bold text-gray-400 mb-1.5 flex items-center justify-between">
-                            <span>AI 操盤手與突發事件動態</span>
-                            <span class="text-[10px] text-purple-300">10 AI 即時博弈中</span>
+                            <span>盤中大單與突發事件快報</span>
+                            <span class="text-[10px] text-purple-300">含匿名主力與散戶深度撮合</span>
                         </div>
                         <div id="ai-feed" class="space-y-1 text-[11px] font-mono h-24 overflow-y-auto pr-1 text-gray-300">
                             <!-- 動態生成成交與事件紀錄 -->
@@ -504,55 +518,40 @@
         </div>
     </section>
 
-    <!-- ==================== 畫面 3：最終結算成果表（方便截圖到班群比拚 ROI） ==================== -->
+    <!-- ==================== 畫面 3：最終結算防竄改成果圖（直接生成 PNG 分享到班群） ==================== -->
     <section id="view-gameover" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
-        <div id="results-capture-card" class="bg-terminal-card border-2 border-amber-500/45 rounded-2xl p-5 sm:p-7 shadow-2xl">
-            <!-- 成果表標題區 -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-terminal-border">
+        <div class="bg-terminal-card border-2 border-amber-500/45 rounded-2xl p-4 sm:p-6 shadow-2xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-4 border-b border-terminal-border">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 text-gray-950 flex items-center justify-center text-2xl font-extrabold shadow-lg">
-                        <i class="fa-solid fa-trophy"></i>
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 text-gray-950 flex items-center justify-center text-xl font-extrabold shadow-lg">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <div>
-                        <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-300">5 ROUNDS COMPLETED • FINAL ROI REPORT</div>
-                        <h2 class="text-xl sm:text-2xl font-extrabold text-white">華爾街五回合最終成果表</h2>
+                        <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-300">VERIFIED PNG CERTIFICATE • ANTI-TAMPER REPORT</div>
+                        <h2 class="text-lg sm:text-2xl font-extrabold text-white">防竄改戰績成果圖已生成</h2>
                     </div>
                 </div>
-                <div id="result-player-summary" class="bg-terminal-bg border border-amber-500/30 rounded-xl px-4 py-2.5 text-right">
+                <div id="result-player-summary" class="bg-terminal-bg border border-amber-500/30 rounded-xl px-4 py-2 text-right">
                     <!-- 玩家最終排名與 ROI 摘要 -->
                 </div>
             </div>
 
-            <!-- 11 位參賽者（玩家 + 10 台 AI）完整 ROI 表格 -->
-            <div class="overflow-x-auto mb-5">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                    <thead>
-                        <tr class="text-[11px] text-gray-400 uppercase border-b border-terminal-border bg-terminal-bg/60">
-                            <th class="py-2.5 px-3">名次</th>
-                            <th class="py-2.5 px-3">操盤手 / AI 策略</th>
-                            <th class="py-2.5 px-3 text-right">初始資金</th>
-                            <th class="py-2.5 px-3 text-right">最終淨值</th>
-                            <th class="py-2.5 px-3 text-right">淨損益</th>
-                            <th class="py-2.5 px-3 text-right">投資報酬率 (ROI)</th>
-                            <th class="py-2.5 px-3">操作摘要 / 評語</th>
-                        </tr>
-                    </thead>
-                    <tbody id="final-results-tbody" class="divide-y divide-terminal-border/60 font-mono">
-                        <!-- 動態生成 11 列結果 -->
-                    </tbody>
-                </table>
+            <!-- 隱藏的高解析度繪圖畫布與顯示用圖片（手機可長按儲存、電腦可下載 PNG） -->
+            <canvas id="result-certificate-canvas" width="1200" height="860" class="hidden"></canvas>
+            <div class="w-full rounded-xl overflow-hidden border border-terminal-border bg-[#070a10] shadow-inner flex items-center justify-center">
+                <img id="result-certificate-img" alt="華爾街風雲防竄改戰績成果圖" class="w-full h-auto block select-all">
             </div>
 
-            <div class="text-[11px] text-gray-400 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-terminal-border/60">
-                <span><i class="fa-solid fa-camera text-amber-400 mr-1"></i> 提示：直接截圖此成果表即可分享到班群，比拚誰的投資報酬率（ROI）最高！</span>
-                <span id="result-timestamp" class="font-mono"></span>
+            <div class="mt-3 text-[11px] text-gray-400 flex flex-wrap items-center justify-between gap-2">
+                <span><i class="fa-solid fa-image text-amber-400 mr-1"></i> 手機可直接<strong>長按上方圖片儲存</strong>，或點擊下方按鈕下載 PNG 傳到班群比拚 ROI（含防偽驗證碼，無法改字造假）！</span>
+                <span id="result-verify-hash" class="font-mono text-amber-300"></span>
             </div>
         </div>
 
         <!-- 結算操作按鈕列 -->
         <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <button onclick="copyResultsForClassGroup()" class="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-sm shadow-lg transition flex items-center gap-2 cursor-pointer">
-                <i class="fa-regular fa-copy"></i> 一鍵複製班群戰績文字
+            <button onclick="downloadResultPng()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-gray-950 font-extrabold text-sm shadow-lg shadow-amber-500/20 transition flex items-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-download"></i> 下載戰績成果圖 (.png)
             </button>
             <button onclick="startNewGame()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-extrabold text-sm shadow-lg transition flex items-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-rotate-right"></i> 再玩一局（全新 5 則新聞）
@@ -569,7 +568,7 @@
             <div class="flex items-center justify-between border-b border-terminal-border pb-3 mb-4">
                 <div class="flex items-center gap-2">
                     <span class="px-2.5 py-1 rounded bg-rose-600 text-white font-extrabold text-xs">BREAKING NEWS</span>
-                    <span id="modal-news-round" class="font-mono text-amber-300 font-bold text-sm">第 1 / 5 回合</span>
+                    <span id="modal-news-round" class="font-mono text-amber-300 font-bold text-sm">第 1 / 5 交易日</span>
                 </div>
                 <div class="text-xs font-mono text-gray-300">
                     新聞倒數: <span id="modal-news-timer" class="text-amber-300 font-extrabold text-lg">30</span>s
@@ -587,7 +586,7 @@
             </div>
 
             <div id="modal-news-impact-box" class="bg-sky-950/35 border border-sky-500/30 rounded-xl p-3 mb-5 text-xs text-sky-200">
-                <div class="font-bold text-sky-300 mb-1"><i class="fa-solid fa-chart-line mr-1"></i> 市場風向解讀（本回合漲跌限 ±10%）</div>
+                <div class="font-bold text-sky-300 mb-1"><i class="fa-solid fa-chart-line mr-1"></i> 市場風向解讀（當日漲跌限 ±10% • 交易 40 秒）</div>
                 <div id="modal-news-impact-text" class="leading-relaxed"></div>
             </div>
 
@@ -596,13 +595,90 @@
                     先看盤面（背景倒數中）
                 </button>
                 <button onclick="skipNewsToTrading()" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-gray-950 font-extrabold text-sm shadow-lg transition flex items-center justify-center gap-2 cursor-pointer">
-                    <i class="fa-solid fa-forward-step"></i> 跳過新聞，提前開盤（30s 交易）
+                    <i class="fa-solid fa-forward-step"></i> 跳過新聞，提前開盤（40s 交易）
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== 彈窗 2：完整規則說明彈窗 ==================== -->
+    <!-- ==================== 彈窗 2：每日盤後籌碼與三大法人買賣超結算面板 ==================== -->
+    <div id="modal-daily-summary" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+        <div class="glass-modal border-2 border-sky-500/50 rounded-2xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-terminal-border pb-3 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-300 flex items-center justify-center text-lg font-extrabold">
+                        <i class="fa-solid fa-chart-column"></i>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-mono font-bold text-sky-300 uppercase">POST-MARKET INSTITUTIONAL REPORT</div>
+                        <h3 id="daily-summary-title" class="text-lg sm:text-xl font-extrabold text-white">第 1 交易日｜盤後成交量與三大法人買賣超</h3>
+                    </div>
+                </div>
+                <div id="daily-summary-total-vol" class="text-right font-mono text-xs bg-terminal-bg border border-terminal-border px-3 py-1.5 rounded-lg">
+                    <!-- 當日市場總成交張數與金額 -->
+                </div>
+            </div>
+
+            <!-- 三大法人買賣超總覽卡片（外資、投信、自營商） -->
+            <div class="grid grid-cols-3 gap-2.5 sm:gap-3 mb-4">
+                <div class="bg-terminal-bg border border-terminal-border rounded-xl p-3">
+                    <div class="text-[11px] text-gray-400 font-bold flex items-center justify-between">
+                        <span>外資及陸資</span>
+                        <span class="text-[10px] font-mono text-gray-500">FOREIGN</span>
+                    </div>
+                    <div id="inst-foreign-val" class="text-base sm:text-lg font-mono font-extrabold mt-1">+$0</div>
+                    <div id="inst-foreign-lots" class="text-[11px] font-mono text-gray-400 mt-0.5">0 張</div>
+                </div>
+                <div class="bg-terminal-bg border border-terminal-border rounded-xl p-3">
+                    <div class="text-[11px] text-gray-400 font-bold flex items-center justify-between">
+                        <span>國內投信</span>
+                        <span class="text-[10px] font-mono text-gray-500">TRUST</span>
+                    </div>
+                    <div id="inst-trust-val" class="text-base sm:text-lg font-mono font-extrabold mt-1">+$0</div>
+                    <div id="inst-trust-lots" class="text-[11px] font-mono text-gray-400 mt-0.5">0 張</div>
+                </div>
+                <div class="bg-terminal-bg border border-terminal-border rounded-xl p-3">
+                    <div class="text-[11px] text-gray-400 font-bold flex items-center justify-between">
+                        <span>證券自營商</span>
+                        <span class="text-[10px] font-mono text-gray-500">DEALER</span>
+                    </div>
+                    <div id="inst-dealer-val" class="text-base sm:text-lg font-mono font-extrabold mt-1">+$0</div>
+                    <div id="inst-dealer-lots" class="text-[11px] font-mono text-gray-400 mt-0.5">0 張</div>
+                </div>
+            </div>
+
+            <!-- 五支個股當日成交量與三大法人買賣超明細表 -->
+            <div class="bg-terminal-bg/90 border border-terminal-border rounded-xl overflow-hidden mb-4">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-terminal-card border-b border-terminal-border text-[11px] text-gray-400">
+                                <th class="py-2.5 px-3 font-semibold">股票代號 / 名稱</th>
+                                <th class="py-2.5 px-3 font-semibold text-right">收盤價</th>
+                                <th class="py-2.5 px-3 font-semibold text-right">當日漲跌</th>
+                                <th class="py-2.5 px-3 font-semibold text-right">當日成交量</th>
+                                <th class="py-2.5 px-3 font-semibold text-right">三大法人合計</th>
+                                <th class="py-2.5 px-3 font-semibold text-center">籌碼動向</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daily-summary-tbody" class="divide-y divide-terminal-border/60 font-mono">
+                            <!-- 動態生成 5 檔盤後數據 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div id="daily-summary-player-note" class="text-xs text-gray-300 font-mono"></div>
+                <button id="btn-next-round" onclick="proceedAfterDailySummary()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-extrabold text-sm shadow-lg transition flex items-center justify-center gap-2 cursor-pointer">
+                    <span>進入下一交易日</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 彈窗 3：完整規則說明彈窗 ==================== -->
     <div id="modal-rules" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="glass-modal border border-terminal-border rounded-2xl max-w-xl w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-terminal-border pb-3 mb-4">
@@ -615,11 +691,11 @@
             </div>
 
             <div class="space-y-3 text-xs sm:text-sm text-gray-200 leading-relaxed">
-                <p><strong class="text-amber-300">1. 五回合雙階段：</strong>每局共 5 回合，起始資金 $100,000。每回合包含 <strong>30 秒新聞階段</strong>（可按「跳過新聞，提前開盤」）與 <strong>30 秒交易階段</strong>。</p>
-                <p><strong class="text-red-400">2. 單回合 ±10% 漲跌停限制：</strong>每回合以該回合開盤價為基準，最高漲至 <strong>+10.00%（漲停）</strong>、最低跌至 <strong>-10.00%（跌停）</strong>，達漲跌停時價格不會再超越極限。</p>
-                <p><strong class="text-purple-300">3. 十台策略 AI 對抗：</strong>10 台 AI 各有不同性格與策略（價值低接、動能追價、漲停獲利了結、逆勢均值回歸、事件狙擊、恐慌停損、大戶控盤等），會根據盤勢與漲跌停位置做出買賣反應。</p>
-                <p><strong class="text-rose-300">4. 臨時突發事件震盪：</strong>交易期間可能觸發「臨時突發事件」（如跳電停擺、大戶倒貨、急單搶貨、監管雜音），打破單邊走勢並製造雙向震盪。</p>
-                <p><strong class="text-emerald-300">5. 班群 ROI 結算：</strong>第 5 回合結束自動結算所有持股與 <strong>投資報酬率（ROI %）</strong>，支援一鍵複製戰績與整張截圖分享到班群。</p>
+                <p><strong class="text-amber-300">1. 五回合雙階段制：</strong>每局共 5 個交易日，起始資金 $100,000。每回合包含 <strong>30 秒新聞階段</strong>（可按「跳過新聞，提前開盤」）與 <strong>40 秒交易階段</strong>。</p>
+                <p><strong class="text-rose-300">2. 盤中 2%～3% 瞬間突發震盪：</strong>40 秒交易期間有機率觸發「盤中突發快訊」，直接造成股價瞬間跳空震盪 <strong>2.0%～3.0%</strong>，打破單邊走勢並引發 AI 追價或停損。</p>
+                <p><strong class="text-red-400">3. 單日 ±10% 漲跌停與防洗盤機制：</strong>每日以當日開盤價為基準，最高漲 <strong>+10%</strong>、最低跌 <strong>-10%</strong>；交易含 <strong>0.15% 稅費</strong>與短線 1.2 秒內連續刷單 0.35% 滑價懲罰。</p>
+                <p><strong class="text-purple-300">4. 百萬至三千萬級 AI ＋ 匿名真實市場資金：</strong>10 台公開 AI 資金為 <strong>$100 萬 ～ $3,000 萬</strong>，幕後還有不顯示名單的匿名散戶與主力大戶（數十萬至數千萬）持續成交，營造真實市場流動性深度。</p>
+                <p><strong class="text-sky-300">5. 盤後三大法人統計 ＋ 終局防竄改 PNG 成果圖：</strong>每天收盤公布當日成交量與三大法人買賣超；第 5 日結束自動生成含防偽驗證碼的 <strong>PNG 戰績成果圖</strong>供班群比拚 ROI。</p>
             </div>
 
             <button onclick="closeModal('modal-rules')" class="mt-5 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-sm transition cursor-pointer">
@@ -628,7 +704,7 @@
         </div>
     </div>
 
-    <!-- ==================== 彈窗 3：匯出單檔 index.html 說明 ==================== -->
+    <!-- ==================== 彈窗 4：匯出單檔 index.html 說明 ==================== -->
     <div id="modal-github" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="glass-modal border border-terminal-border rounded-2xl max-w-lg w-full p-6 shadow-2xl">
             <div class="flex items-center justify-between border-b border-terminal-border pb-3 mb-4">
@@ -661,232 +737,225 @@
     <script>
         /**
          * ============================================================================
-         * 華爾街風雲：十台AI操盤手對決 - 單人五回合股票模擬器核心引擎
+         * 華爾街風雲：十台AI操盤手對決 - 真實擬真股市與防竄改成果圖引擎
          * ============================================================================
          */
 
         const TOTAL_ROUNDS = 5;
         const NEWS_SECONDS = 30;
-        const TRADING_SECONDS = 30;
+        const TRADING_SECONDS = 40; // 交易時間改為 40 秒
         const INITIAL_CAPITAL = 100000;
-        const ROUND_LIMIT_RATE = 0.10; // 單回合嚴格 ±10% 漲跌停限制
+        const ROUND_LIMIT_RATE = 0.10; // 單日嚴格 ±10% 漲跌停限制
+        const TRADE_FEE_RATE = 0.0015; // 0.15% 手續費/交易稅
 
-        // 五支不同特色股票
+        // 五支不同產業特色股票
         const BASE_STOCKS = [
-            { code: '2330', name: '晶圓代工龍頭', sector: '半導體晶圓代工', initPrice: 100.00, volatility: 0.017, color: '#38bdf8' },
-            { code: '3017', name: 'AI 伺服器散熱', sector: '液冷與機櫃散熱', initPrice: 90.00,  volatility: 0.023, color: '#fb7185' },
-            { code: '6446', name: '創新製藥生技', sector: '生技新藥研發',   initPrice: 75.00,  volatility: 0.028, color: '#34d399' },
-            { code: '2603', name: '遠洋航運物流', sector: '貨櫃海運與物流', initPrice: 60.00,  volatility: 0.022, color: '#22d3ee' },
-            { code: '1519', name: '綠能儲能電網', sector: '儲能系統與電網', initPrice: 80.00,  volatility: 0.020, color: '#fbbf24' }
+            { code: 'TSM', name: '台積晶圓',     sector: '先進半導體晶圓代工', initPrice: 100.00, volatility: 0.015, color: '#38bdf8' },
+            { code: 'FOX', name: '鴻海AI伺服器', sector: 'AI機櫃與雲端伺服器', initPrice: 85.00,  volatility: 0.020, color: '#fb7185' },
+            { code: 'EVR', name: '長榮航運',     sector: '遠洋貨櫃航運物流',   initPrice: 65.00,  volatility: 0.021, color: '#22d3ee' },
+            { code: 'MTK', name: '聯發晶片',     sector: '旗艦手機與邊緣AI晶片', initPrice: 95.00, volatility: 0.019, color: '#c084fc' },
+            { code: 'CTB', name: '國泰金控',     sector: '壽險銀行與資產管理', initPrice: 55.00,  volatility: 0.012, color: '#34d399' }
         ];
 
-        // 10 台不同性格與策略的 AI 操盤手
+        // 10 台公開顯示的機構級 AI 操盤手（資金一律 $1,000,000 ～ $30,000,000 不等）
         const AI_PROFILES = [
-            { id: 'ai_1',  name: '價值低接 AI',   style: '價值低接型',   desc: '回檔深蹲買進、逢高分批獲利',   cashFactor: 1.05 },
-            { id: 'ai_2',  name: '動能追價 AI',   style: '動能追價型',   desc: '順勢強勢追價、接近漲停轉保守', cashFactor: 1.15 },
-            { id: 'ai_3',  name: '漲停獲利 AI',   style: '高檔了結型',   desc: '漲幅達標或逼近漲停果斷鎖利',   cashFactor: 1.00 },
-            { id: 'ai_4',  name: '逆勢均值 AI',   style: '逆勢均值回歸', desc: '過度拉升時反手壓盤、急跌低接', cashFactor: 1.10 },
-            { id: 'ai_5',  name: '事件狙擊 AI',   style: '事件狙擊型',   desc: '緊盯新聞與突發事件快速進出',   cashFactor: 1.12 },
-            { id: 'ai_6',  name: '風控停損 AI',   style: '風控停損型',   desc: '遇到利空或下殺嚴格執行停損',   cashFactor: 0.92 },
-            { id: 'ai_7',  name: '高頻量化 AI',   style: '高頻量化型',   desc: '高頻雙向報價、製造盤中活水',   cashFactor: 1.00 },
-            { id: 'ai_8',  name: '散熱晶片 AI',   style: '科技算力型',   desc: '專注晶圓代工與 AI 散熱雙主軸', cashFactor: 1.08 },
-            { id: 'ai_9',  name: '生技航運 AI',   style: '題材輪動型',   desc: '靈活切換生技新藥與航運題材',   cashFactor: 1.05 },
-            { id: 'ai_10', name: '主力大戶 AI',   style: '大戶控盤型',   desc: '資金雄厚、偶爾敲出大單震盪盤面', cashFactor: 1.40 }
+            { id: 'ai_1',  name: '摩根外資亞太',   style: '外資趨勢波段', instType: 'FOREIGN', minCash: 18000000, maxCash: 26000000 },
+            { id: 'ai_2',  name: '高盛量化動能',   style: '量化順勢追價', instType: 'FOREIGN', minCash: 12000000, maxCash: 20000000 },
+            { id: 'ai_3',  name: '瑞銀估值回歸',   style: '逆勢均值回歸', instType: 'FOREIGN', minCash: 9000000,  maxCash: 15000000 },
+            { id: 'ai_4',  name: '貝萊德全球基金', style: '長線價值低接', instType: 'FOREIGN', minCash: 22000000, maxCash: 30000000 },
+            { id: 'ai_5',  name: '元大龍頭投信',   style: '投信季底作帳', instType: 'TRUST',   minCash: 5000000,  maxCash: 9000000  },
+            { id: 'ai_6',  name: '國泰科技投信',   style: '半導體AI主軸', instType: 'TRUST',   minCash: 4000000,  maxCash: 8000000  },
+            { id: 'ai_7',  name: '富邦高股息投信', style: '金融航運防禦', instType: 'TRUST',   minCash: 3500000,  maxCash: 7000000  },
+            { id: 'ai_8',  name: '凱基自營避險',   style: '漲停前鎖利派', instType: 'DEALER',  minCash: 2000000,  maxCash: 4500000  },
+            { id: 'ai_9',  name: '群益事件狙擊',   style: '突發震盪套利', instType: 'DEALER',  minCash: 1500000,  maxCash: 3500000  },
+            { id: 'ai_10', name: '統一造市自營部', style: '高頻造市流動', instType: 'DEALER',  minCash: 1000000,  maxCash: 2500000  }
         ];
 
-        // 18 則各不相同的財經新聞事件庫
+        // 22 則各不相同的財經新聞事件庫
         const NEWS_LIBRARY = [
             {
                 category: '【晶圓代工】',
-                title: '先進製程 2 奈米試產良率超標，晶圓代工龍頭迎追加投片！',
-                body: '國際晶片大廠加快次世代處理器導入進度，晶圓代工龍頭產能利用率維持高檔，供應鏈拉貨動能轉強。',
-                hint: '偏多 2330、3017，留意漲幅接近 +10% 獲利了結賣壓',
-                impacts: { '2330': 0.028, '3017': 0.014, '6446': -0.004, '2603': 0.002, '1519': 0.005 }
+                title: '先進製程 2 奈米試產良率超標，台積晶圓迎國際大廠追加投片！',
+                body: '北美雲端巨頭加快次世代 AI 加速器導入進度，台積晶圓產能利用率維持滿載，上下游供應鏈拉貨動能強勁。',
+                hint: '偏多 TSM、MTK，留意漲幅逼近 +10% 機構獲利了結賣壓',
+                impacts: { 'TSM': 0.025, 'FOX': 0.012, 'EVR': 0.002, 'MTK': 0.014, 'CTB': 0.004 }
             },
             {
-                category: '【AI 散熱】',
-                title: '高功耗 AI 機櫃全面轉向液冷方案，散熱模組訂單大增！',
-                body: '資料中心熱密度攀升帶動水冷板與快接頭需求，AI 伺服器散熱廠第四季出貨量看增。',
-                hint: '偏多 3017、2330，短線波動度放大',
-                impacts: { '2330': 0.012, '3017': 0.032, '6446': -0.003, '2603': 0.001, '1519': 0.006 }
+                category: '【AI 伺服器】',
+                title: '新一代液冷 AI 伺服器機櫃出貨放量，鴻海AI伺服器營收看增！',
+                body: '大型資料中心資本支出上調，鴻海AI伺服器取得主力機櫃組裝份額，法人預估單季毛利率同步走升。',
+                hint: '強力題材 FOX、TSM，短線震盪放大',
+                impacts: { 'TSM': 0.011, 'FOX': 0.028, 'EVR': 0.003, 'MTK': 0.008, 'CTB': 0.003 }
             },
             {
-                category: '【生技新藥】',
-                title: '創新製藥生技抗體偶聯新藥解盲正向，授權談判升溫！',
-                body: '臨床數據展現良好療效與安全性，生技族群吸引短線與波段買盤關注，但籌碼換手亦相當快速。',
-                hint: '強力題材 6446，高波動震盪',
-                impacts: { '2330': -0.003, '3017': -0.004, '6446': 0.035, '2603': 0.002, '1519': 0.001 }
+                category: '【遠洋航運】',
+                title: '主要轉運港口塞港與航線繞道效應延續，貨櫃運價指數跳漲！',
+                body: '歐美航線艙位吃緊，長榮航運現貨運價調漲成功，吸引短線資金與波段機構大單湧入。',
+                hint: '偏多 EVR，科技股資金略受排擠',
+                impacts: { 'TSM': -0.003, 'FOX': -0.002, 'EVR': 0.030, 'MTK': -0.003, 'CTB': 0.004 }
             },
             {
-                category: '【航運物流】',
-                title: '紅海繞道與塞港延誤未解，遠洋貨櫃運價指數再度走揚！',
-                body: '船舶繞行拉長航程週期，遠洋航運物流營收動能獲得支撐，航運股成為盤面資金輪動焦點。',
-                hint: '偏多 2603，微幅影響進出口成本',
-                impacts: { '2330': -0.002, '3017': -0.005, '6446': 0.002, '2603': 0.032, '1519': 0.004 }
+                category: '【邊緣 AI 晶片】',
+                title: '旗艦 AI 手機單晶片銷售優於預期，聯發晶片啟動追加晶圓訂單！',
+                body: '終端品牌廠積極備貨高階旗艦機種，聯發晶片市占率持續擴張，帶動半導體設計族群走強。',
+                hint: '偏多 MTK、TSM，留意盤中獲利回吐震盪',
+                impacts: { 'TSM': 0.012, 'FOX': 0.006, 'EVR': 0.001, 'MTK': 0.028, 'CTB': 0.002 }
             },
             {
-                category: '【綠能儲能】',
-                title: '強化電網韌性計畫加速推進，大型儲能案場標案陸續開出！',
-                body: '再生能源併網與削峰填谷需求提升，綠能儲能電網廠商在手訂單能見度看升。',
-                hint: '偏多 1519，防禦與能源題材受矚目',
-                impacts: { '2330': 0.004, '3017': 0.005, '6446': 0.003, '2603': 0.002, '1519': 0.030 }
+                category: '【金融金控】',
+                title: '壽險避險成本下降且銀行手續費創高，國泰金控獲利報喜！',
+                body: '金融股基本面穩健且殖利率具吸引力，高股息投信與防禦型外資持續加碼國泰金控。',
+                hint: '穩健偏多 CTB，波動較低抗跌',
+                impacts: { 'TSM': 0.002, 'FOX': 0.003, 'EVR': 0.002, 'MTK': 0.002, 'CTB': 0.024 }
             },
             {
                 category: '【出口管制】',
-                title: '海外監管單位研議擴大高階運算晶片出口審查，科技股承壓！',
-                body: '市場擔憂跨國管制影響科技供應鏈出貨節奏，晶圓代工與 AI 散熱出現逢高調節壓力。',
-                hint: '利空 2330、3017，資金可能轉向 6446 或 1519',
-                impacts: { '2330': -0.026, '3017': -0.022, '6446': 0.007, '2603': 0.006, '1519': 0.009 }
+                title: '海外監管單位研議擴大高階算力晶片出口審查，科技權值股承壓！',
+                body: '市場擔憂跨國管制影響部分 AI 伺服器與晶片出貨節奏，外資對科技族群啟動逢高調節。',
+                hint: '利空 TSM、FOX、MTK，資金轉向 CTB、EVR',
+                impacts: { 'TSM': -0.022, 'FOX': -0.024, 'EVR': 0.006, 'MTK': -0.021, 'CTB': 0.010 }
             },
             {
                 category: '【運價雜音】',
-                title: '新造貨櫃船陸續交付下水，市場憂慮明年海運供給增加！',
-                body: '部分機構提醒運價高檔震盪風險，遠洋航運物流股價遭遇短線獲利了結賣壓。',
-                hint: '偏空 2603，注意回檔支撐',
-                impacts: { '2330': 0.004, '3017': 0.003, '6446': 0.004, '2603': -0.028, '1519': 0.005 }
-            },
-            {
-                category: '【藥價審查】',
-                title: '主管機關啟動新年度藥價核價檢討，生技股短線震盪加劇！',
-                body: '市場重新評估藥品給付價格變動對獲利的影響，創新製藥生技多空分歧擴大。',
-                hint: '偏空 6446，留意逆勢抄底與停損單',
-                impacts: { '2330': 0.005, '3017': 0.004, '6446': -0.028, '2603': 0.003, '1519': 0.004 }
-            },
-            {
-                category: '【高檔震盪】',
-                title: '指數波段漲幅已大，法人啟動高檔調節與部位再平衡！',
-                body: '部分漲多股票出現獲利了結單，盤面不再無腦一路往上衝，轉為個股表現與多空拉鋸。',
-                hint: '高檔震盪：各股漲跌互見，切忌盲目追高',
-                impacts: { '2330': -0.011, '3017': -0.013, '6446': -0.008, '2603': -0.007, '1519': -0.006 }
+                title: '新造大型貨櫃輪集中交付下水，市場憂慮航運供過於求壓力！',
+                body: '部分機構發布報告提醒運價高檔回檔風險，長榮航運遭遇短線停損與獲利了結賣單。',
+                hint: '偏空 EVR，注意跌勢中的逆勢低接買盤',
+                impacts: { 'TSM': 0.004, 'FOX': 0.004, 'EVR': -0.026, 'MTK': 0.003, 'CTB': 0.005 }
             },
             {
                 category: '【利率預期】',
-                title: '最新通膨數據略高於市場預期，高估值成長股面臨評價修正！',
-                body: '市場重新定價利率路徑，高本益比族群波動加大，防禦型與低基期標的相對抗跌。',
-                hint: '壓抑 3017、6446，2603、1519 震盪整理',
-                impacts: { '2330': -0.012, '3017': -0.019, '6446': -0.015, '2603': -0.004, '1519': -0.005 }
+                title: '最新通膨數據高於預期，市場延後降息時程引發高估值股修正！',
+                body: '公債殖利率反彈壓抑高本益比電子股評價，金融股相對受惠利差維持高檔。',
+                hint: '壓抑 MTK、FOX，偏多 CTB',
+                impacts: { 'TSM': -0.011, 'FOX': -0.016, 'EVR': -0.005, 'MTK': -0.018, 'CTB': 0.015 }
             },
             {
-                category: '【邊緣 AI】',
-                title: '智慧終端裝置導入輕量化 AI 模型，帶動零組件升級潮！',
-                body: '終端換機需求回溫，晶圓代工與散熱、電能管理模組同步受惠，多空交投熱絡。',
-                hint: '偏多 2330、1519、3017',
-                impacts: { '2330': 0.019, '3017': 0.016, '6446': 0.002, '2603': 0.004, '1519': 0.012 }
+                category: '【高檔震盪】',
+                title: '指數波段漲幅已大，十大機構啟動高檔調節與部位再平衡！',
+                body: '外資與自營商針對漲多標的同步減碼，盤面進入多空劇烈拉鋸震盪，切忌盲目追高。',
+                hint: '全市場震盪偏空：留意沖高回落風險',
+                impacts: { 'TSM': -0.010, 'FOX': -0.012, 'EVR': -0.009, 'MTK': -0.011, 'CTB': -0.006 }
             },
             {
-                category: '【生技併購】',
-                title: '跨國藥廠積極尋找罕見病與腫瘤新藥標的，生技族群點火！',
-                body: '併購題材推升生技股人氣，創新製藥生技盤中量能放大，短線沖銷與追價並存。',
-                hint: '利多 6446，留意震盪洗盤',
-                impacts: { '2330': 0.002, '3017': 0.001, '6446': 0.029, '2603': 0.003, '1519': 0.004 }
+                category: '【主權基金加碼】',
+                title: '中東與北歐主權基金宣布提高亞洲科技與金融權值股配置！',
+                body: '長線主權資金鎖定台積晶圓、鴻海AI伺服器與國泰金控進行波段布局，下檔支撐轉強。',
+                hint: '偏多 TSM、FOX、CTB',
+                impacts: { 'TSM': 0.017, 'FOX': 0.016, 'EVR': 0.003, 'MTK': 0.008, 'CTB': 0.014 }
             },
             {
-                category: '【港口調度】',
-                title: '亞洲主要轉運港作業吃緊，貨櫃船期延誤推升短期運價！',
-                body: '船期不穩使市場有效運力收斂，遠洋航運物流迎來短線急單與運價支撐。',
-                hint: '利多 2603，其他族群溫和波動',
-                impacts: { '2330': 0.003, '3017': -0.002, '6446': 0.002, '2603': 0.025, '1519': 0.004 }
+                category: '【供應鏈瓶頸】',
+                title: '高階封裝產能階段性吃緊，部分 AI 晶片與伺服器交期延後！',
+                body: '交期調整引發短線籌碼鬆動，鴻海AI伺服器與聯發晶片盤中出現劇烈洗盤震盪。',
+                hint: 'FOX、MTK 高波動震盪，TSM 相對有撐',
+                impacts: { 'TSM': 0.005, 'FOX': -0.017, 'EVR': 0.002, 'MTK': -0.016, 'CTB': 0.004 }
             },
             {
-                category: '【儲能政策】',
-                title: '表後儲能與工商用電大戶備援規範上路，儲能設備需求增溫！',
-                body: '企業強化用電安全帶動儲能系統安裝潮，綠能儲能電網股價獲得買盤青睞。',
-                hint: '利多 1519，微幅帶動 2330',
-                impacts: { '2330': 0.007, '3017': 0.004, '6446': 0.002, '2603': 0.003, '1519': 0.028 }
+                category: '【匯率劇烈波動】',
+                title: '亞洲貨幣匯率急升急貶，外銷電子與航運面臨匯兌評價變數！',
+                body: '匯市雙向大幅波動使外銷廠毛利率出現不確定性，法人提醒留意停利停損紀律。',
+                hint: '外銷與航運震盪洗盤',
+                impacts: { 'TSM': -0.008, 'FOX': -0.009, 'EVR': -0.012, 'MTK': -0.007, 'CTB': 0.005 }
             },
             {
-                category: '【散熱良率】',
-                title: '液冷散熱管路滲漏測試趨嚴，部分新廠商交期遞延！',
-                body: '品質驗證門檻提高使訂單集中於技術成熟大廠，盤中散熱族群出現劇烈洗盤。',
-                hint: '3017 高波動震盪，2330 相對穩健',
-                impacts: { '2330': 0.008, '3017': -0.017, '6446': 0.003, '2603': 0.002, '1519': 0.006 }
+                category: '【投信季底作帳】',
+                title: '國內投信啟動季底績效作帳行情，中小型與主力認養股點火！',
+                body: '投信買盤集中火力拉抬聯發晶片與鴻海AI伺服器，盤面交投明顯升溫。',
+                hint: '偏多 MTK、FOX，留意自營商逢高倒貨',
+                impacts: { 'TSM': 0.006, 'FOX': 0.019, 'EVR': 0.004, 'MTK': 0.021, 'CTB': 0.003 }
             },
             {
-                category: '【匯率波動】',
-                title: '新台幣與美元匯率急升急貶，外銷族群面臨匯兌評價震盪！',
-                body: '匯市雙向波動使外銷廠毛利出現變數，法人提醒留意追高風險與停利紀律。',
-                hint: '全面震盪：留意雙向刷洗',
-                impacts: { '2330': -0.009, '3017': -0.007, '6446': -0.005, '2603': -0.011, '1519': -0.006 }
+                category: '【法說會報喜】',
+                title: '半導體龍頭法說會上調全年營收成長展望，資本支出維持高檔！',
+                body: '管理層對 AI 需求給出強勁指引，台積晶圓帶領半導體設備與晶片族群同步走揚。',
+                hint: '利多 TSM、MTK、FOX',
+                impacts: { 'TSM': 0.023, 'FOX': 0.014, 'EVR': 0.002, 'MTK': 0.016, 'CTB': 0.004 }
             },
             {
-                category: '【法說會焦點】',
-                title: '法說會釋出審慎樂觀展望，強調穩健擴產不盲目擴張！',
-                body: '管理層強調資本支出控管與獲利品質，市場解讀為中長線穩健但短線不躁進。',
-                hint: '溫和偏多 2330、1519，盤勢節奏平穩',
-                impacts: { '2330': 0.014, '3017': 0.008, '6446': 0.005, '2603': 0.006, '1519': 0.013 }
+                category: '【跨國貿易協定】',
+                title: '亞太區域關稅減免新協議生效，海運貨櫃吞吐量創同期新高！',
+                body: '區域進出口貿易活絡，長榮航運與貿易融資業務受惠，金融與航運雙雙走強。',
+                hint: '偏多 EVR、CTB',
+                impacts: { 'TSM': 0.004, 'FOX': 0.005, 'EVR': 0.024, 'MTK': 0.003, 'CTB': 0.012 }
             },
             {
-                category: '【資金輪動】',
-                title: '強勢股漲多拉回，中低基期族群接棒輪動演出！',
-                body: '資金從先前強勢股流出並轉向其他板塊，盤面呈現「漲多回檔、落後補漲」的震盪格局。',
-                hint: '輪動震盪：留意強弱轉換',
-                impacts: { '2330': -0.008, '3017': -0.010, '6446': 0.014, '2603': 0.012, '1519': 0.009 }
+                category: '【金融監理鬆綁】',
+                title: '金管會放寬財富管理與海外投資業務限制，金控獲利空間打開！',
+                body: '國泰金控受惠高資產客戶資金回流，外資與投信同步買超推升股價表現。',
+                hint: '利多 CTB，大盤情緒溫和偏多',
+                impacts: { 'TSM': 0.003, 'FOX': 0.003, 'EVR': 0.002, 'MTK': 0.003, 'CTB': 0.025 }
+            },
+            {
+                category: '【資金大輪動】',
+                title: '強勢科技股漲多拉回，資金大舉轉進低基期航運與金融板塊！',
+                body: '機構法人進行「賣電子、買傳產金融」換股操作，盤面呈現明顯翹翹板效應。',
+                hint: '利空 TSM、FOX、MTK；利多 EVR、CTB',
+                impacts: { 'TSM': -0.014, 'FOX': -0.015, 'EVR': 0.020, 'MTK': -0.013, 'CTB': 0.018 }
+            },
+            {
+                category: '【AI 終端換機潮】',
+                title: '企業級 AI PC 與智慧終端換機需求啟動，晶片與組裝廠同樂！',
+                body: '品牌廠上調下半年出貨目標，聯發晶片與鴻海AI伺服器同步迎來追單效應。',
+                hint: '偏多 MTK、FOX、TSM',
+                impacts: { 'TSM': 0.013, 'FOX': 0.017, 'EVR': 0.002, 'MTK': 0.019, 'CTB': 0.003 }
             }
         ];
 
-        // 交易中隨機觸發的「臨時突發事件」（製造震盪、避免單邊一直往上衝）
+        // 盤中隨機觸發的「臨時突發事件」（直接造成股價瞬間震盪 2.0% ~ 3.0%）
         const SHOCK_EVENTS = [
             {
-                title: '突發跳電短暫影響產線！',
-                tag: '空方突襲 • 急跌震盪',
-                targetCode: '2330',
-                priceShock: -0.035,
-                flowShock: -320,
-                cls: 'text-emerald-300'
+                title: '晶圓廠突發跳電警報！短暫影響部分機台運作',
+                targetCode: 'TSM',
+                dir: -1, // 向下震盪 2%~3%
+                tag: '空方突襲 • 瞬間急殺'
             },
             {
-                title: '主力大戶盤中反手倒貨！',
-                tag: '獲利了結 • 賣壓湧現',
-                targetCode: '3017',
-                priceShock: -0.038,
-                flowShock: -350,
-                cls: 'text-emerald-300'
+                title: '神祕外資大戶萬張市價倒貨！獲利了結賣壓湧出',
+                targetCode: 'FOX',
+                dir: -1,
+                tag: '大戶倒貨 • 瞬間下挫'
             },
             {
-                title: '生技臨床數據出現雜音，短線急殺！',
-                tag: '消息震盪 • 多空交戰',
-                targetCode: '6446',
-                priceShock: -0.040,
-                flowShock: -300,
-                cls: 'text-emerald-300'
+                title: '主力大戶突擊掃貨！連續千張外盤大單敲進',
+                targetCode: 'MTK',
+                dir: 1, // 向上震盪 2%~3%
+                tag: '主力掃貨 • 瞬間急拉'
             },
             {
-                title: '航線調度突發延誤，運價出現回檔！',
-                tag: '短線壓回 • 震盪洗盤',
-                targetCode: '2603',
-                priceShock: -0.035,
-                flowShock: -280,
-                cls: 'text-emerald-300'
+                title: '主要轉運港突發罷工危機！運價預期瞬間飆升',
+                targetCode: 'EVR',
+                dir: 1,
+                tag: '突發利多 • 瞬間跳漲'
             },
             {
-                title: '儲能標案審查延後，盤中出現賣壓！',
-                tag: '政策雜音 • 震盪回檔',
-                targetCode: '1519',
-                priceShock: -0.034,
-                flowShock: -260,
-                cls: 'text-emerald-300'
+                title: '海外投資部位出現匯損傳聞，機構短線急殺！',
+                targetCode: 'CTB',
+                dir: -1,
+                tag: '傳聞震盪 • 瞬間壓回'
             },
             {
-                title: '機構大單突發回補抄底，買盤湧入！',
-                tag: '低接反彈 • 多方急攻',
-                targetCode: null,
-                priceShock: 0.032,
-                flowShock: 300,
-                cls: 'text-rose-300'
+                title: '國際主權基金盤中突擊加碼，強勢買盤湧入！',
+                targetCode: 'TSM',
+                dir: 1,
+                tag: '主權護盤 • 瞬間拉升'
             },
             {
-                title: '量化程式觸發停利停損，全市場震盪！',
-                tag: '雙向震盪 • 波動放大',
-                targetCode: null,
-                priceShock: -0.022,
-                flowShock: -220,
-                cls: 'text-amber-300'
+                title: '雲端大客戶傳出調整伺服器拉貨時程，盤中急震！',
+                targetCode: 'FOX',
+                dir: 1,
+                tag: '急單傳聞 • 瞬間急衝'
+            },
+            {
+                title: '高頻程式單觸發連鎖停損，盤中瞬間下洗甩轎！',
+                targetCode: 'MTK',
+                dir: -1,
+                tag: '程式洗盤 • 瞬間下殺'
             }
         ];
 
         // 遊戲狀態
         let game = {
-            status: 'LOBBY', // LOBBY | NEWS | TRADING | GAMEOVER
+            status: 'LOBBY', // LOBBY | NEWS | TRADING | DAILY_SUMMARY | GAMEOVER
             colorScheme: 'TW', // TW (紅漲綠跌) | US (綠漲紅跌)
             playerName: '操盤手',
             round: 1,
@@ -894,14 +963,20 @@
             currentNews: null,
             activeShock: null,
             shockCooldown: 0,
+            shocksTriggeredThisRound: 0,
             usedNewsIndices: [],
             stocks: [],
             priceHistory: {},
-            selectedCode: '2330',
+            playerNetWorthHistory: [INITIAL_CAPITAL],
+            selectedCode: 'TSM',
             netOrderFlow: {},
             recentPressure: {},
+            lastPlayerTradeTime: {},
             participants: [],
-            feeds: []
+            hiddenTraders: [], // 幕後不顯示的匿名散戶與主力大戶群（資金數十萬至數千萬）
+            dailyStats: {},     // 當日成交量與三大法人買賣超統計
+            feeds: [],
+            verifyHash: ''
         };
 
         let timerInterval = null;
@@ -916,7 +991,7 @@
 
         /**
          * ============================================================================
-         * 遊戲初始化與回合控制（5 回合 × 30s 新聞（可跳過）＋ 30s 交易）
+         * 遊戲初始化與回合控制（5 個交易日 × 30s 新聞（可跳過）＋ 40s 交易）
          * ============================================================================
          */
         function startNewGame() {
@@ -943,34 +1018,70 @@
             game.priceHistory = {};
             game.netOrderFlow = {};
             game.recentPressure = {};
+            game.lastPlayerTradeTime = {};
             game.stocks.forEach(s => {
                 game.priceHistory[s.code] = [s.price];
                 game.netOrderFlow[s.code] = 0;
                 game.recentPressure[s.code] = 0;
+                game.lastPlayerTradeTime[s.code] = 0;
             });
 
-            game.selectedCode = '2330';
+            game.selectedCode = 'TSM';
             game.usedNewsIndices = [];
             game.feeds = [];
             game.activeShock = null;
             game.shockCooldown = 0;
+            game.playerNetWorthHistory = [INITIAL_CAPITAL];
 
-            // 建立 1 位玩家 + 10 位 AI（共 11 位）
+            // 1. 建立公開參賽者：1 位玩家 ($100,000) + 10 台千萬級 AI ($1,000,000 ~ $30,000,000 不等)
             game.participants = [
-                createParticipant('player', playerName, '人類操盤手', '自主交易', false, INITIAL_CAPITAL)
+                createParticipant('player', playerName, '散戶操盤手', 'PLAYER', false, INITIAL_CAPITAL)
             ];
             AI_PROFILES.forEach(ai => {
-                const startCash = Math.round(INITIAL_CAPITAL * ai.cashFactor);
+                // 在 minCash ~ maxCash ($100萬 ~ $3,000萬) 之間隨機取十萬為單位的初始資金
+                const steps = Math.floor((ai.maxCash - ai.minCash) / 100000);
+                const randomCash = ai.minCash + Math.floor(Math.random() * (steps + 1)) * 100000;
                 game.participants.push(
-                    createParticipant(ai.id, ai.name, ai.style, ai.desc, true, startCash)
+                    createParticipant(ai.id, ai.name, ai.style, ai.instType, true, randomCash)
                 );
             });
+
+            // 2. 建立幕後「隱藏匿名市場參與者」（45 位不知名散戶、中實戶與神秘大戶，資金 $300,000 ~ $35,000,000，不顯示在名單）
+            game.hiddenTraders = [];
+            for (let i = 0; i < 45; i++) {
+                let tierCash = 0;
+                let instType = 'RETAIL';
+                if (i < 25) {
+                    // 匿名散戶與中實戶：30萬 ~ 300萬
+                    tierCash = (Math.floor(Math.random() * 28) + 3) * 100000;
+                    instType = 'RETAIL';
+                } else if (i < 38) {
+                    // 匿名大戶與外資分點：500萬 ~ 1,800萬
+                    tierCash = (Math.floor(Math.random() * 14) + 5) * 1000000;
+                    instType = i % 2 === 0 ? 'FOREIGN' : 'TRUST';
+                } else {
+                    // 神祕超級主力：2,000萬 ~ 3,500萬
+                    tierCash = (Math.floor(Math.random() * 16) + 20) * 1000000;
+                    instType = i % 2 === 0 ? 'FOREIGN' : 'DEALER';
+                }
+                const holdings = {};
+                BASE_STOCKS.forEach(s => {
+                    // 預先配置部分基本籌碼以利雙向掛單造市
+                    const initLots = Math.floor((tierCash * 0.25) / (s.initPrice * 1000));
+                    holdings[s.code] = initLots * 1000;
+                });
+                game.hiddenTraders.push({
+                    cash: tierCash * 0.75,
+                    instType,
+                    holdings
+                });
+            }
 
             switchView('view-game');
             startRound(1);
         }
 
-        function createParticipant(id, name, style, desc, isAI, initialCash) {
+        function createParticipant(id, name, style, instType, isAI, initialCash) {
             const holdings = {};
             BASE_STOCKS.forEach(s => {
                 holdings[s.code] = { qty: 0, avgCost: 0, trades: 0 };
@@ -979,7 +1090,7 @@
                 id,
                 name,
                 style,
-                desc,
+                instType,
                 isAI,
                 initialCapital: initialCash,
                 cash: initialCash,
@@ -989,15 +1100,35 @@
             };
         }
 
+        function resetDailyStats() {
+            game.dailyStats = {};
+            game.stocks.forEach(s => {
+                game.dailyStats[s.code] = {
+                    volumeShares: 0,
+                    turnoverValue: 0,
+                    foreignNetShares: 0,
+                    foreignNetValue: 0,
+                    trustNetShares: 0,
+                    trustNetValue: 0,
+                    dealerNetShares: 0,
+                    dealerNetValue: 0
+                };
+            });
+        }
+
         function startRound(roundNum) {
             game.round = roundNum;
             game.status = 'NEWS';
             game.timeLeft = NEWS_SECONDS;
             game.activeShock = null;
             game.shockCooldown = 4;
+            game.shocksTriggeredThisRound = 0;
             document.getElementById('shock-event-banner').classList.add('hidden');
 
-            // 設定本回合「開盤參考價」與嚴格 ±10% 漲跌停上下限
+            // 重置當日成交量與三大法人買賣超統計
+            resetDailyStats();
+
+            // 設定當日「開盤參考價」與嚴格 ±10% 漲跌停上下限
             game.stocks.forEach(s => {
                 s.roundOpenPrice = s.price;
                 s.limitUp = Number((s.roundOpenPrice * (1 + ROUND_LIMIT_RATE)).toFixed(2));
@@ -1014,7 +1145,7 @@
             game.usedNewsIndices.push(pickIdx);
             game.currentNews = NEWS_LIBRARY[pickIdx];
 
-            pushFeed(`📰 第 ${roundNum} 回合新聞：${game.currentNews.title}`, 'text-amber-300');
+            pushFeed(`📰 第 ${roundNum} 交易日新聞：${game.currentNews.title}`, 'text-amber-300');
             showNewsModal();
             renderGameUI();
 
@@ -1030,8 +1161,8 @@
         function enterTradingPhase() {
             game.status = 'TRADING';
             game.timeLeft = TRADING_SECONDS;
-            pushFeed(`🔔 第 ${game.round} 回合開盤！單回合漲跌限 ±10%，30 秒即時交易開始`, 'text-sky-300');
-            showToast(`第 ${game.round} 回合開盤！單回合漲跌限 ±10%`, 'info');
+            pushFeed(`🔔 第 ${game.round} 交易日開盤！40 秒即時撮合開始，單日漲跌限 ±10%`, 'text-sky-300');
+            showToast(`第 ${game.round} 交易日開盤！交易時間 40 秒`, 'info');
             renderGameUI();
         }
 
@@ -1048,25 +1179,29 @@
             } else if (game.status === 'TRADING') {
                 game.timeLeft -= 1;
 
-                // 1. 隨機觸發「臨時突發事件」製造雙向震盪
+                // 1. 隨機觸發盤中突發事件（造成股價瞬間震盪 2.0% ~ 3.0%）
                 maybeTriggerShockEvent();
 
-                // 2. 10 台智慧 AI 操盤手即時攻防下單
+                // 2. 10 台公開千萬級 AI 操盤手即時攻防下單
                 runAITradingStep();
 
-                // 3. 更新股價（受新聞、突發事件、玩家與 10 台 AI 供需影響，並嚴格限制於 ±10% 漲跌停內）
+                // 3. 幕後 45 位隱藏匿名散戶與主力大戶同步撮合（不顯示名字，增加真實成交量與市場深度）
+                runHiddenMarketStep();
+
+                // 4. 更新股價（受新聞、突發 2~3% 瞬間震盪、公開 AI 與隱藏市場供需影響，嚴格限制於 ±10% 內）
                 updateStockPrices();
 
-                // 4. 更新所有參賽者總資產與 ROI
+                // 5. 更新所有參賽者總資產與 ROI
                 recalculateNetWorths();
 
                 if (game.timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    if (game.round < TOTAL_ROUNDS) {
-                        startRound(game.round + 1);
-                    } else {
-                        finishFiveRounds();
+                    const me = game.participants[0];
+                    if (me) {
+                        game.playerNetWorthHistory.push(me.netWorth);
                     }
+                    // 顯示當日盤後成交量與三大法人買賣超結算面板
+                    showDailySummaryModal();
                     return;
                 }
                 renderGameUI();
@@ -1075,7 +1210,7 @@
 
         /**
          * ============================================================================
-         * 臨時突發事件與 10 台智慧 AI 攻防邏輯
+         * 盤中突發事件（瞬間跳空震盪 2.0% ~ 3.0%）與 10 AI ＋ 隱藏市場資金撮合
          * ============================================================================
          */
         function maybeTriggerShockEvent() {
@@ -1083,28 +1218,34 @@
                 game.shockCooldown -= 1;
                 return;
             }
-            // 每秒約 16% 機率觸發臨時事件，觸發後冷卻 6 秒避免連續轟炸
-            if (Math.random() < 0.16) {
+            // 每回合最多觸發 2 次突發事件，每次造成 2.0% ~ 3.0% 瞬間震盪
+            if (game.shocksTriggeredThisRound < 2 && Math.random() < 0.14) {
                 const ev = SHOCK_EVENTS[Math.floor(Math.random() * SHOCK_EVENTS.length)];
                 const targetStock = ev.targetCode ? getStock(ev.targetCode) : pickRandomStock();
+
+                // 精確計算 2.0% ~ 3.0% 的瞬間跳空震盪幅度
+                const magnitude = 0.02 + Math.random() * 0.01; // 0.020 ~ 0.030
+                const signedShock = ev.dir * magnitude;
+                const pctDisplay = (signedShock * 100).toFixed(2);
 
                 game.activeShock = {
                     code: targetStock.code,
                     name: targetStock.name,
                     title: ev.title,
-                    tag: ev.tag,
-                    priceShock: ev.priceShock
+                    signedShock
                 };
-                game.shockCooldown = 6;
-                game.netOrderFlow[targetStock.code] += ev.flowShock;
+                game.shockCooldown = 9;
+                game.shocksTriggeredThisRound += 1;
+                game.netOrderFlow[targetStock.code] += ev.dir * 8500;
 
                 const banner = document.getElementById('shock-event-banner');
                 banner.classList.remove('hidden');
                 document.getElementById('shock-event-text').textContent = `${targetStock.code} ${targetStock.name}：${ev.title}`;
-                document.getElementById('shock-event-tag').textContent = ev.tag;
+                document.getElementById('shock-event-tag').textContent = `${ev.tag} (${signedShock > 0 ? '+' : ''}${pctDisplay}%)`;
 
-                pushFeed(`⚡ 突發事件【${targetStock.code} ${targetStock.name}】${ev.title} (${ev.tag})`, ev.cls);
-                showToast(`突發事件：${targetStock.code} ${ev.title}`, 'info');
+                const feedCls = signedShock > 0 ? 'text-rose-300' : 'text-emerald-300';
+                pushFeed(`⚡ 突發震盪【${targetStock.code} ${targetStock.name}】${ev.title}（瞬間 ${signedShock > 0 ? '+' : ''}${pctDisplay}%）`, feedCls);
+                showToast(`盤中突發事件：${targetStock.code} 瞬間震盪 ${signedShock > 0 ? '+' : ''}${pctDisplay}%`, 'info');
             }
         }
 
@@ -1113,17 +1254,14 @@
             const ais = game.participants.filter(p => p.isAI);
 
             ais.forEach(ai => {
-                const actProb = ai.style === '高頻量化型' ? 0.80 : (ai.style === '大戶控盤型' ? 0.55 : 0.65);
+                const actProb = ai.style === '高頻造市流動' ? 0.85 : 0.72;
                 if (Math.random() > actProb) return;
 
-                // 挑選目標股票
                 let stock = null;
-                if (game.activeShock && ai.style === '事件狙擊型' && Math.random() < 0.75) {
-                    stock = getStock(game.activeShock.code);
-                } else if (ai.style === '科技算力型') {
-                    stock = Math.random() < 0.5 ? getStock('2330') : getStock('3017');
-                } else if (ai.style === '題材輪動型') {
-                    stock = Math.random() < 0.5 ? getStock('6446') : getStock('2603');
+                if (ai.style === '半導體AI主軸') {
+                    stock = [getStock('TSM'), getStock('FOX'), getStock('MTK')][Math.floor(Math.random() * 3)];
+                } else if (ai.style === '金融航運防禦') {
+                    stock = Math.random() < 0.5 ? getStock('CTB') : getStock('EVR');
                 } else {
                     stock = pickRandomStock();
                 }
@@ -1136,59 +1274,109 @@
 
                 let side = null;
 
-                // 若接近漲停（+10%），獲利了結型與逆勢均值 AI 會傾向賣出壓盤，避免無腦追高
                 if (nearLimitUp) {
-                    if ((ai.style === '高檔了結型' || ai.style === '逆勢均值回歸' || ai.style === '價值低接型') && holding.qty > 0) {
+                    if ((ai.style === '漲停前鎖利派' || ai.style === '逆勢均值回歸' || ai.style === '長線價值低接') && holding.qty > 0) {
                         side = 'SELL';
-                    } else if (ai.style === '動能追價型' && stock.price < stock.limitUp && ai.cash > stock.price * 5) {
-                        side = Math.random() < 0.35 ? 'BUY' : null;
+                    } else if (ai.style === '量化順勢追價' && stock.price < stock.limitUp && ai.cash > stock.price * 500) {
+                        side = Math.random() < 0.30 ? 'BUY' : null;
                     }
                 } else if (nearLimitDown) {
-                    // 若接近跌停（-10%），價值低接與逆勢均值 AI 會試圖承接，恐慌停損型則可能割肉
-                    if ((ai.style === '價值低接型' || ai.style === '逆勢均值回歸') && ai.cash > stock.price * 10) {
-                        side = Math.random() < 0.6 ? 'BUY' : null;
-                    } else if (ai.style === '風控停損型' && holding.qty > 0) {
-                        side = Math.random() < 0.5 ? 'SELL' : null;
+                    if ((ai.style === '長線價值低接' || ai.style === '逆勢均值回歸' || ai.style === '外資趨勢波段') && ai.cash > stock.price * 800) {
+                        side = Math.random() < 0.65 ? 'BUY' : null;
+                    } else if (holding.qty > 0) {
+                        side = Math.random() < 0.35 ? 'SELL' : null;
                     }
                 } else {
-                    // 一般區間內依策略決定買賣
-                    if (ai.style === '動能追價型' || ai.style === '科技算力型' || ai.style === '題材輪動型') {
-                        if ((impact > 0.006 || roundPct > 0.015) && ai.cash > stock.price * 8) side = 'BUY';
+                    if (ai.style === '外資趨勢波段' || ai.style === '量化順勢追價' || ai.style === '投信季底作帳' || ai.style === '半導體AI主軸' || ai.style === '金融航運防禦') {
+                        if ((impact > 0.005 || roundPct > 0.015) && ai.cash > stock.price * 500) side = 'BUY';
                         else if (holding.qty > 0 && (impact < -0.008 || roundPct > 0.055)) side = 'SELL';
-                    } else if (ai.style === '價值低接型' || ai.style === '逆勢均值回歸') {
-                        if (roundPct < -0.025 && ai.cash > stock.price * 10) side = 'BUY';
-                        else if (roundPct > 0.045 && holding.qty > 0) side = 'SELL';
-                        else if (holding.qty > 0 && stock.price > holding.avgCost * 1.06) side = 'SELL';
-                    } else if (ai.style === '高檔了結型') {
-                        if (roundPct > 0.03 && holding.qty > 0) side = 'SELL';
-                        else if (roundPct < -0.015 && ai.cash > stock.price * 10) side = 'BUY';
-                    } else if (ai.style === '風控停損型') {
-                        if ((roundPct < -0.035 || impact < -0.01) && holding.qty > 0) side = 'SELL';
-                        else if (impact > 0.012 && roundPct < 0.02 && ai.cash > stock.price * 8) side = 'BUY';
-                    } else if (ai.style === '事件狙擊型') {
-                        if (game.activeShock && game.activeShock.code === stock.code) {
-                            side = game.activeShock.priceShock < 0 ? 'BUY' : 'SELL';
-                        } else {
-                            side = Math.random() < 0.5 ? 'BUY' : 'SELL';
-                        }
+                    } else if (ai.style === '逆勢均值回歸' || ai.style === '長線價值低接') {
+                        if (roundPct < -0.020 && ai.cash > stock.price * 600) side = 'BUY';
+                        else if (roundPct > 0.042 && holding.qty > 0) side = 'SELL';
+                    } else if (ai.style === '漲停前鎖利派') {
+                        if (roundPct > 0.030 && holding.qty > 0) side = 'SELL';
+                        else if (roundPct < -0.015 && ai.cash > stock.price * 500) side = 'BUY';
                     } else {
-                        // 高頻量化型 & 大戶控盤型
                         side = Math.random() < 0.5 ? 'BUY' : 'SELL';
                     }
                 }
 
                 if (side === 'BUY') {
-                    const maxQty = Math.floor(ai.cash / stock.price);
-                    if (maxQty <= 0) return;
-                    const lot = ai.style === '大戶控盤型' ? (Math.floor(Math.random() * 5) + 2) * 35 : (Math.floor(Math.random() * 4) + 1) * 15;
-                    const qty = Math.min(maxQty, Math.max(1, lot));
-                    settleTrade(ai, stock, 'BUY', qty, qty >= 65);
+                    const maxQty = Math.floor(ai.cash / (stock.price * (1 + TRADE_FEE_RATE)));
+                    if (maxQty < 100) return;
+                    // 依 AI 資金規模（100萬~3,000萬）下出數百至數千股機構大單
+                    const scaleFactor = Math.max(1, Math.floor(ai.initialCapital / 3500000));
+                    const lot = (Math.floor(Math.random() * 5) + 2) * 300 * scaleFactor;
+                    const qty = Math.min(maxQty, lot);
+                    settleTrade(ai, stock, 'BUY', qty, qty >= 2500);
                 } else if (side === 'SELL' && holding.qty > 0) {
-                    const ratio = (ai.style === '高檔了結型' || ai.style === '風控停損型') ? 0.75 : (Math.random() * 0.45 + 0.25);
-                    const qty = Math.min(holding.qty, Math.max(1, Math.floor(holding.qty * ratio)));
-                    settleTrade(ai, stock, 'SELL', qty, qty >= 65);
+                    const ratio = ai.style === '漲停前鎖利派' ? 0.65 : (Math.random() * 0.4 + 0.2);
+                    const qty = Math.min(holding.qty, Math.max(100, Math.floor(holding.qty * ratio)));
+                    settleTrade(ai, stock, 'SELL', qty, qty >= 2500);
                 }
             });
+        }
+
+        // 幕後隱藏的匿名散戶與主力大戶撮合（不顯示 names，僅貢獻真實成交量、法人買賣超與流動性深度）
+        function runHiddenMarketStep() {
+            const impacts = game.currentNews ? game.currentNews.impacts : {};
+
+            game.hiddenTraders.forEach(trader => {
+                if (Math.random() > 0.45) return;
+                const stock = pickRandomStock();
+                const impact = impacts[stock.code] || 0;
+                const roundPct = (stock.price - stock.roundOpenPrice) / stock.roundOpenPrice;
+
+                // 匿名散戶與主力綜合市場傾向
+                const buyBias = 0.5 + impact * 4.5 - roundPct * 1.2;
+                const isBuy = Math.random() < Math.max(0.2, Math.min(0.8, buyBias));
+
+                if (isBuy && trader.cash > stock.price * 200) {
+                    const maxQty = Math.floor(trader.cash / stock.price);
+                    const baseShares = trader.instType === 'RETAIL'
+                        ? (Math.floor(Math.random() * 4) + 1) * 100
+                        : (Math.floor(Math.random() * 6) + 2) * 400;
+                    const qty = Math.min(maxQty, baseShares);
+                    if (qty > 0) {
+                        trader.cash -= qty * stock.price;
+                        trader.holdings[stock.code] = (trader.holdings[stock.code] || 0) + qty;
+                        game.netOrderFlow[stock.code] += qty;
+                        recordMarketStats(stock, 'BUY', qty, trader.instType);
+                    }
+                } else if (!isBuy && (trader.holdings[stock.code] || 0) >= 100) {
+                    const owned = trader.holdings[stock.code];
+                    const baseShares = trader.instType === 'RETAIL'
+                        ? (Math.floor(Math.random() * 4) + 1) * 100
+                        : (Math.floor(Math.random() * 6) + 2) * 400;
+                    const qty = Math.min(owned, baseShares);
+                    if (qty > 0) {
+                        trader.cash += qty * stock.price;
+                        trader.holdings[stock.code] -= qty;
+                        game.netOrderFlow[stock.code] -= qty;
+                        recordMarketStats(stock, 'SELL', qty, trader.instType);
+                    }
+                }
+            });
+        }
+
+        function recordMarketStats(stock, side, qty, instType) {
+            const st = game.dailyStats[stock.code];
+            if (!st) return;
+            const amount = qty * stock.price;
+            st.volumeShares += qty;
+            st.turnoverValue += amount;
+
+            const sign = side === 'BUY' ? 1 : -1;
+            if (instType === 'FOREIGN') {
+                st.foreignNetShares += sign * qty;
+                st.foreignNetValue += sign * amount;
+            } else if (instType === 'TRUST') {
+                st.trustNetShares += sign * qty;
+                st.trustNetValue += sign * amount;
+            } else if (instType === 'DEALER') {
+                st.dealerNetShares += sign * qty;
+                st.dealerNetValue += sign * amount;
+            }
         }
 
         function updateStockPrices() {
@@ -1196,34 +1384,33 @@
 
             game.stocks.forEach(stock => {
                 const prev = stock.price;
-                const newsDrift = (impacts[stock.code] || 0) * 0.35;
+                const newsDrift = (impacts[stock.code] || 0) * 0.28;
 
-                // 玩家與 10 台 AI 淨買賣供需
+                // 高流動性市場深度分母（24,000 股），千萬級機構與匿名大戶主導定價，散戶小額買賣無法洗盤
                 const netShares = game.netOrderFlow[stock.code] || 0;
-                const supplyDemandImpact = Math.tanh(netShares / 700) * 0.028;
+                const supplyDemandImpact = Math.tanh(netShares / 24000) * 0.022;
 
-                // 若本秒剛發生針對此股的突發事件衝擊，套用一次性震盪力道並清除
+                // 若本秒觸發盤中突發事件，直接注入 2.0% ~ 3.0% 瞬間跳空震盪
                 let shockImpulse = 0;
                 if (game.activeShock && game.activeShock.code === stock.code) {
-                    shockImpulse = game.activeShock.priceShock;
+                    shockImpulse = game.activeShock.signedShock;
                     game.activeShock = null;
                 }
 
-                // 輕微向本回合開盤價回歸的震盪張力，避免單邊死衝
-                const meanReversion = ((stock.roundOpenPrice - prev) / stock.roundOpenPrice) * 0.08;
-                const noise = (Math.random() - 0.5) * stock.volatility * 0.9;
+                // 適度均值回歸張力，避免單邊無止盡上衝
+                const meanReversion = ((stock.roundOpenPrice - prev) / stock.roundOpenPrice) * 0.07;
+                const noise = (Math.random() - 0.5) * stock.volatility * 0.85;
 
                 let rawRate = newsDrift + supplyDemandImpact + shockImpulse + meanReversion + noise;
                 rawRate = Math.max(-0.055, Math.min(0.055, rawRate));
 
                 let nextPrice = Number((prev * (1 + rawRate)).toFixed(2));
 
-                // 嚴格執行單回合 ±10% 漲跌停上下限
+                // 嚴格執行單日 ±10% 漲跌停上下限
                 if (nextPrice > stock.limitUp) nextPrice = stock.limitUp;
                 if (nextPrice < stock.limitDown) nextPrice = stock.limitDown;
 
-                // 記錄有效買賣力道顯示
-                const effectiveFlow = netShares + (nextPrice > prev ? 140 : (nextPrice < prev ? -140 : 0));
+                const effectiveFlow = netShares + (nextPrice > prev ? 3200 : (nextPrice < prev ? -3200 : 0));
                 game.recentPressure[stock.code] = game.recentPressure[stock.code] * 0.45 + effectiveFlow * 0.55;
                 game.netOrderFlow[stock.code] = 0;
 
@@ -1231,7 +1418,7 @@
                 stock.price = nextPrice;
 
                 game.priceHistory[stock.code].push(nextPrice);
-                if (game.priceHistory[stock.code].length > 160) {
+                if (game.priceHistory[stock.code].length > 200) {
                     game.priceHistory[stock.code].shift();
                 }
             });
@@ -1254,7 +1441,7 @@
             if (!stock || !me) return;
 
             if (modeOrQty === 'ALL_IN') {
-                const maxAffordable = Math.floor(me.cash / stock.price);
+                const maxAffordable = Math.floor(me.cash / (stock.price * (1 + TRADE_FEE_RATE)));
                 input.value = Math.max(1, maxAffordable);
             } else if (modeOrQty === 'SELL_ALL') {
                 const owned = me.holdings[stock.code].qty;
@@ -1271,14 +1458,15 @@
             if (!stock || !me) return;
 
             const qty = Math.max(1, parseInt(document.getElementById('input-trade-qty').value, 10) || 0);
-            const est = qty * stock.price;
+            const estBuy = qty * stock.price * (1 + TRADE_FEE_RATE);
+            const estSell = qty * stock.price * (1 - TRADE_FEE_RATE);
 
-            document.getElementById('preview-buy').textContent = `約 $${formatNum(est)}`;
-            document.getElementById('preview-sell').textContent = `約 $${formatNum(est)}`;
+            document.getElementById('preview-buy').textContent = `含費約 $${formatNum(estBuy)}`;
+            document.getElementById('preview-sell').textContent = `實收約 $${formatNum(estSell)}`;
 
             const isTrading = game.status === 'TRADING';
             const owned = me.holdings[stock.code].qty;
-            document.getElementById('btn-buy').disabled = !isTrading || me.cash < stock.price;
+            document.getElementById('btn-buy').disabled = !isTrading || me.cash < stock.price * (1 + TRADE_FEE_RATE);
             document.getElementById('btn-sell').disabled = !isTrading || owned <= 0;
         }
 
@@ -1297,9 +1485,9 @@
             }
 
             if (side === 'BUY') {
-                const maxCanBuy = Math.floor(me.cash / stock.price);
+                const maxCanBuy = Math.floor(me.cash / (stock.price * (1 + TRADE_FEE_RATE)));
                 if (maxCanBuy <= 0) {
-                    showToast('現金不足，無法買進！', 'error');
+                    showToast('現金不足（含 0.15% 手續費），無法買進！', 'error');
                     return;
                 }
                 if (qty > maxCanBuy) qty = maxCanBuy;
@@ -1312,43 +1500,55 @@
                 if (qty > owned) qty = owned;
             }
 
-            settleTrade(me, stock, side, qty, true);
+            const now = Date.now();
+            const isSpamming = (now - (game.lastPlayerTradeTime[stock.code] || 0)) < 1200;
+            game.lastPlayerTradeTime[stock.code] = now;
+
+            settleTrade(me, stock, side, qty, true, isSpamming);
+            if (isSpamming) {
+                showToast('短線極高頻刷單：觸發造市商滑價 0.35%', 'info');
+            }
             recalculateNetWorths();
             renderGameUI();
         }
 
-        function settleTrade(participant, stock, side, qty, logNotable) {
-            const amount = qty * stock.price;
+        function settleTrade(participant, stock, side, qty, logNotable, extraSlippage = false) {
+            const rawAmount = qty * stock.price;
+            const feeRate = TRADE_FEE_RATE + (extraSlippage ? 0.0035 : 0);
             const h = participant.holdings[stock.code];
 
             if (side === 'BUY') {
-                if (participant.cash < amount - 0.01) return;
-                const totalCost = h.qty * h.avgCost + amount;
+                const totalPay = rawAmount * (1 + feeRate);
+                if (participant.cash < totalPay - 0.01) return;
+                const totalCost = h.qty * h.avgCost + totalPay;
                 h.qty += qty;
                 h.avgCost = h.qty > 0 ? totalCost / h.qty : 0;
                 h.trades += 1;
-                participant.cash -= amount;
+                participant.cash -= totalPay;
                 participant.totalTrades += 1;
                 game.netOrderFlow[stock.code] += qty;
+                recordMarketStats(stock, 'BUY', qty, participant.instType);
 
                 if (logNotable && !participant.isAI) {
                     pushFeed(`🟢 ${participant.name} 買進 ${stock.code} ${qty} 股 @ $${stock.price.toFixed(2)}`, 'text-rose-300');
                 } else if (logNotable) {
-                    pushFeed(`🤖 ${participant.name} 買進 ${stock.code} ${qty} 股 @ $${stock.price.toFixed(2)}`, 'text-gray-300');
+                    pushFeed(`🏦 ${participant.name} 機構買單 ${stock.code} ${Math.round(qty / 1000)} 張 @ $${stock.price.toFixed(2)}`, 'text-gray-300');
                 }
             } else {
                 if (h.qty < qty) return;
+                const netReceive = rawAmount * (1 - feeRate);
                 h.qty -= qty;
                 if (h.qty === 0) h.avgCost = 0;
                 h.trades += 1;
-                participant.cash += amount;
+                participant.cash += netReceive;
                 participant.totalTrades += 1;
                 game.netOrderFlow[stock.code] -= qty;
+                recordMarketStats(stock, 'SELL', qty, participant.instType);
 
                 if (logNotable && !participant.isAI) {
                     pushFeed(`🔵 ${participant.name} 賣出 ${stock.code} ${qty} 股 @ $${stock.price.toFixed(2)}`, 'text-emerald-300');
                 } else if (logNotable) {
-                    pushFeed(`🤖 ${participant.name} 賣出 ${stock.code} ${qty} 股 @ $${stock.price.toFixed(2)}`, 'text-gray-400');
+                    pushFeed(`🏦 ${participant.name} 機構賣單 ${stock.code} ${Math.round(qty / 1000)} 張 @ $${stock.price.toFixed(2)}`, 'text-gray-400');
                 }
             }
         }
@@ -1369,13 +1569,114 @@
 
         /**
          * ============================================================================
-         * 五回合結束與最終成果表（方便截圖到班群比 ROI）
+         * 每日盤後結算面板：當日成交量與三大法人買賣超統計
+         * ============================================================================
+         */
+        function showDailySummaryModal() {
+            game.status = 'DAILY_SUMMARY';
+            document.getElementById('daily-summary-title').textContent = `第 ${game.round} 交易日｜盤後成交量與三大法人買賣超`;
+
+            let totalSharesAll = 0;
+            let totalTurnoverAll = 0;
+            let totalForeignVal = 0, totalForeignShares = 0;
+            let totalTrustVal = 0, totalTrustShares = 0;
+            let totalDealerVal = 0, totalDealerShares = 0;
+
+            const rowsHtml = game.stocks.map(s => {
+                const st = game.dailyStats[s.code];
+                const diff = s.price - s.roundOpenPrice;
+                const pct = (diff / s.roundOpenPrice) * 100;
+                const lots = Math.round(st.volumeShares / 1000);
+                const instNetShares = st.foreignNetShares + st.trustNetShares + st.dealerNetShares;
+                const instNetLots = Math.round(instNetShares / 1000);
+                const instNetVal = st.foreignNetValue + st.trustNetValue + st.dealerNetValue;
+
+                totalSharesAll += st.volumeShares;
+                totalTurnoverAll += st.turnoverValue;
+                totalForeignVal += st.foreignNetValue;
+                totalForeignShares += st.foreignNetShares;
+                totalTrustVal += st.trustNetValue;
+                totalTrustShares += st.trustNetShares;
+                totalDealerVal += st.dealerNetValue;
+                totalDealerShares += st.dealerNetShares;
+
+                let tagHtml = '<span class="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[10px]">多空平衡</span>';
+                if (instNetLots > 15) {
+                    tagHtml = '<span class="px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[10px] font-bold">法人同步買超</span>';
+                } else if (instNetLots < -15) {
+                    tagHtml = '<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">法人逢高倒貨</span>';
+                }
+
+                return `
+                    <tr class="hover:bg-terminal-hover/60">
+                        <td class="py-2.5 px-3 font-sans">
+                            <span class="font-mono font-bold mr-1.5" style="color:${s.color}">${s.code}</span>
+                            <span class="font-bold text-white">${s.name}</span>
+                        </td>
+                        <td class="py-2.5 px-3 text-right font-bold text-white">$${s.price.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-right font-semibold ${getTrendClass(diff)}">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</td>
+                        <td class="py-2.5 px-3 text-right text-amber-300 font-semibold">${formatNum(lots)} 張</td>
+                        <td class="py-2.5 px-3 text-right font-bold ${getTrendClass(instNetLots)}">
+                            ${instNetLots >= 0 ? '+' : ''}${formatNum(instNetLots)} 張
+                            <div class="text-[10px] font-normal opacity-80">${instNetVal >= 0 ? '+' : '-'}$${formatNum(Math.abs(instNetVal))}</div>
+                        </td>
+                        <td class="py-2.5 px-3 text-center font-sans">${tagHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('daily-summary-tbody').innerHTML = rowsHtml;
+            document.getElementById('daily-summary-total-vol').innerHTML = `
+                <div class="text-[10px] text-gray-400">全市場總成交量 / 金額</div>
+                <div class="text-amber-300 font-bold">${formatNum(Math.round(totalSharesAll / 1000))} 張 • $${formatNum(totalTurnoverAll)}</div>
+            `;
+
+            renderInstCard('inst-foreign-val', 'inst-foreign-lots', totalForeignVal, totalForeignShares);
+            renderInstCard('inst-trust-val', 'inst-trust-lots', totalTrustVal, totalTrustShares);
+            renderInstCard('inst-dealer-val', 'inst-dealer-lots', totalDealerVal, totalDealerShares);
+
+            const me = game.participants[0];
+            const myROI = getROI(me);
+            document.getElementById('daily-summary-player-note').innerHTML = `
+                你的目前淨值：<strong class="text-white">$${formatNum(me.netWorth)}</strong>（ROI <span class="${getTrendClass(myROI)} font-bold">${myROI >= 0 ? '+' : ''}${myROI.toFixed(2)}%</span>）
+            `;
+
+            const nextBtn = document.getElementById('btn-next-round');
+            if (game.round < TOTAL_ROUNDS) {
+                nextBtn.innerHTML = `<span>進入第 ${game.round + 1} 交易日</span> <i class="fa-solid fa-arrow-right"></i>`;
+            } else {
+                nextBtn.innerHTML = `<span>完成 5 日交易，生成防竄改成果圖</span> <i class="fa-solid fa-trophy"></i>`;
+            }
+
+            openModal('modal-daily-summary');
+        }
+
+        function renderInstCard(valId, lotsId, val, shares) {
+            const lots = Math.round(shares / 1000);
+            const valEl = document.getElementById(valId);
+            const lotsEl = document.getElementById(lotsId);
+            valEl.textContent = `${val >= 0 ? '+' : '-'}$${formatNum(Math.abs(val))}`;
+            valEl.className = `text-base sm:text-lg font-mono font-extrabold mt-1 ${getTrendClass(val)}`;
+            lotsEl.textContent = `${lots >= 0 ? '買超 +' : '賣超 '}${formatNum(lots)} 張`;
+        }
+
+        function proceedAfterDailySummary() {
+            closeModal('modal-daily-summary');
+            if (game.round < TOTAL_ROUNDS) {
+                startRound(game.round + 1);
+            } else {
+                finishFiveRounds();
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 五回合結束與「防竄改 PNG 成果圖」生成（直接生成圖片分享到班群）
          * ============================================================================
          */
         function finishFiveRounds() {
             game.status = 'GAMEOVER';
 
-            // 第 5 回合結束，依最終收盤價將剩餘持股換算為現金
             game.participants.forEach(p => {
                 game.stocks.forEach(s => {
                     const h = p.holdings[s.code];
@@ -1388,78 +1689,337 @@
                 p.netWorth = p.cash;
             });
 
+            const me = game.participants[0];
+            if (me) {
+                if (game.playerNetWorthHistory.length < TOTAL_ROUNDS + 1) {
+                    game.playerNetWorthHistory.push(me.netWorth);
+                } else {
+                    game.playerNetWorthHistory[TOTAL_ROUNDS] = me.netWorth;
+                }
+            }
+
             switchView('view-gameover');
-            renderFinalResultsTable();
+            generateTamperProofCertificate();
         }
 
-        function renderFinalResultsTable() {
+        function computeVerifyHash(payloadStr) {
+            let h1 = 0xdeadbeef;
+            let h2 = 0x41c6ce57;
+            for (let i = 0; i < payloadStr.length; i++) {
+                const ch = payloadStr.charCodeAt(i);
+                h1 = Math.imul(h1 ^ ch, 2654435761);
+                h2 = Math.imul(h2 ^ ch, 1597334677);
+            }
+            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+            return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).toUpperCase().padStart(12, '0');
+        }
+
+        function generateTamperProofCertificate() {
             const ranked = [...game.participants].sort((a, b) => getROI(b) - getROI(a));
             const myRankIndex = ranked.findIndex(p => !p.isAI);
             const me = ranked[myRankIndex];
             const myROI = getROI(me);
+            const myPnL = me.netWorth - me.initialCapital;
+            const timestampStr = new Date().toLocaleString('zh-TW', { hour12: false });
+
+            const rawSig = `${me.name}|${me.netWorth.toFixed(2)}|${myROI.toFixed(2)}|${myRankIndex + 1}|${me.totalTrades}|${timestampStr}`;
+            const hashCode = computeVerifyHash(rawSig);
+            game.verifyHash = hashCode;
 
             document.getElementById('result-player-summary').innerHTML = `
-                <div class="text-[11px] text-gray-400">${escapeHtml(me.name)} 的最終名次</div>
-                <div class="text-lg sm:text-xl font-mono font-extrabold text-amber-300">
+                <div class="text-[11px] text-gray-400">${escapeHtml(me.name)} 的最終成績</div>
+                <div class="text-base sm:text-xl font-mono font-extrabold text-amber-300">
                     第 ${myRankIndex + 1} / 11 名 • ROI ${myROI >= 0 ? '+' : ''}${myROI.toFixed(2)}%
                 </div>
             `;
+            document.getElementById('result-verify-hash').textContent = `防偽驗證碼：#${hashCode}`;
 
-            document.getElementById('result-timestamp').textContent = `結算時間：${new Date().toLocaleString('zh-TW', { hour12: false })}`;
+            const canvas = document.getElementById('result-certificate-canvas');
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width;
+            const H = canvas.height;
 
-            const tbody = document.getElementById('final-results-tbody');
-            tbody.innerHTML = ranked.map((p, idx) => {
+            // 1. 深色金融終端背景與防偽斜紋浮水印
+            const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+            bgGrad.addColorStop(0, '#090d16');
+            bgGrad.addColorStop(0.5, '#0f1624');
+            bgGrad.addColorStop(1, '#080b12');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.save();
+            ctx.translate(W / 2, H / 2);
+            ctx.rotate(-0.22);
+            ctx.font = '700 22px JetBrains Mono, monospace';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
+            ctx.textAlign = 'center';
+            for (let y = -500; y <= 500; y += 90) {
+                ctx.fillText(`WALL STREET ARENA • ${me.name} • ROI ${myROI.toFixed(2)}% • VERIFY #${hashCode}`, 0, y);
+            }
+            ctx.restore();
+
+            ctx.strokeStyle = 'rgba(245, 158, 11, 0.55)';
+            ctx.lineWidth = 3;
+            roundRectPath(ctx, 18, 18, W - 36, H - 36, 20);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+            ctx.lineWidth = 1;
+            roundRectPath(ctx, 26, 26, W - 52, H - 52, 16);
+            ctx.stroke();
+
+            // 2. 頂部標題與認證標章
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = '800 16px JetBrains Mono, monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText('WALL STREET ARENA • 5 DAYS REAL MARKET SIMULATION', 52, 66);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 34px Inter, sans-serif';
+            ctx.fillText('《華爾街風雲：十台AI操盤手對決》戰績成果圖', 50, 108);
+
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.14)';
+            roundRectPath(ctx, W - 360, 48, 308, 66, 12);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#fcd34d';
+            ctx.font = '700 13px JetBrains Mono, monospace';
+            ctx.textAlign = 'right';
+            ctx.fillText('ANTI-TAMPER VERIFY HASH', W - 70, 72);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 20px JetBrains Mono, monospace';
+            ctx.fillText(`#${hashCode}`, W - 70, 100);
+
+            // 3. 玩家核心戰績卡片 ＋ 五日資產曲線圖
+            ctx.fillStyle = 'rgba(18, 25, 38, 0.92)';
+            roundRectPath(ctx, 50, 134, 590, 210, 16);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#9ca3af';
+            ctx.font = '600 15px Inter, sans-serif';
+            ctx.fillText('參賽操盤手', 76, 168);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 30px Inter, sans-serif';
+            ctx.fillText(me.name, 76, 206);
+
+            const rankBadgeText = `總排名：第 ${myRankIndex + 1} / 11 名`;
+            ctx.fillStyle = myRankIndex === 0 ? '#f59e0b' : '#0284c7';
+            roundRectPath(ctx, 430, 156, 186, 36, 10);
+            ctx.fill();
+            ctx.fillStyle = myRankIndex === 0 ? '#090d16' : '#ffffff';
+            ctx.font = '800 16px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(rankBadgeText, 523, 180);
+
+            const isPositive = myROI >= 0;
+            const roiColor = game.colorScheme === 'TW'
+                ? (isPositive ? '#f87171' : '#34d399')
+                : (isPositive ? '#34d399' : '#f87171');
+
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#9ca3af';
+            ctx.font = '600 14px Inter, sans-serif';
+            ctx.fillText('初始資金', 76, 252);
+            ctx.fillStyle = '#e5e7eb';
+            ctx.font = '700 22px JetBrains Mono, monospace';
+            ctx.fillText(`$${formatNum(me.initialCapital)}`, 76, 282);
+
+            ctx.fillStyle = '#9ca3af';
+            ctx.font = '600 14px Inter, sans-serif';
+            ctx.fillText('最終總資產', 236, 252);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 24px JetBrains Mono, monospace';
+            ctx.fillText(`$${formatNum(me.netWorth)}`, 236, 282);
+
+            ctx.fillStyle = '#9ca3af';
+            ctx.font = '600 14px Inter, sans-serif';
+            ctx.fillText('投資報酬率 (ROI)', 420, 252);
+            ctx.fillStyle = roiColor;
+            ctx.font = '800 28px JetBrains Mono, monospace';
+            ctx.fillText(`${myROI >= 0 ? '+' : ''}${myROI.toFixed(2)}%`, 420, 284);
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '600 14px JetBrains Mono, monospace';
+            ctx.fillText(`淨損益：${myPnL >= 0 ? '+' : ''}$${formatNum(myPnL)}   |   總成交筆數：${me.totalTrades} 筆`, 76, 324);
+
+            // 右側：五日資產成長曲線圖
+            ctx.fillStyle = 'rgba(18, 25, 38, 0.92)';
+            roundRectPath(ctx, 660, 134, 490, 210, 16);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+            ctx.stroke();
+
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = '700 15px Inter, sans-serif';
+            ctx.fillText('五日淨值走勢曲線 (NET WORTH CURVE)', 684, 164);
+
+            const curveHist = game.playerNetWorthHistory;
+            const cX = 690, cY = 182, cW = 435, cH = 135;
+            let minNW = Math.min(...curveHist, INITIAL_CAPITAL * 0.95);
+            let maxNW = Math.max(...curveHist, INITIAL_CAPITAL * 1.05);
+            if (maxNW - minNW < 1000) {
+                minNW -= 1000;
+                maxNW += 1000;
+            }
+
+            const baseY = cY + cH - ((INITIAL_CAPITAL - minNW) / (maxNW - minNW)) * cH;
+            ctx.save();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+            ctx.beginPath();
+            ctx.moveTo(cX, baseY);
+            ctx.lineTo(cX + cW, baseY);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.beginPath();
+            curveHist.forEach((val, i) => {
+                const px = cX + (curveHist.length > 1 ? (i / (curveHist.length - 1)) * cW : cW / 2);
+                const py = cY + cH - ((val - minNW) / (maxNW - minNW)) * cH;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            });
+            ctx.strokeStyle = roiColor;
+            ctx.lineWidth = 3.5;
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+
+            curveHist.forEach((val, i) => {
+                const px = cX + (curveHist.length > 1 ? (i / (curveHist.length - 1)) * cW : cW / 2);
+                const py = cY + cH - ((val - minNW) / (maxNW - minNW)) * cH;
+                ctx.beginPath();
+                ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                ctx.strokeStyle = roiColor;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '600 11px JetBrains Mono, monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(i === 0 ? '初始' : `D${i}`, px, cY + cH + 16);
+            });
+
+            // 4. 下半部：11 位公開席次（玩家 ＋ 10 台百萬至三千萬級 AI）完整排名榜
+            ctx.fillStyle = 'rgba(18, 25, 38, 0.92)';
+            roundRectPath(ctx, 50, 362, 1100, 444, 16);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+            ctx.stroke();
+
+            ctx.fillStyle = 'rgba(9, 13, 22, 0.85)';
+            roundRectPath(ctx, 52, 364, 1096, 38, 12);
+            ctx.fill();
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '700 13px Inter, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('名次', 74, 388);
+            ctx.fillText('操盤手 / 機構 AI 策略', 150, 388);
+            ctx.textAlign = 'right';
+            ctx.fillText('初始資金', 590, 388);
+            ctx.fillText('最終總資產', 775, 388);
+            ctx.fillText('投資報酬率 (ROI)', 960, 388);
+            ctx.fillText('成交筆數', 1120, 388);
+
+            ranked.forEach((p, idx) => {
+                const rowY = 408 + idx * 35.5;
                 const roi = getROI(p);
-                const pnl = p.netWorth - p.initialCapital;
                 const isMe = !p.isAI;
-                const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
-                const roiClass = getTrendClass(roi);
+                const rowRoiColor = game.colorScheme === 'TW'
+                    ? (roi >= 0 ? '#f87171' : '#34d399')
+                    : (roi >= 0 ? '#34d399' : '#f87171');
 
-                let summary = `${p.totalTrades} 筆成交`;
-                if (idx === 0 && roi > 0) summary = `🔥 冠軍 • ${p.totalTrades} 筆成交`;
-                else if (roi >= 12) summary = `🚀 高報酬 • ${p.totalTrades} 筆成交`;
-                else if (roi > 0) summary = `📈 獲利收官 • ${p.totalTrades} 筆成交`;
-                else if (roi > -10) summary = `🛡️ 震盪小虧 • ${p.totalTrades} 筆成交`;
-                else summary = `📉 逆風承壓 • ${p.totalTrades} 筆成交`;
+                if (isMe) {
+                    ctx.fillStyle = 'rgba(245, 158, 11, 0.22)';
+                    roundRectPath(ctx, 62, rowY - 21, 1076, 31, 8);
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(245, 158, 11, 0.65)';
+                    ctx.lineWidth = 1.2;
+                    ctx.stroke();
+                } else if (idx % 2 === 1) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                    ctx.fillRect(62, rowY - 21, 1076, 31);
+                }
 
-                return `
-                    <tr class="${isMe ? 'bg-amber-500/15 font-bold' : 'hover:bg-terminal-hover/60'}">
-                        <td class="py-2.5 px-3 font-bold text-white">${medal}</td>
-                        <td class="py-2.5 px-3 font-sans">
-                            <span class="text-white font-bold">${escapeHtml(p.name)}</span>
-                            ${isMe ? '<span class="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-amber-400 text-gray-950 font-extrabold">你</span>' : `<span class="ml-1.5 text-[11px] text-gray-400">(${p.style})</span>`}
-                        </td>
-                        <td class="py-2.5 px-3 text-right text-gray-300">$${formatNum(p.initialCapital)}</td>
-                        <td class="py-2.5 px-3 text-right text-white font-bold">$${formatNum(p.netWorth)}</td>
-                        <td class="py-2.5 px-3 text-right ${roiClass}">${pnl >= 0 ? '+' : ''}$${formatNum(pnl)}</td>
-                        <td class="py-2.5 px-3 text-right font-extrabold ${roiClass}">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</td>
-                        <td class="py-2.5 px-3 font-sans text-xs text-gray-200">${summary}</td>
-                    </tr>
-                `;
-            }).join('');
+                const medal = idx === 0 ? '🥇 #1' : idx === 1 ? '🥈 #2' : idx === 2 ? '🥉 #3' : `#${idx + 1}`;
+                ctx.textAlign = 'left';
+                ctx.fillStyle = isMe ? '#fcd34d' : '#e2e8f0';
+                ctx.font = '700 14px JetBrains Mono, monospace';
+                ctx.fillText(medal, 74, rowY);
+
+                ctx.font = isMe ? '800 15px Inter, sans-serif' : '600 14px Inter, sans-serif';
+                ctx.fillStyle = '#ffffff';
+                const labelText = isMe ? `${p.name} 【本局玩家】` : `${p.name}（${p.style}）`;
+                ctx.fillText(labelText, 150, rowY);
+
+                ctx.textAlign = 'right';
+                ctx.font = '600 14px JetBrains Mono, monospace';
+                ctx.fillStyle = '#9ca3af';
+                ctx.fillText(`$${formatNum(p.initialCapital)}`, 590, rowY);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '700 14px JetBrains Mono, monospace';
+                ctx.fillText(`$${formatNum(p.netWorth)}`, 775, rowY);
+
+                ctx.fillStyle = rowRoiColor;
+                ctx.font = '800 15px JetBrains Mono, monospace';
+                ctx.fillText(`${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%`, 960, rowY);
+
+                ctx.fillStyle = '#cbd5e1';
+                ctx.font = '600 13px JetBrains Mono, monospace';
+                ctx.fillText(`${p.totalTrades} 筆`, 1120, rowY);
+            });
+
+            // 5. 底部結算時間與防偽聲明
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#64748b';
+            ctx.font = '600 13px JetBrains Mono, monospace';
+            ctx.fillText(`結算時間：${timestampStr}   |   交易日：5 日 × 40 秒   |   單日漲跌停：±10%`, 52, H - 34);
+
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillText(`OFFICIAL VERIFIED SCORE CARD • #${hashCode}`, W - 52, H - 34);
+
+            const imgEl = document.getElementById('result-certificate-img');
+            imgEl.src = canvas.toDataURL('image/png');
         }
 
-        function copyResultsForClassGroup() {
-            const ranked = [...game.participants].sort((a, b) => getROI(b) - getROI(a));
-            const myIdx = ranked.findIndex(p => !p.isAI);
-            const me = ranked[myIdx];
-            const myROI = getROI(me);
+        function roundRectPath(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
 
-            const lines = [
-                `📊《華爾街風雲：十台AI操盤手對決》五回合戰績`,
-                `操盤手：${me.name}｜名次：第 ${myIdx + 1}/11 名`,
-                `最終淨值：$${formatNum(me.netWorth)}｜投資報酬率(ROI)：${myROI >= 0 ? '+' : ''}${myROI.toFixed(2)}%`,
-                `--- 榜單前三名 ---`,
-                ...ranked.slice(0, 3).map((p, i) => `${i + 1}. ${p.name}：ROI ${getROI(p) >= 0 ? '+' : ''}${getROI(p).toFixed(2)}% ($${formatNum(p.netWorth)})`)
-            ];
-
-            const ta = document.createElement('textarea');
-            ta.value = lines.join('\n');
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            showToast('已複製班群戰績文字，可直接貼上分享！', 'success');
+        function downloadResultPng() {
+            const canvas = document.getElementById('result-certificate-canvas');
+            const link = document.createElement('a');
+            const safeName = (game.playerName || 'player').replace(/[\\/:*?"<>|]/g, '_');
+            link.download = `華爾街戰績_${safeName}_${game.verifyHash || 'ROI'}.png`;
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('已下載防竄改戰績成果圖 (.png)，可直接傳到班群！', 'success');
         }
 
         function backToLobby() {
@@ -1478,7 +2038,7 @@
             const totalPhaseSec = isNews ? NEWS_SECONDS : TRADING_SECONDS;
             const pctLeft = Math.max(0, Math.min(100, (game.timeLeft / totalPhaseSec) * 100));
 
-            document.getElementById('hud-round-badge').textContent = `ROUND ${game.round} / ${TOTAL_ROUNDS}`;
+            document.getElementById('hud-round-badge').textContent = `DAY ${game.round} / ${TOTAL_ROUNDS}`;
             const phaseBadge = document.getElementById('hud-phase-badge');
             const phaseSub = document.getElementById('hud-phase-sub');
             const skipBtn = document.getElementById('btn-skip-news');
@@ -1492,9 +2052,9 @@
                 skipBtn.classList.remove('opacity-40', 'cursor-not-allowed');
                 timerBar.className = 'h-full bg-amber-400 transition-all duration-500';
             } else {
-                phaseBadge.textContent = '⚡ 交易階段 (30s)';
+                phaseBadge.textContent = '⚡ 交易階段 (40s)';
                 phaseBadge.className = 'px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold text-xs animate-pulse';
-                phaseSub.textContent = '單回合 ±10% 漲跌停 • 10 台 AI 與突發事件同步運作';
+                phaseSub.textContent = '單日 ±10% 漲跌停 • 10 台機構 AI 與匿名深度資金撮合中';
                 skipBtn.disabled = true;
                 skipBtn.classList.add('opacity-40', 'cursor-not-allowed');
                 timerBar.className = 'h-full bg-emerald-400 transition-all duration-500';
@@ -1529,24 +2089,26 @@
                 roiEl.className = `text-lg sm:text-xl font-mono font-extrabold px-2.5 py-1 rounded-lg bg-gray-900/90 ${getTrendClass(roi)}`;
             }
 
-            // 選中股票詳情與本回合 ±10% 漲跌停標示
+            // 選中股票詳情與當日 ±10% 漲跌停標示
             const selected = getStock(game.selectedCode);
             if (selected && me) {
                 const diff = selected.price - selected.roundOpenPrice;
                 const pct = (diff / selected.roundOpenPrice) * 100;
                 const trendCls = getTrendClass(diff);
+                const st = game.dailyStats[selected.code] || { volumeShares: 0 };
 
                 document.getElementById('chart-code').textContent = selected.code;
                 document.getElementById('chart-name').textContent = selected.name;
                 document.getElementById('chart-sector').textContent = selected.sector;
                 document.getElementById('chart-price').textContent = `$${selected.price.toFixed(2)}`;
                 document.getElementById('chart-price').className = `text-2xl font-mono font-extrabold ${trendCls}`;
-                document.getElementById('chart-change').textContent = `本回 ${diff >= 0 ? '+' : ''}${diff.toFixed(2)} (${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%)`;
+                document.getElementById('chart-change').textContent = `當日 ${diff >= 0 ? '+' : ''}${diff.toFixed(2)} (${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%)`;
                 document.getElementById('chart-change').className = `text-xs font-mono font-semibold ${trendCls}`;
 
                 document.getElementById('chart-limit-down').textContent = `$${selected.limitDown.toFixed(2)}`;
                 document.getElementById('chart-round-open').textContent = `$${selected.roundOpenPrice.toFixed(2)}`;
                 document.getElementById('chart-limit-up').textContent = `$${selected.limitUp.toFixed(2)}`;
+                document.getElementById('chart-volume').textContent = `${formatNum(Math.round(st.volumeShares / 1000))} 張`;
 
                 const limitBadge = document.getElementById('chart-limit-badge');
                 if (selected.price >= selected.limitUp - 0.001) {
@@ -1565,9 +2127,8 @@
                 document.getElementById('trade-owned').textContent = h.qty;
                 document.getElementById('trade-avg').textContent = `$${h.avgCost.toFixed(2)}`;
 
-                // 多空力道條
                 const p = game.recentPressure[selected.code] || 0;
-                const upPct = Math.max(12, Math.min(88, 50 + p / 18));
+                const upPct = Math.max(12, Math.min(88, 50 + p / 40));
                 const upBar = document.getElementById('pressure-up-bar');
                 const downBar = document.getElementById('pressure-down-bar');
                 upBar.style.width = `${upPct}%`;
@@ -1582,8 +2143,8 @@
                 }
 
                 const pLabel = document.getElementById('pressure-label');
-                if (p > 35) pLabel.textContent = '買盤強勢推升';
-                else if (p < -35) pLabel.textContent = '賣壓湧現下探';
+                if (p > 900) pLabel.textContent = '機構與主力買盤強勢';
+                else if (p < -900) pLabel.textContent = '機構與主力賣壓湧現';
                 else pLabel.textContent = '多空震盪拉鋸';
             }
 
@@ -1605,6 +2166,8 @@
                 const trendCls = getTrendClass(diff);
                 const h = me.holdings[s.code];
                 const pnl = h.qty > 0 ? (s.price - h.avgCost) * h.qty : 0;
+                const st = game.dailyStats[s.code] || { volumeShares: 0 };
+                const lots = Math.round(st.volumeShares / 1000);
 
                 const isLimitUp = s.price >= s.limitUp - 0.001;
                 const isLimitDown = s.price <= s.limitDown + 0.001;
@@ -1632,7 +2195,7 @@
                                 <span>${s.name}</span>
                                 ${statusBadge}
                             </div>
-                            <div class="text-[10px] text-gray-400 font-mono">限 $${s.limitDown.toFixed(1)} ~ $${s.limitUp.toFixed(1)}</div>
+                            <div class="text-[10px] text-gray-400 font-mono">量 ${formatNum(lots)} 張 • 限 $${s.limitDown.toFixed(1)}~$${s.limitUp.toFixed(1)}</div>
                         </td>
                         <td class="py-2 text-right font-mono font-bold text-white">$${s.price.toFixed(2)}</td>
                         <td class="py-2 text-right font-mono font-semibold ${trendCls}">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</td>
@@ -1692,7 +2255,6 @@
             const plotW = w - padL - padR;
             const plotH = h - padT - padB;
 
-            // 包含本回合漲跌停上下限作為刻度參考
             let minVal = Math.min(...series, stock.limitDown);
             let maxVal = Math.max(...series, stock.limitUp);
             if (maxVal - minVal < 2) {
@@ -1706,7 +2268,6 @@
             const toX = (i) => padL + (series.length > 1 ? (i / (series.length - 1)) * plotW : plotW / 2);
             const toY = (v) => padT + plotH - ((v - minVal) / (maxVal - minVal)) * plotH;
 
-            // 網格與價格刻度
             ctx.strokeStyle = '#1b2232';
             ctx.lineWidth = 1;
             ctx.font = '10px JetBrains Mono';
@@ -1723,7 +2284,6 @@
                 ctx.fillText('$' + v.toFixed(1), w - padR + 6, y + 3);
             }
 
-            // 漲停 (+10%) 與跌停 (-10%) 參考線
             const upY = toY(stock.limitUp);
             const downY = toY(stock.limitDown);
             ctx.save();
@@ -1771,7 +2331,6 @@
                 ctx.stroke();
             }
 
-            // 最新價光點
             const lx = toX(series.length - 1);
             const ly = toY(series[series.length - 1]);
             ctx.beginPath();
@@ -1790,7 +2349,7 @@
          */
         function showNewsModal() {
             if (!game.currentNews) return;
-            document.getElementById('modal-news-round').textContent = `第 ${game.round} / ${TOTAL_ROUNDS} 回合`;
+            document.getElementById('modal-news-round').textContent = `第 ${game.round} / ${TOTAL_ROUNDS} 交易日`;
             document.getElementById('modal-news-timer').textContent = game.timeLeft;
             document.getElementById('modal-news-category').textContent = game.currentNews.category;
             document.getElementById('modal-news-headline').textContent = game.currentNews.title;
